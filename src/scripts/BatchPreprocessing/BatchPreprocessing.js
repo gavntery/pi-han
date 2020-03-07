@@ -138,7 +138,7 @@ function main()
    console.hide();
 
    if ( Parameters.isViewTarget )
-      throw new Error( TITLE + " can only be executed in the global context." );
+      throw new Error( TITLE + "只能在全局环境中运行。" );
 
    engine.importParameters();
 
@@ -150,7 +150,7 @@ function main()
 
       if ( !dialog.execute() )
       {
-         if ( (new MessageBox( "Do you really want to exit " + TITLE + " ?",
+         if ( (new MessageBox( "你真的要退出" + TITLE + "吗？",
               TITLE, StdIcon_Question, StdButton_No, StdButton_Yes )).execute() == StdButton_Yes )
             break;
          continue;

@@ -477,27 +477,27 @@ StackEngine.prototype.rejectionMethods = function()
 {
    var methods = [
       {
-         name: "No rejection",
+         name: "不排斥",
          rejection: ImageIntegration.prototype.NoRejection
       },
       {
-         name: "Min/Max",
+         name: "最小值/最大值",
          rejection: ImageIntegration.prototype.MinMax
       },
       {
-         name: "Percentile Clipping",
+         name: "百分比剪切(Percentile Clipping)",
          rejection: ImageIntegration.prototype.PercentileClip
       },
       {
-         name: "Sigma Clipping",
+         name: "标准差剪切(Sigma Clipping)",
          rejection: ImageIntegration.prototype.SigmaClip
       },
       {
-         name: "Winsorized Sigma Clipping",
+         name: "Winsorized标准差剪切(Sigma Clipping)",
          rejection: ImageIntegration.prototype.WinsorizedSigmaClip
       },
       {
-         name: "Linear Fit Clipping",
+         name: "线性拟合剪切(Linear Fit Clipping)",
          rejection: ImageIntegration.prototype.LinearFit
       }
    ];

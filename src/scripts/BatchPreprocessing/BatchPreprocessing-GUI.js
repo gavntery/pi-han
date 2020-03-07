@@ -111,7 +111,7 @@ function ParametersControl( title, parent, expand )
       this.closeButton = new ToolButton( this );
       this.closeButton.icon = this.scaledResource( ":/icons/close.png" );
       this.closeButton.setScaledFixedSize( 20, 20 );
-      this.closeButton.toolTip = "Back";
+      this.closeButton.toolTip = "返回";
       this.closeButton.onClick = function()
       {
          this.parent.parent.hide();
@@ -203,11 +203,11 @@ function OverscanRectControl( parent, overscan, sourceRegion )
    var editWidth1 = 7 * this.font.width( "0" );
 
    this.label = new Label( this );
-   this.label.text = ((overscan < 0) ? "Image" : (sourceRegion ? "Source" : "Target")) + " region:";
+   this.label.text = ((overscan < 0) ? "图像" : (sourceRegion ? "源" : "目标")) + " 范围:";
    this.label.minWidth = this.dialog.labelWidth1;
    this.label.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
-   var fullName = "Overscan " + ((overscan < 0) ? "image" : "#" + (overscan+1).toString() + (sourceRegion ? " source" : " target")) + " region";
+   var fullName = "过扫描 " + ((overscan < 0) ? "图像" : "#" + (overscan+1).toString() + (sourceRegion ? " 源" : " 目标")) + " 范围";
 
    this.leftControl = new NumericEdit( this );
    this.leftControl.overscan = overscan;
@@ -412,13 +412,13 @@ OverscanControl.prototype = new Control;
 function BiasOverscanControl( parent )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Overscan", parent );
+   this.__base__( "过扫描(Overscan)", parent );
 
    //
 
    this.applyCheckBox = new CheckBox( this );
-   this.applyCheckBox.text = "Apply";
-   this.applyCheckBox.toolTip = "<p>Apply overscan correction.</p>";
+   this.applyCheckBox.text = "启用";
+   this.applyCheckBox.toolTip = "<p>启用过扫描(overscan)校准。</p>";
    this.applyCheckBox.onCheck = function( checked )
    {
       engine.overscan.enabled = checked;
@@ -435,9 +435,9 @@ function BiasOverscanControl( parent )
    //
 
    this.editButton = new PushButton( this );
-   this.editButton.text = "Overscan parameters...";
+   this.editButton.text = "过扫描(Overscan)参数...";
    this.editButton.icon = this.scaledResource( ":/icons/arrow-right.png" );
-   this.editButton.toolTip = "<p>Edit overscan parameters.</p>";
+   this.editButton.toolTip = "<p>编辑overscan的参数.</p>";
    this.editButton.onClick = function()
    {
       var biasPage = this.dialog.tabBox.pageControlByIndex( ImageType.BIAS );
@@ -468,30 +468,30 @@ BiasOverscanControl.prototype = new Control;
 function ImageIntegrationControl( parent, imageType, expand )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Image Integration", parent, expand );
+   this.__base__( "图像堆叠", parent, expand );
 
    this.imageType = imageType;
 
    //
 
    this.combinationLabel = new Label( this );
-   this.combinationLabel.text = "Combination:";
+   this.combinationLabel.text = "合成:";
    this.combinationLabel.minWidth = this.dialog.labelWidth1;
    this.combinationLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
    this.combinationComboBox = new ComboBox( this );
-   this.combinationComboBox.addItem( "Average" );
-   this.combinationComboBox.addItem( "Median" );
-   this.combinationComboBox.addItem( "Minimum" );
-   this.combinationComboBox.addItem( "Maximum" );
+   this.combinationComboBox.addItem( "平均值" );
+   this.combinationComboBox.addItem( "中位数" );
+   this.combinationComboBox.addItem( "最大值" );
+   this.combinationComboBox.addItem( "最小值" );
    this.combinationComboBox.onItemSelected = function( item )
    {
       engine.combination[this.parent.parent.imageType] = item;
    };
 
    this.combinationLabel.toolTip = this.combinationComboBox.toolTip =
-      "<p><b>Average</b> combination provides the best signal-to-noise ratio in the integrated result.</p>" +
-      "<p><b>Median</b> combination provides more robust rejection of outliers, but at the cost of more noise.</p>";
+      "<p><b>平均值</b>合成为图像堆叠提供最佳的信噪比。</p>" +
+      "<p><b>中位数</b>合成提供对异常值更强健的排斥，但以更多的噪声为代价.</p>";
 
    this.combinationSizer = new HorizontalSizer;
    this.combinationSizer.spacing = 4;
@@ -501,7 +501,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.rejectionAlgorithmLabel = new Label( this );
-   this.rejectionAlgorithmLabel.text = "Rejection algorithm:";
+   this.rejectionAlgorithmLabel.text = "排斥算法:";
    this.rejectionAlgorithmLabel.minWidth = this.dialog.labelWidth1;
    this.rejectionAlgorithmLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -515,14 +515,13 @@ function ImageIntegrationControl( parent, imageType, expand )
    };
 
    this.rejectionAlgorithmLabel.toolTip = this.rejectionAlgorithmComboBox.toolTip =
-      "<p>The <b>iterative sigma clipping</b> algorithm is usually a good option to integrate more than " +
-      "10 or 15 images. Keep in mind that for sigma clipping to work, the standard deviation must be a good " +
-      "estimate of dispersion, which requires a sufficient number of pixels per stack (the more images the " +
-      "better).</p>" +
-      "<p><b>Winsorized sigma clipping</b> is similar to the normal sigma clipping algorithm, but uses a " +
-      "special iterative procedure based on Huber's method of robust estimation of parameters through " +
-      "<i>Winsorization</i>. This algorithm can yield superior rejection of outliers with better preservation " +
-      "of significant data for large sets of images.</p>" +
+      "<p><b>标准差排异(Sigma Clipping)</b>算法通常是合成10-15个以上图像的理想算法。" +
+      "记住，要想使用Sigma Clipping算法，预估的标准差散布情况必须很好，因此堆栈中的像素越多越好" +
+      "(也就是图像越多越好)。</p>" +
+      "<p><b>Winsorized Sigma Clipping</b>算法与普通的Sigma Clipping算法类似。" +
+      "但是它使用了一个特殊的迭代过程，这个迭代过程是基于Huber的使用<i>缩尾处理" +
+      "(Winsorization)</i>的健壮性参数评估方法。该算法可以更好地保留离散值，" +
+      "从而可以更好地保留大量图像的重要数据。</p>" +
       "<p><b>Linear fit clipping</b> fits each pixel stack to a straigtht line. The linear fit is optimized " +
       "in the twofold sense of minimizing average absolute deviation and maximizing inliers. This rejection " +
       "algorithm is more robust than sigma clipping for large sets of images, especially in presence of " +
@@ -557,7 +556,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.minMaxLowLabel = new Label( this );
-   this.minMaxLowLabel.text = "Min/Max low:";
+   this.minMaxLowLabel.text = "最小值/最大值下限:";
    this.minMaxLowLabel.minWidth = this.dialog.labelWidth1;
    this.minMaxLowLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -583,7 +582,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.minMaxHighLabel = new Label( this );
-   this.minMaxHighLabel.text = "Min/Max high:";
+   this.minMaxHighLabel.text = "最小值/最大值上限:";
    this.minMaxHighLabel.minWidth = this.dialog.labelWidth1;
    this.minMaxHighLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -609,7 +608,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.percentileLowControl = new NumericControl( this );
-   this.percentileLowControl.label.text = "Percentile low:";
+   this.percentileLowControl.label.text = "百分数下限:";
    this.percentileLowControl.label.minWidth = this.dialog.labelWidth1;
    this.percentileLowControl.setRange( 0, 1 );
    this.percentileLowControl.slider.setRange( 0, 1000 );
@@ -625,7 +624,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.percentileHighControl = new NumericControl( this );
-   this.percentileHighControl.label.text = "Percentile high:";
+   this.percentileHighControl.label.text = "百分数上限:";
    this.percentileHighControl.label.minWidth = this.dialog.labelWidth1;
    this.percentileHighControl.setRange( 0, 1 );
    this.percentileHighControl.slider.setRange( 0, 1000 );
@@ -641,7 +640,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.sigmaLowControl = new NumericControl( this );
-   this.sigmaLowControl.label.text = "Sigma low:";
+   this.sigmaLowControl.label.text = "SigmaClip下限:";
    this.sigmaLowControl.label.minWidth = this.dialog.labelWidth1;
    this.sigmaLowControl.setRange( 0, 10 );
    this.sigmaLowControl.slider.setRange( 0, 1000 );
@@ -658,7 +657,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.sigmaHighControl = new NumericControl( this );
-   this.sigmaHighControl.label.text = "Sigma high:";
+   this.sigmaHighControl.label.text = "SigmaClip上限:";
    this.sigmaHighControl.label.minWidth = this.dialog.labelWidth1;
    this.sigmaHighControl.setRange ( 0, 10 );
    this.sigmaHighControl.slider.setRange( 0, 1000 );
@@ -675,7 +674,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.linearFitLowControl = new NumericControl( this );
-   this.linearFitLowControl.label.text = "Linear fit low:";
+   this.linearFitLowControl.label.text = "线性拟合(Linear fit)下限:";
    this.linearFitLowControl.label.minWidth = this.dialog.labelWidth1;
    this.linearFitLowControl.setRange( 0, 10 );
    this.linearFitLowControl.slider.setRange( 0, 1000 );
@@ -692,7 +691,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    //
 
    this.linearFitHighControl = new NumericControl( this );
-   this.linearFitHighControl.label.text = "Linear fit high:";
+   this.linearFitHighControl.label.text = "线性拟合(Linear fit)上限:";
    this.linearFitHighControl.label.minWidth = this.dialog.labelWidth1;
    this.linearFitHighControl.setRange( 0, 10 );
    this.linearFitHighControl.slider.setRange( 0, 1000 );
@@ -711,7 +710,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    if ( ImageIntegration.prototype.Rejection_ESD )
    {
       this.esdOutliersControl = new NumericControl( this );
-      this.esdOutliersControl.label.text = "ESD outliers:";
+      this.esdOutliersControl.label.text = "ESD异常值:";
       this.esdOutliersControl.label.minWidth = this.dialog.labelWidth1;
       this.esdOutliersControl.setRange( 0, 1 );
       this.esdOutliersControl.slider.setRange( 0, 1000 );
@@ -729,7 +728,7 @@ function ImageIntegrationControl( parent, imageType, expand )
       };
 
       this.esdSignificanceControl = new NumericControl( this );
-      this.esdSignificanceControl.label.text = "ESD significance:";
+      this.esdSignificanceControl.label.text = "ESD重要度:";
       this.esdSignificanceControl.label.minWidth = this.dialog.labelWidth1;
       this.esdSignificanceControl.setRange( 0, 1 );
       this.esdSignificanceControl.slider.setRange( 0, 1000 );
@@ -769,7 +768,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    if ( this.imageType == ImageType.FLAT )
    {
       this.largeScaleRejectionCheckBox = new CheckBox( this );
-      this.largeScaleRejectionCheckBox.text = "Large-scale pixel rejection";
+      this.largeScaleRejectionCheckBox.text = "大尺度像素排斥";
       this.largeScaleRejectionCheckBox.toolTip = "<p>Apply large-scale pixel rejection, high pixel sample values. " +
          "Useful to improve rejection of stars for integration of sky flats.</p>";
       this.largeScaleRejectionCheckBox.onCheck = function( checked )
@@ -786,7 +785,7 @@ function ImageIntegrationControl( parent, imageType, expand )
       //
 
       this.largeScaleRejectionLayersLabel = new Label( this );
-      this.largeScaleRejectionLayersLabel.text = "Large-scale layers:";
+      this.largeScaleRejectionLayersLabel.text = "大尺度层数:";
       this.largeScaleRejectionLayersLabel.minWidth = this.dialog.labelWidth1;
       this.largeScaleRejectionLayersLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -812,7 +811,7 @@ function ImageIntegrationControl( parent, imageType, expand )
       //
 
       this.largeScaleRejectionGrowthLabel = new Label( this );
-      this.largeScaleRejectionGrowthLabel.text = "Large-scale growth:";
+      this.largeScaleRejectionGrowthLabel.text = "大尺度增长值:";
       this.largeScaleRejectionGrowthLabel.minWidth = this.dialog.labelWidth1;
       this.largeScaleRejectionGrowthLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -925,12 +924,12 @@ ImageIntegrationControl.prototype = new Control;
 function CosmeticCorrectionControl( parent )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Cosmetic Correction", parent );
+   this.__base__( "瑕疵校正(Cosmetic Correction)", parent );
 
    //
 
    this.applyCheckBox = new CheckBox( this );
-   this.applyCheckBox.text = "Apply";
+   this.applyCheckBox.text = "启用";
    this.applyCheckBox.toolTip = "<p>Apply cosmetic correction.</p>";
    this.applyCheckBox.onCheck = function( checked )
    {
@@ -952,7 +951,7 @@ function CosmeticCorrectionControl( parent )
       "before deBayering (when appropriate) and registration.</p>";
 
    this.templateIconIdLabel = new Label( this );
-   this.templateIconIdLabel.text = "Template icon:";
+   this.templateIconIdLabel.text = "模板图标:";
    this.templateIconIdLabel.minWidth = this.dialog.labelWidth1;
    this.templateIconIdLabel.toolTip = templateIconIdToolTip;
    this.templateIconIdLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
@@ -1004,12 +1003,12 @@ CosmeticCorrectionControl.prototype = new Control;
 function DeBayerControl( parent )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "DeBayer", parent );
+   this.__base__( "反拜尔(DeBayer)", parent );
 
    //
 
    this.bayerPatternLabel = new Label( this );
-   this.bayerPatternLabel.text = "Bayer/mosaic pattern:";
+   this.bayerPatternLabel.text = "拜尔/马赛克模式:";
    this.bayerPatternLabel.minWidth = this.dialog.labelWidth1;
    this.bayerPatternLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -1036,7 +1035,7 @@ function DeBayerControl( parent )
    //
 
    this.debayerMethodLabel = new Label( this );
-   this.debayerMethodLabel.text = "DeBayer method:";
+   this.debayerMethodLabel.text = "DeBayer方法:";
    this.debayerMethodLabel.minWidth = this.dialog.labelWidth1;
    this.debayerMethodLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -1074,25 +1073,25 @@ DeBayerControl.prototype = new Control;
 function ImageRegistrationControl( parent, expand )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Image Registration", parent, expand );
+   this.__base__( "图像对齐", parent, expand );
 
    this.pixelInterpolationLabel = new Label( this );
-   this.pixelInterpolationLabel.text = "Pixel interpolation:";
+   this.pixelInterpolationLabel.text = "像素插值算法:";
    this.pixelInterpolationLabel.minWidth = this.dialog.labelWidth1;
    this.pixelInterpolationLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
    this.pixelInterpolationComboBox = new ComboBox( this );
-   this.pixelInterpolationComboBox.addItem( "Nearest Neighbor" );
-   this.pixelInterpolationComboBox.addItem( "Bilinear" );
-   this.pixelInterpolationComboBox.addItem( "Bicubic Spline" );
-   this.pixelInterpolationComboBox.addItem( "Bicubic B-Spline" );
+   this.pixelInterpolationComboBox.addItem( "近邻法(Nearest Neighbor)" );
+   this.pixelInterpolationComboBox.addItem( "双线性法(Bilinear)" );
+   this.pixelInterpolationComboBox.addItem( "双三次样条法(Bicubic Spline)" );
+   this.pixelInterpolationComboBox.addItem( "双三次b样条法(Bicubic B-Spline)" );
    this.pixelInterpolationComboBox.addItem( "Lanczos-3" );
    this.pixelInterpolationComboBox.addItem( "Lanczos-4" );
    this.pixelInterpolationComboBox.addItem( "Lanczos-5" );
    this.pixelInterpolationComboBox.addItem( "Mitchell-Netravali Filter" );
    this.pixelInterpolationComboBox.addItem( "Catmul-Rom Spline Filter" );
-   this.pixelInterpolationComboBox.addItem( "Cubic B-Spline Filter" );
-   this.pixelInterpolationComboBox.addItem( "Auto" );
+   this.pixelInterpolationComboBox.addItem( "三次b样条过滤(Cubic B-Spline Filter)" );
+   this.pixelInterpolationComboBox.addItem( "自动" );
    this.pixelInterpolationComboBox.currentItem = engine.pixelInterpolation;
    this.pixelInterpolationComboBox.onItemSelected = function( item )
    {
@@ -1107,7 +1106,7 @@ function ImageRegistrationControl( parent, expand )
    //
 
    this.clampingThresholdControl = new NumericControl( this );
-   this.clampingThresholdControl.label.text = "Clamping threshold:";
+   this.clampingThresholdControl.label.text = "Clamping阈值:";
    this.clampingThresholdControl.label.minWidth = this.dialog.labelWidth1;
    this.clampingThresholdControl.setRange( 0, 1 );
    this.clampingThresholdControl.slider.setRange( 0, 1000 );
@@ -1124,7 +1123,7 @@ function ImageRegistrationControl( parent, expand )
    //
 
    this.maxStarsLabel = new Label( this );
-   this.maxStarsLabel.text = "Maximum stars:";
+   this.maxStarsLabel.text = "星点最大值:";
    this.maxStarsLabel.minWidth = this.dialog.labelWidth1;
    this.maxStarsLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -1152,7 +1151,7 @@ function ImageRegistrationControl( parent, expand )
    //
 
    this.distortionCorrectionCheckBox = new CheckBox( this );
-   this.distortionCorrectionCheckBox.text = "Distortion correction";
+   this.distortionCorrectionCheckBox.text = "变形校准";
    this.distortionCorrectionCheckBox.toolTip = "<p>Check this option to enable StarAlignment's arbitrary distortion correction " +
       "algorithms.</p>" +
       "<p>This feature is required to correct for nonlinear distorions such as barrel, pincushion and lateral chromatic aberration, " +
@@ -1176,7 +1175,7 @@ function ImageRegistrationControl( parent, expand )
    //
 
    this.noiseReductionFilterRadiusLabel = new Label( this );
-   this.noiseReductionFilterRadiusLabel.text = "Noise reduction:";
+   this.noiseReductionFilterRadiusLabel.text = "降噪:";
    this.noiseReductionFilterRadiusLabel.minWidth = this.dialog.labelWidth1;
    this.noiseReductionFilterRadiusLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
@@ -1206,7 +1205,7 @@ function ImageRegistrationControl( parent, expand )
    //
 
    this.useTriangleSimilarityCheckBox = new CheckBox( this );
-   this.useTriangleSimilarityCheckBox.text = "Use triangle similarity";
+   this.useTriangleSimilarityCheckBox.text = "使用三角形相似度";
    this.useTriangleSimilarityCheckBox.toolTip = "<p>If this option is checked, the image registration process will use " +
       "triangle similarity instead of polygonal descriptors for the star matching routine.</p>" +
       "<p>Polygonal descriptors are more robust and accurate, but cannot register images subject to specular transformations " +
@@ -1252,12 +1251,12 @@ ImageRegistrationControl.prototype = new Control;
 function LightsIntegrationControl( parent )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Image Integration", parent );
+   this.__base__( "图像堆叠", parent );
 
    //
 
    this.applyCheckBox = new CheckBox( this );
-   this.applyCheckBox.text = "Apply";
+   this.applyCheckBox.text = "启用";
    this.applyCheckBox.toolTip = "<p>Integrate light frames after image registration.</p>";
    this.applyCheckBox.onCheck = function( checked )
    {
@@ -1274,7 +1273,7 @@ function LightsIntegrationControl( parent )
    //
 
    this.editButton = new PushButton( this );
-   this.editButton.text = "Integration parameters...";
+   this.editButton.text = "堆叠参数...";
    this.editButton.icon = this.scaledResource( ":/icons/arrow-right.png" );
    this.editButton.toolTip = "<p>Edit image integration parameters.</p>";
    this.editButton.onClick = function()
@@ -1307,12 +1306,12 @@ LightsIntegrationControl.prototype = new Control;
 function LightsRegistrationControl( parent )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Image Registration", parent );
+   this.__base__( "图像对齐", parent );
 
    //
 
    this.generateDrizzleDataCheckBox = new CheckBox( this );
-   this.generateDrizzleDataCheckBox.text = "Generate drizzle data";
+   this.generateDrizzleDataCheckBox.text = "生成Drizzle数据";
    this.generateDrizzleDataCheckBox.toolTip = "<p>Generate .xdrz files in the image registration task. " +
          "These files can later be used with the ImageIntegration and DrizzleIntegration tools to " +
          "perform a drizzle integration process.</p>";
@@ -1331,7 +1330,7 @@ function LightsRegistrationControl( parent )
    //
 
    this.editButton = new PushButton( this );
-   this.editButton.text = "Registration parameters...";
+   this.editButton.text = "对齐参数...";
    this.editButton.icon = this.scaledResource( ":/icons/arrow-right.png" );
    this.editButton.toolTip = "<p>Edit image registration parameters.</p>";
    this.editButton.onClick = function()
@@ -1377,7 +1376,7 @@ function FileControl( parent, imageType )
    //
 
    this.clearButton = new PushButton( this );
-   this.clearButton.text = "Clear";
+   this.clearButton.text = "清除";
    this.clearButton.icon = this.scaledResource( ":/icons/clear.png" );
    this.clearButton.toolTip = "<p>Clear the current list of input files.</p>";
    this.clearButton.onClick = function()
@@ -1386,7 +1385,7 @@ function FileControl( parent, imageType )
    };
 
    this.removeSelectedButton = new PushButton( this );
-   this.removeSelectedButton.text = "Remove Selected";
+   this.removeSelectedButton.text = "移除选定项";
    this.removeSelectedButton.icon = this.scaledResource( ":/icons/clear.png" );
    this.removeSelectedButton.toolTip = "<p>Remove selected items in the current list of input files.</p>";
    this.removeSelectedButton.onClick = function()
@@ -1413,7 +1412,7 @@ function FileControl( parent, imageType )
    };
 
    this.invertSelectionButton = new PushButton( this );
-   this.invertSelectionButton.text = "Invert Selection";
+   this.invertSelectionButton.text = "反选";
    this.invertSelectionButton.icon = this.scaledResource( ":/icons/select-invert.png" );
    this.invertSelectionButton.toolTip = "<p>Invert selected items in the current list of input files.</p>";
    this.invertSelectionButton.onClick = function()
@@ -1464,7 +1463,7 @@ function FileControl( parent, imageType )
    case ImageType.DARK:
 
       this.darkOptimizationThresholdControl = new NumericControl( this );
-      this.darkOptimizationThresholdControl.label.text = "Optimization threshold:";
+      this.darkOptimizationThresholdControl.label.text = "优化阈值:";
       this.darkOptimizationThresholdControl.label.minWidth = this.dialog.labelWidth1
                                           + this.dialog.logicalPixelsToPhysical( 6 ); // + integration control margin
       this.darkOptimizationThresholdControl.setRange( 0, 10 );
@@ -1488,7 +1487,7 @@ function FileControl( parent, imageType )
       //
 
       this.darkOptimizationWindowLabel = new Label( this );
-      this.darkOptimizationWindowLabel.text = "Optimization window:";
+      this.darkOptimizationWindowLabel.text = "优化窗口:";
       this.darkOptimizationWindowLabel.minWidth = this.dialog.labelWidth1
                                           + this.dialog.logicalPixelsToPhysical( 6 ); // + integration control margin
       this.darkOptimizationWindowLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
@@ -1523,7 +1522,7 @@ function FileControl( parent, imageType )
       //
 
       this.darkExposureToleranceLabel = new Label( this );
-      this.darkExposureToleranceLabel.text = "Exposure tolerance:";
+      this.darkExposureToleranceLabel.text = "曝光宽容度:";
       this.darkExposureToleranceLabel.minWidth = this.dialog.labelWidth1
                                           + this.dialog.logicalPixelsToPhysical( 6 ); // + integration control margin
       this.darkExposureToleranceLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
@@ -1562,7 +1561,7 @@ function FileControl( parent, imageType )
 
       this.flatDarksOnlyCheckBox = new CheckBox( this );
       this.flatDarksOnlyCheckBox.checked = engine.flatDarksOnly;
-      this.flatDarksOnlyCheckBox.text = "Calibrate with flat darks only";
+      this.flatDarksOnlyCheckBox.text = "只使用暗平场校准";
       this.flatDarksOnlyCheckBox.toolTip = "<p>Perform calibration of flat frames only if darks with the same " +
         "duration (flat darks) are provided. Useful when scaling darks of significantly different duration is " +
         "not reliable because of the presence of non-negligible residuals, such as ampglow.</p>";
@@ -1590,7 +1589,7 @@ function FileControl( parent, imageType )
    case ImageType.LIGHT:
 
       this.calibrateOnlyCheckBox = new CheckBox( this );
-      this.calibrateOnlyCheckBox.text = "Calibrate only";
+      this.calibrateOnlyCheckBox.text = "仅校准";
       this.calibrateOnlyCheckBox.toolTip = "<p>Calibrate only - Do not perform the image registration and integration tasks.</p>";
       this.calibrateOnlyCheckBox.onCheck = function( checked )
       {
@@ -1653,21 +1652,21 @@ function ResetDialog()
    //
 
    this.resetParametersRadioButton = new RadioButton( this );
-   this.resetParametersRadioButton.text = "Reset all parameters to factory-default values";
+   this.resetParametersRadioButton.text = "重置所有参数到默认值";
 
    this.reloadSettingsRadioButton = new RadioButton( this );
-   this.reloadSettingsRadioButton.text = "Reload settings stored since the last session";
+   this.reloadSettingsRadioButton.text = "重载最后一次保存的设置";
    this.reloadSettingsRadioButton.checked = true;
 
    this.clearFileListsCheckBox = new CheckBox( this );
-   this.clearFileListsCheckBox.text = "Clear all file lists";
+   this.clearFileListsCheckBox.text = "清除所有文件列表";
    this.clearFileListsCheckBox.checked = false;
 
    //
 
    this.okButton = new PushButton( this );
    this.okButton.defaultButton = true;
-   this.okButton.text = "OK";
+   this.okButton.text = "确定";
    this.okButton.icon = this.scaledResource( ":/icons/ok.png" );
    this.okButton.onClick = function()
    {
@@ -1675,7 +1674,7 @@ function ResetDialog()
    };
 
    this.cancelButton = new PushButton( this );
-   this.cancelButton.text = "Cancel";
+   this.cancelButton.text = "取消";
    this.cancelButton.icon = this.scaledResource( ":/icons/cancel.png" );
    this.cancelButton.onClick = function()
    {
@@ -1724,7 +1723,7 @@ function SelectCustomFilesDialog()
    //
 
    this.fileListLabel = new Label( this );
-   this.fileListLabel.text = "Selected Files";
+   this.fileListLabel.text = "选择文件";
 
    this.fileList = new StyledTreeBox( this );
    this.fileList.numberOfColumns = 1;
@@ -1732,7 +1731,7 @@ function SelectCustomFilesDialog()
    this.fileList.setScaledMinSize( 400, 250 );
 
    this.addButton = new PushButton( this );
-   this.addButton.text = "Add Files";
+   this.addButton.text = "添加文件";
    this.addButton.icon = this.scaledResource( ":/icons/add.png" );
    this.addButton.toolTip = "<p>Add files to the input files list.</p>";
    this.addButton.onClick = function()
@@ -1750,9 +1749,9 @@ function SelectCustomFilesDialog()
    };
 
    this.clearButton = new PushButton( this );
-   this.clearButton.text = "Clear";
+   this.clearButton.text = "清除";
    this.clearButton.icon = this.scaledResource( ":/icons/clear.png" );
-   this.clearButton.toolTip = "<p>Clear the curent list of input files.</p>";
+   this.clearButton.toolTip = "<p>清除当前列表中的文件。</p>";
    this.clearButton.onClick = function()
    {
       this.dialog.files = new Array;
@@ -1771,17 +1770,17 @@ function SelectCustomFilesDialog()
    var imageTypeToolTip = "<p>Frame type. Select '?' to determine frame types automatically.</p>";
 
    this.imageTypeLabel = new Label( this );
-   this.imageTypeLabel.text = "Image type:";
+   this.imageTypeLabel.text = "图像类型:";
    this.imageTypeLabel.minWidth = labelWidth1;
    this.imageTypeLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
    this.imageTypeLabel.toolTip = imageTypeToolTip;
 
    this.imageTypeComboBox = new ComboBox( this );
    this.imageTypeComboBox.addItem( "?" );
-   this.imageTypeComboBox.addItem( "Bias frame" );
-   this.imageTypeComboBox.addItem( "Dark frame" );
-   this.imageTypeComboBox.addItem( "Flat field" );
-   this.imageTypeComboBox.addItem( "Light frame" );
+   this.imageTypeComboBox.addItem( "偏置帧" );
+   this.imageTypeComboBox.addItem( "暗场帧" );
+   this.imageTypeComboBox.addItem( "平场帧" );
+   this.imageTypeComboBox.addItem( "亮场帧" );
    this.imageTypeComboBox.currentItem = this.imageType + 1; // ImageType property -> combobox item
    this.imageTypeComboBox.toolTip = imageTypeToolTip;
    this.imageTypeComboBox.onItemSelected = function( item )
@@ -1799,7 +1798,7 @@ function SelectCustomFilesDialog()
    var filterToolTip = "<p>Filter name. Specify a single question mark '?' to determine filters automatically.</p>";
 
    this.filterLabel = new Label( this );
-   this.filterLabel.text = "Filter name:";
+   this.filterLabel.text = "滤镜名称:";
    this.filterLabel.minWidth = labelWidth1;
    this.filterLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
    this.filterLabel.toolTip = filterToolTip;
@@ -1822,7 +1821,7 @@ function SelectCustomFilesDialog()
    var binningToolTip = "<p>Pixel binning. Specify zero to determine binnings automatically.</p>";
 
    this.binningLabel = new Label( this );
-   this.binningLabel.text = "Binning:";
+   this.binningLabel.text = "像素合并:";
    this.binningLabel.minWidth = labelWidth1;
    this.binningLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
    this.binningLabel.toolTip = binningToolTip;
@@ -1846,7 +1845,7 @@ function SelectCustomFilesDialog()
    //
 
    this.exposureTimeEdit = new NumericEdit( this );
-   this.exposureTimeEdit.label.text = "Exposure time (s):";
+   this.exposureTimeEdit.label.text = "曝光时间(秒):";
    this.exposureTimeEdit.label.minWidth = labelWidth1;
    this.exposureTimeEdit.setRange( 0, 999999 );
    this.exposureTimeEdit.setPrecision( 2 );
@@ -1862,7 +1861,7 @@ function SelectCustomFilesDialog()
 
    this.okButton = new PushButton( this );
    this.okButton.defaultButton = true;
-   this.okButton.text = "OK";
+   this.okButton.text = "确定";
    this.okButton.icon = this.scaledResource( ":/icons/ok.png" );
    this.okButton.onClick = function()
    {
@@ -1870,7 +1869,7 @@ function SelectCustomFilesDialog()
    };
 
    this.cancelButton = new PushButton( this );
-   this.cancelButton.text = "Cancel";
+   this.cancelButton.text = "取消";
    this.cancelButton.icon = this.scaledResource( ":/icons/cancel.png" );
    this.cancelButton.onClick = function()
    {
@@ -1900,7 +1899,7 @@ function SelectCustomFilesDialog()
    this.adjustToContents();
    this.setMinSize();
 
-   this.windowTitle = "Add Custom Frames";
+   this.windowTitle = "添加自定义帧";
 
    this.updateFileList = function()
    {
@@ -1943,7 +1942,7 @@ function StackDialog()
    this.helpLabel.wordWrapping = true;
    this.helpLabel.useRichText = true;
    this.helpLabel.text =
-      "<p>A script for calibration and alignment of light frames<br/>"
+      "<p>一个用于校准和对齐亮场的脚本<br/>"
     + "Copyright (c) 2012 Kai Wiechen.<br/>"
     + "Copyright (c) 2012-2019 Pleiades Astrophoto.</p>";
 
@@ -1966,10 +1965,10 @@ function StackDialog()
 
    this.tabBox = new TabBox( this );
 
-   this.tabBox.addPage( new FileControl( this, ImageType.BIAS ),  "Bias" );
-   this.tabBox.addPage( new FileControl( this, ImageType.DARK ),  "Darks" );
-   this.tabBox.addPage( new FileControl( this, ImageType.FLAT ),  "Flats" );
-   this.tabBox.addPage( new FileControl( this, ImageType.LIGHT ), "Lights" );
+   this.tabBox.addPage( new FileControl( this, ImageType.BIAS ),  "偏置" );
+   this.tabBox.addPage( new FileControl( this, ImageType.DARK ),  "暗场" );
+   this.tabBox.addPage( new FileControl( this, ImageType.FLAT ),  "平场" );
+   this.tabBox.addPage( new FileControl( this, ImageType.LIGHT ), "亮场" );
    this.tabBox.currentPageIndex = 3;
 
    // Handle click on file name -> set registration reference image
@@ -2003,7 +2002,7 @@ function StackDialog()
    //
 
    this.fileAddButton = new PushButton( this );
-   this.fileAddButton.text = "Add Files";
+   this.fileAddButton.text = "添加文件";
    this.fileAddButton.icon = this.scaledResource( ":/icons/add.png" );
    this.fileAddButton.toolTip = "<p>Add files to the input files list.</p>" +
          "<p>Image types will be selected automatically based on XISF image properties and/or FITS keywords.</p>";
@@ -2031,7 +2030,7 @@ function StackDialog()
    };
 
    this.biasAddButton = new PushButton( this );
-   this.biasAddButton.text = "Add Bias";
+   this.biasAddButton.text = "添加偏置场";
    this.biasAddButton.icon = this.scaledResource( ":/icons/add.png" );
    this.biasAddButton.toolTip = "<p>Add files to the input bias frames list.</p>" +
          "<p>Files will be added as bias frames unconditionally - no keyword checks will be performed.</p>";
@@ -2060,7 +2059,7 @@ function StackDialog()
    };
 
    this.darkAddButton = new PushButton( this );
-   this.darkAddButton.text = "Add Darks";
+   this.darkAddButton.text = "添加暗场";
    this.darkAddButton.icon = this.scaledResource( ":/icons/add.png" );
    this.darkAddButton.toolTip = "<p>Add files to the input dark frames list.</p>" +
          "<p>Files will be added as dark frames unconditionally - no keyword checks will be performed.</p>";
@@ -2089,7 +2088,7 @@ function StackDialog()
    };
 
    this.flatAddButton = new PushButton( this );
-   this.flatAddButton.text = "Add Flats";
+   this.flatAddButton.text = "添加平场";
    this.flatAddButton.icon = this.scaledResource( ":/icons/add.png" );
    this.flatAddButton.toolTip = "<p>Add files to the input flat frames list.</p>" +
          "<p>Files will be added as flat frames unconditionally - no keyword checks will be performed.</p>";
@@ -2118,7 +2117,7 @@ function StackDialog()
    };
 
    this.lightAddButton = new PushButton( this );
-   this.lightAddButton.text = "Add Lights";
+   this.lightAddButton.text = "添加亮场";
    this.lightAddButton.icon = this.scaledResource( ":/icons/add.png" );
    this.lightAddButton.toolTip = "<p>Add files to the input light frames list.</p>" +
          "<p>Files will be added as light frames unconditionally - no keyword checks will be performed.</p>";
@@ -2147,7 +2146,7 @@ function StackDialog()
    };
 
    this.customAddButton = new PushButton( this );
-   this.customAddButton.text = "Add Custom";
+   this.customAddButton.text = "添加自定义";
    this.customAddButton.icon = this.scaledResource( ":/icons/document-edit.png" );
    this.customAddButton.toolTip = "<p>Add custom files to the input custom frames list.</p>";
    this.customAddButton.onClick = function()
@@ -2174,7 +2173,7 @@ function StackDialog()
    //
 
    this.resetButton = new PushButton( this );
-   this.resetButton.text = "Reset";
+   this.resetButton.text = "重置";
    this.resetButton.icon = this.scaledResource( ":/icons/reload.png" );
    this.resetButton.toolTip = "<p>Perform optional reset and clearing actions.</p>";
    this.resetButton.onClick = function()
@@ -2196,7 +2195,7 @@ function StackDialog()
 
    this.diagnosticsButton = new PushButton( this );
    this.diagnosticsButton.defaultButton = true;
-   this.diagnosticsButton.text = "Diagnostics";
+   this.diagnosticsButton.text = "诊断";
    this.diagnosticsButton.icon = this.scaledResource( ":/icons/gear.png" );
    this.diagnosticsButton.toolTip = "<p>Check validity of selected files and processes.</p>";
    this.diagnosticsButton.onClick = function()
@@ -2214,7 +2213,7 @@ function StackDialog()
    //
 
    this.runButton = new PushButton( this );
-   this.runButton.text = "Run";
+   this.runButton.text = "运行";
    this.runButton.icon = this.scaledResource( ":/icons/power.png" );
    this.runButton.onClick = function()
    {
@@ -2222,7 +2221,7 @@ function StackDialog()
    };
 
    this.exitButton = new PushButton( this );
-   this.exitButton.text = "Exit";
+   this.exitButton.text = "退出";
    this.exitButton.icon = this.scaledResource( ":/icons/close.png" );
    this.exitButton.onClick = function()
    {
@@ -2232,7 +2231,7 @@ function StackDialog()
    //
 
    this.cfaImagesCheckBox = new CheckBox( this );
-   this.cfaImagesCheckBox.text = "CFA images";
+   this.cfaImagesCheckBox.text = "彩色图像";
    this.cfaImagesCheckBox.toolTip = "<p>When checked, the Batch Preprocessing script works under the assumption that all " +
       "input frames (calibration and light frames) have been mosaiced with a Color Filter Array (CFA) pattern, such as a " +
       "Bayer pattern. When this option is enabled, an additional deBayering task will be performed prior to image " +
@@ -2246,7 +2245,7 @@ function StackDialog()
    //
 
    this.optimizeDarksCheckBox = new CheckBox( this );
-   this.optimizeDarksCheckBox.text = "Optimize dark frames";
+   this.optimizeDarksCheckBox.text = "优化暗场帧";
    this.optimizeDarksCheckBox.toolTip = "<p>Enable this option to apply <i>dark frame optimization</i> during calibration " +
       "of flat and light frames.</p>" +
       "<p>The dark frame optimization routine computes dark scaling factors to minimize the noise induced by dark subtraction.</p>";
@@ -2259,7 +2258,7 @@ function StackDialog()
    //
 
    this.generateRejectionMapsCheckBox = new CheckBox( this );
-   this.generateRejectionMapsCheckBox.text = "Generate rejection maps"
+   this.generateRejectionMapsCheckBox.text = "生成排斥图"
    this.generateRejectionMapsCheckBox.toolTip = "<p>Generate rejection map images during integration of bias, dark, flat and " +
       "light frames.</p>" +
       "<p>Rejection maps are stored as multiple-image XISF files.</p>";
@@ -2283,7 +2282,7 @@ function StackDialog()
     //
 
     this.saveProcessLogCheckBox = new CheckBox( this );
-    this.saveProcessLogCheckBox.text = "Save process log";
+    this.saveProcessLogCheckBox.text = "保存处理日志";
     this.saveProcessLogCheckBox.toolTip = "<p>When checked, the log of the process will be saved as a plain text file on the " +
       "output directory tree.</p>";
     this.saveProcessLogCheckBox.onCheck = function( checked )
@@ -2294,7 +2293,7 @@ function StackDialog()
     //
 
    this.upBottomFITSCheckBox = new CheckBox( this );
-   this.upBottomFITSCheckBox.text = "Up-bottom FITS";
+   this.upBottomFITSCheckBox.text = "顶-底FITS";
    this.upBottomFITSCheckBox.toolTip = "<p>If this option is enabled, the Batch Preprocessing script assumes that all input " +
       "FITS files follow the \'top-left\' coordinate convention: the origin of coordinates is at the top left corner of the " +
       "image, and vertical coordinates grow from top to bottom. This is the convention used by most amateur camera control " +
@@ -2309,7 +2308,7 @@ function StackDialog()
    //
 
    this.useAsMasterBiasCheckBox = new CheckBox( this );
-   this.useAsMasterBiasCheckBox.text = "Use master bias";
+   this.useAsMasterBiasCheckBox.text = "使用主偏置场";
    this.useAsMasterBiasCheckBox.toolTip = "<p>Use the first bias frame file as master bias.</p>";
    this.useAsMasterBiasCheckBox.onCheck = function( checked )
    {
@@ -2321,7 +2320,7 @@ function StackDialog()
    //
 
    this.useAsMasterDarkCheckBox = new CheckBox( this );
-   this.useAsMasterDarkCheckBox.text = "Use master dark";
+   this.useAsMasterDarkCheckBox.text = "使用主暗场";
    this.useAsMasterDarkCheckBox.toolTip = "<p>Use the first dark frame file as master dark.</p>";
    this.useAsMasterDarkCheckBox.onCheck = function( checked )
    {
@@ -2333,7 +2332,7 @@ function StackDialog()
    //
 
    this.useAsMasterFlatCheckBox = new CheckBox( this );
-   this.useAsMasterFlatCheckBox.text = "Use master flat";
+   this.useAsMasterFlatCheckBox.text = "使用主平场";
    this.useAsMasterFlatCheckBox.toolTip = "<p>Use the first flat frame file as master flat.</p>";
    this.useAsMasterFlatCheckBox.onCheck = function( checked )
    {
@@ -2366,7 +2365,7 @@ function StackDialog()
    this.optionsSizer.add( this.optionsSizer1 );
    this.optionsSizer.add( this.optionsSizer2 );
 
-   this.optionsControl = new ParametersControl( "Global Options", this );
+   this.optionsControl = new ParametersControl( "全局选项", this );
    this.optionsControl.add( this.optionsSizer );
 
    //
@@ -2406,7 +2405,7 @@ function StackDialog()
    this.referenceImageSizer.addSpacing( 2 );
    this.referenceImageSizer.add( this.referenceImageSelectButton );
 
-   this.referenceImageControl = new ParametersControl( "Registration Reference Image", this );
+   this.referenceImageControl = new ParametersControl( "对齐参考图像", this );
    this.referenceImageControl.add( this.referenceImageSizer );
 
    //
@@ -2448,7 +2447,7 @@ function StackDialog()
    this.outputDirSizer.addSpacing( 2 );
    this.outputDirSizer.add( this.outputDirSelectButton );
 
-   this.outputDirControl = new ParametersControl( "Output Directory", this );
+   this.outputDirControl = new ParametersControl( "输出目录", this );
    this.outputDirControl.add( this.outputDirSizer );
 
    //

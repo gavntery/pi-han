@@ -55,7 +55,7 @@
 
 #define VERSION            "1.52"
 
-#define TITLE              "Batch Preprocessing Script"
+#define TITLE              "批量预处理脚本(BPP)"
 
 #define SETTINGS_KEY_BASE  "BatchPreprocessing/"
 

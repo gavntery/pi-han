@@ -33,8 +33,8 @@
 
 #feature-id    Render > 3DPlot
 
-#feature-info  A script to generate three-dimensional image renditions. \
-               Optional output as a new image or as a SVG file.<br/> \
+#feature-info  一个生成3D解析图的脚本。 \
+               可以选择输出成一个新的图像或SVG文件。<br/> \
                <br/> \
                Copyright &copy; 2009 Andr&eacute;s Pozo, David Serrano (PTeam), \
                Juan Conejero (PTeam)
@@ -198,7 +198,7 @@ function Render( src, g, limits, xform, perspecParams)
 
    g.pen = new Pen( perspecParams.polygonBorder, 0 );
 
-   src.initializeStatus( "Rendering 3D profile", src.height-1 );
+   src.initializeStatus( "正在生成3D配置文件", src.height-1 );
    // Paint the polygons from back to front
    for (var n = 0; n < src.height-1; n++) {
       for (var m = 0; m < src.width-1; m++) {
@@ -270,8 +270,8 @@ function _3dplot_dialog() {
        margin = this.logicalPixelsToPhysical( 4 );
        wordWrapping = true;
        useRichText = true;
-       text = "<p><b>" + TITLE + " v" + VERSION + "</b> &mdash; A " +
-          "script to generate 3D image renditions.</p>" +
+       text = "<p><b>" + TITLE + " v" + VERSION + "</b> &mdash; 一个 " +
+          "生成3D解析图的脚本。</p>" +
           "<p>Copyright &copy; 2009 Andr&eacute;s Pozo / David Serrano / Juan Conejero</p>";
    }
 
@@ -279,14 +279,14 @@ function _3dplot_dialog() {
 
    this.srcImage_Label = new Label( this );
    this.srcImage_Label.minWidth = labelWidth1;
-   this.srcImage_Label.text = "Source image:";
+   this.srcImage_Label.text = "源图像:";
    this.srcImage_Label.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
    this.srcImage_ViewList = new ViewList( this );
    this.srcImage_ViewList.scaledMinWidth = 250;
    this.srcImage_ViewList.getAll(); // include main views as well as previews
    this.srcImage_ViewList.currentView = perspecParams.srcView;
-   this.srcImage_ViewList.toolTip = "<p>Select the image to be rendered.</p>";
+   this.srcImage_ViewList.toolTip = "<p>选择图像来渲染。</p>";
    this.srcImage_ViewList.onViewSelected = function( view )
    {
       perspecParams.srcView = view;
@@ -301,7 +301,7 @@ function _3dplot_dialog() {
 
    this.svgOutput_CB = new CheckBox (this);
    with (this.svgOutput_CB) {
-      text = "SVG Format";
+      text = "SVG 格式";
       checked = perspecParams.svgOutput;
       onCheck = function (checked) {
          perspecParams.svgOutput = checked;
@@ -309,9 +309,9 @@ function _3dplot_dialog() {
          this.dialog.svgFileName_Edit.enabled = checked;
          this.dialog.svgFileName_Button.enabled = checked;
       };
-      toolTip = "<p>Select this option to generate the 3D rendition in Scalable Vector Graphics " +
-                "format (SVG). Otherwise the rendition will be generated as a new image window.</p>" +
-                "<p><b>* Warning *</b> SVG files can be very large even for relatively small images.</p>";
+      toolTip = "<p>选择这个选项可以将生成出来的3D解析图保存为一个SVG格式的文件。" +
+                "否则会将新生成的图像在一个新窗口中打开（未保存）。</p>" +
+                "<p><b>* 注意 *</b> 即使原始图像相对很小，SVG文件也可能会非常大。</p>";
    }
 
    this.svgOutput_Sizer = new HorizontalSizer;
@@ -323,7 +323,7 @@ function _3dplot_dialog() {
 
    this.svgFileName_Label = new Label( this );
    with ( this.svgFileName_Label ) {
-      text = "SVG output file:";
+      text = "SVG输出文件:";
       textAlignment = TextAlign_Right|TextAlign_VertCenter;
       minWidth = labelWidth1;
       enabled = perspecParams.svgOutput;
