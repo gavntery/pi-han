@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | MosaicByCoordinates</title>
+   <meta name="keywords" content="mosaic, alignment, coordinates" />
+   <meta name="author" content="Andrés del Pozo" />
+   <meta name="description" content="Script for creating mosaics of deep sky astronomical images using their coordinates." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>MosaicByCoordinates</h1>
+
+<div id="authors">
+<p>By Andrés del Pozo</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for creating mosaics of deep sky astronomical images using their coordinates. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> mosaic, alignment, coordinates</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Tiles__">2.1&emsp;Tiles</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Geometry__">2.2&emsp;Geometry</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Options__">2.3&emsp;Options</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_images__">2.4&emsp;Output images</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__How_to_build_a_mosaic__">3&emsp;How to build a mosaic</a></li>
+<li class="pidoc_tocItem"><a href="#__Tips__">4&emsp;Tips</a></li>
+<li class="pidoc_tocItem"><a href="#__Limitations__">5&emsp;Limitations</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>Mosaics in PixInsight can be done using the tool <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> for aligning the images. This tool works comparing the overlapping areas between the target image and a reference image and trying to find a match between them. Then computes a lineal transformation that converts the geometry of the target image so that it is similar to the reference image.</p>
+<p>This usually works very well but it has a few limitations:</p>
+
+<ul class="pidoc_list">
+<li>When building mosaics, <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> can only match the images when there is a big enough overlapping area. For example, it can not align images from the segmented sensors of professional telescopes.</li>
+<li>When building mosaics, <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> aligns the images by pairs. When a mosaic is formed by many tiles the process is prone to mismatchings caused by accumulating errors. Although this can be avoided using a reference image that cover the whole mosaic area, the script MosaicByCoordinates resolves this problem in a easier and elegant way.</li>
+<li><a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> can not create mosaic of really big areas that cover most or all the sky.</li>
+</ul>
+
+<p><strong>MosaicByCoordinates</strong> tries to solve this shortcomings using a different approach to the alignment: Instead of matching an image against other, it requires that the images are plate solved. Knowing the coordinates of each pixel of the image the script can reproject them so the geometries of the images are compatible.</p>
+<p>The geometry of the image has to be defined using the convention <em>FITS World Coordinate System (WCS)</em><sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+E. W. Greisen, M. R. Calabretta (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+M. R. Calabretta, E. W. Greisen (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122">[2]</a></sup> . This can be done using the scripts <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> or <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a>. There are also other applications that can solve images using this convention as PinPoint.</p>
+<p>MosaicByCoordinates can cope with two kind of geometric distortions:</p>
+
+<ul class="pidoc_list">
+<li> <strong>Projection distortions</strong>: When two images are not centered in the same point they have different projections. The difference in the projections causes that there is not a lineal transformation between them. This effect is stronger in images with short focal length.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ The following animation shows an example of this effect. The images have been generated from catalog data and the only geometric distortions are caused by the projection. As can be seen in the animation, the Orion asterism has different distortions in each frame.
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img style="width:100%;height:auto;" src="images/ProjectionDistortion.gif" alt=""/>
+</div>
+</li>
+<li> <strong>Geometric optical aberrations</strong>: The plate solving of astronomical images is usually done supposing that the optical system can be modeled by a <a href="http://en.wikipedia.org/wiki/Gnomonic_projection" title="http://en.wikipedia.org/wiki/Gnomonic_projection">Gnomonic projection</a> <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Wikipedia contributors, <em><a href='http://en.wikipedia.org/wiki/Gnomonic_projection' title='http://en.wikipedia.org/wiki/Gnomonic_projection'>Gnomonic projection</a></em>, Wikipedia, The Free Encyclopedia">[3]</a></sup>. However, many lenses or telescopes don't follow strictly this projection. The images from these optical systems can not be solved with high accuracy using only lineal polynomials. <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> and <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> can use higher degree polynomials to model the geometric distortions. MosaicByCoordinates can use the distortion model generated by the plate solving process for fixing it when aligning images with different distortions.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ The following image is the distortion map from an image taken with a 17mm lens. It shows the difference between the image and an &quot;ideal&quot; lens that generates images using Gnomonic projection.
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="width:100%;height:auto;" src="images/Aberrations.png" alt=""/>
+</div>
+</li>
+</ul>
+
+<p>MosaicByCoordinates can generate the mosaic using different projections with different properties. For example, the Gnomonic projection is useful for narrowfield images, Mercator for medium/wide field images and Hammer-Aitoff can be used for all-sky images. A more detailed description of the supported projections can be found in the <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">Projections document</a>.</p>
+<p>As a result, MosaicByCoordinates can be used for generating wide field mosaics where the tiles have little or no overlapping and when the tiles have strong distortions caused by short focal lenses.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+
+<div style="text-align:center;">
+<img src="images/MainDialog.png" alt=""/>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Tiles__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Tiles</h4>
+<p>The list of tiles contains the images that will be aligned. You have to add to this list all the images that compose the mosaic.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Add files</p>
+</dt>
+<dd>
+<p>This button opens the file dialog for adding files to the tiles list.</p>
+</dd>
+<dt>
+<p>Add windows</p>
+</dt>
+<dd>
+<p>This button opens a dialog that allows to add open images to the list of tiles. This dialog shows the windows open in PixInsight where you can choose which are added to the list of tiles.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p>The results of the alignment of these images are not written to a file. Instead, windows with the resulting images are open in the workspace of PixInsight.</p>
+</dd>
+<dt>
+<p>Remove images</p>
+</dt>
+<dd>
+<p>Removes the selected images from the list.</p>
+</dd>
+<dt>
+<p>Clear list</p>
+</dt>
+<dd>
+<p>Removes all the images from the list.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Geometry__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Geometry</h4>
+<p>The geometry is defined by several parameters that can be calculated by the script or chosen by the user. Each field has a checkbox that when left unchecked means that its value should be calculated by the script.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Projection</p>
+</dt>
+<dd>
+<p>The projection of the image determines how the celestial sphere is mapped to a plane. MosaicByCoordinates supports several <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">projections with different characteristics</a>. If the checkbox is not checked the projection will be chosen by the script.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p>The <strong>Advanced</strong> button allows to select the coordinates of the origin of the projection. If you are not familiar with the projections you should set the origin of the projection to the center of the image.</p>
+</dd>
+<dt>
+<p>Coordinates of the center of the mosaic</p>
+</dt>
+<dd>
+<p>This parameter determines the center of the mosaic. Usually the automatic value is adequate, but sometimes it is necessary to change it. For example, when the mosaic covers the whole sky you could want to change which part of the sky will be at the center of the mosaic.</p>
+</dd>
+<dt>
+<p>Resolution</p>
+</dt>
+<dd>
+<p>This is the resolution of the mosaic expressed in seconds per pixel. Since some projections can distort heavily the image, this value is only true for the coordinates at the center of the projection.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p>The automatic calculation sets this value to the smallest of all the tiles.</p>
+</dd>
+<dt>
+<p>Rotation</p>
+</dt>
+<dd>
+<p>This is the rotation angle of the mosaic. The automatic calculation sets this value to the rotation of the first tile.</p>
+</dd>
+<dt>
+<p>Dimensions</p>
+</dt>
+<dd>
+<p>Dimension in pixels of the final image. The button <strong>Calculate</strong> calculates the minimum values for these fields that cover all the tiles. Sometimes these can be very large so the script trunks them to 20000 pixels.</p>
+</dd>
+<dt>
+<p>Calculate <a id="Calculate"></a></p>
+</dt>
+<dd>
+<p>This button calculates the values for the geometry fields set to automatic. It analyzes the tiles an calculates the best geometry for the mosaic. It tries to set the center of the mosaic such as the final image is as small as possible.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Options__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Options</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Quality</p>
+</dt>
+<dd>
+<p>This option determines the quality of the output:</p>
+
+<ul class="pidoc_list">
+<li><strong>Fast <a id="Fast"></a></strong>: This option calculates the alignment transformation for a few pixels and then approximates the transformation for the rest of pixels using splines. The quality of the transformation is usually good enough for most uses but it is not guaranteed that all the pixels are correct.</li>
+<li><strong>High quality <a id="HQ"></a></strong>: This option calculates the alignment transformation for all the pixels in the image. The quality of the result is the best possible but the process can be quite slow, up to several minutes for each image.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Pixel interpolation</p>
+</dt>
+<dd>
+<p>This option determines the algorithm for pixel interpolation. The available values are the same used in <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>.</p>
+</dd>
+<dt>
+<p>Clamping threshold</p>
+</dt>
+<dd>
+<p>This parameter is explained in the documentation of <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_images__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Output images</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Output directory</p>
+</dt>
+<dd>
+<p>Path of the directory where the aligned images will be written. If it is empty, the images will be written at the same directories as the source images.</p>
+<p>This parameter is not used when aligning windows since in this case the images are not written to the disk.</p>
+</dd>
+<dt>
+<p>Output file suffix</p>
+</dt>
+<dd>
+<p>This suffix will be appended to the filename when saving each image.</p>
+</dd>
+<dt>
+<p>Overwrite existing files</p>
+</dt>
+<dd>
+<p>If this option is not checked the alignment of an image fails when the output file already exists.</p>
+</dd>
+<dt>
+<p>On error</p>
+</dt>
+<dd>
+<p>This parameter determines what to do when there are errors during the process. The options are <em>Continue</em>, <em>Abort</em> and <em>Ask user</em>.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__How_to_build_a_mosaic__">
+   <h3 class="pidoc_sectionTitle">3&emsp;How to build a mosaic</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'How_to_build_a_mosaic', this );">[hide]</p>
+   <div id="How_to_build_a_mosaic">
+<p>The steps for building a mosaic using MosaicByCoordinates are these:</p>
+
+<ol class="pidoc_list">
+<li>Calibrate, register and integrate the subframes of each tile.</li>
+<li>Crop the tiles in order to remove the areas at the borders that were no covered by all the subframes.</li>
+<li>(<em>Optional</em>) If the tiles have gradients you should remove them using <a href="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html" title="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html">DynamicBackgroundExtraction</a>.</li>
+<li>If the tiles are RGB you should do a color calibration.</li>
+<li>Solve the coordinates of all the tiles. This can be done with <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> or <a href="../../scripts/MannualImageSolver/MannualImageSolver.html" title="../../scripts/MannualImageSolver/MannualImageSolver.html">MannualImageSolver</a>. Please read the documentation for both scripts since it has useful tips about how to best solve the images. <br/>
+ It is very important to remind that <strong><u>MosaicByCoordinates requires a &quot;perfect&quot; coordinates solution across the whole image</u></strong>. The quality of the alignment of the tiles depends on this process. If there is any kind of deviation in any part of an image (specially in the borders) the tiles would not get aligned correctly.</li>
+<li>Launch the script MosaicByCoordinates and add all the images that compose the mosaic to the tiles list. The script is designed for working with all the images of the mosaic at the same time. It is not optimal to process groups of images separately. If the tiles have separate images for each color channel, you should add to the script all the images of all the channels at the same time.</li>
+<li>The geometry of the resulting mosaic can be calculated automatically or you can choose which parameters you want to configure. The button <a href="#Calculate">Calculate</a> analyzes the tiles and calculate the geometry of the mosaic. The calculated values can be seen in the fields of the dialog after <strong>Calculate</strong> finishes. You can change any of the fields if the automatic value is not as desired.</li>
+<li>Pressing <strong>OK</strong> the script begins the process. As a result the script generates a new image for each tile of the mosaic. These new images have the geometry of final mosaic. The contents of each tile are projected on its output image, leaving black the parts of the mosaic not covered by the tile.</li>
+<li>As the last step the tiles have to be merged. You can do this using <a href="../../tools/PixelMath/PixelMath.html" title="../../tools/PixelMath/PixelMath.html">PixelMath</a>, <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a> or even <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a>. <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a> is recommended when the tiles overlap and you do not want that the seams are visible in the result. <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> is useful when the tiles don't overlap. In this case the <strong>Combination</strong> parameter should be set to <strong>maximum</strong>.</li>
+</ol>
+
+<p>This process is only a guideline and it should be adapted to the characteristics of the images.</p>
+<p>For creating color mosaics using RGB, LRGB or narrowband data the color channels can be merged before aligning the tiles, or you can create a mosaic for each channel and then merge the mosaic of each channel. Both methods have advantages and disadvantages. Merging the channels before executing MosaicByCoordinates allows to do a different color calibration for each tile. This is useful when the light pollution causes a different color drift in each tile.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p><span class="pidoc_figure_title">Figure 3 &mdash;</span>  <strong>Mosaic example</strong></p>
+<div class="pidoc_mouseover">
+<ul>
+<li><span class="pidoc_indicator_default" id="7iHDo3p9Ona789na_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('7iHDo3p9Ona789na', 'images/MosaicExample0.png'); pidoc_hideGroup('7iHDo3p9Ona789na', 6); pidoc_setOpacity('7iHDo3p9Ona789na_1', 1.0);">Original Tiles</a></li>
+<li><span class="pidoc_indicator" id="7iHDo3p9Ona789na_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('7iHDo3p9Ona789na', 'images/MosaicExample4.png'); pidoc_hideGroup('7iHDo3p9Ona789na', 6); pidoc_setOpacity('7iHDo3p9Ona789na_2', 1.0);">Aligned Tile 1</a></li>
+<li><span class="pidoc_indicator" id="7iHDo3p9Ona789na_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('7iHDo3p9Ona789na', 'images/MosaicExample5.png'); pidoc_hideGroup('7iHDo3p9Ona789na', 6); pidoc_setOpacity('7iHDo3p9Ona789na_3', 1.0);">Aligned Tile 2</a></li>
+<li><span class="pidoc_indicator" id="7iHDo3p9Ona789na_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('7iHDo3p9Ona789na', 'images/MosaicExample6.png'); pidoc_hideGroup('7iHDo3p9Ona789na', 6); pidoc_setOpacity('7iHDo3p9Ona789na_4', 1.0);">Aligned Tile 3</a></li>
+<li><span class="pidoc_indicator" id="7iHDo3p9Ona789na_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('7iHDo3p9Ona789na', 'images/MosaicExample7.png'); pidoc_hideGroup('7iHDo3p9Ona789na', 6); pidoc_setOpacity('7iHDo3p9Ona789na_5', 1.0);">Merged mosaic</a></li>
+<li><span class="pidoc_indicator" id="7iHDo3p9Ona789na_6"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('7iHDo3p9Ona789na', 'images/MosaicExample8.png'); pidoc_hideGroup('7iHDo3p9Ona789na', 6); pidoc_setOpacity('7iHDo3p9Ona789na_6', 1.0);">Annotated mosaic</a></li>
+</ul>
+<img src="images/MosaicExample0.png" id="7iHDo3p9Ona789na" alt="" />
+</div>
+</div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Tips__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Tips</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Tips', this );">[hide]</p>
+   <div id="Tips">
+
+<ul class="pidoc_list">
+<li> Since MosaicByCoordinates uses the coordinates of the image as the sole method for aligning the images, the coordinates solution must be of very high precision. It should have residuals of less than one pixel.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+For narrow field images taken with long focal lengths (usually more than 1000mm) and lenses of high optical quality, the solution usually doesn't need distortion correction. However, images taken with short focal lengths (&lt;100mm) or lenses with strong aberrations (for example, Newton telescopes with coma), the coordinates should be calculated using distortion correction in order to achieve the required precision. These coordinates solutions can be calculated using both <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> and <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a>.</li>
+<li>The automatic calculation of the geometry of the algorithm is usually valid. However, you should check it and change any field necessary.</li>
+<li> Projection selection:
+<ul class="pidoc_list">
+<li>In narrow field images (at most a few degrees) all the projections give very similar results. <em>Gnomonic</em> is recommended in this case because it is the fastest and more compatible projection.</li>
+<li>For medium/wide field mosaics (5-120 degrees) you should use the <em>Stereographic</em> or <em>Mercator</em> projections.</li>
+<li>For mosaics that cover the visible sky Orthographic projection is a good fit.</li>
+<li><em>Hammer-Aitoff</em> allows to make mosaics of the full sky sphere.</li>
+<li>For images not covered by the previous cases you should try which projection is best for the image.</li>
+</ul>
+
+</li>
+<li>The generation of the tiles can be very slow (several minutes per tile). When you are trying to configure the geometry of the mosaic and you want to do several tests, you can temporarily configure the resolution to a higher value in order to reduce the final size of the mosaic and accelerate the process. Multiplying the resolution by 2 makes the script 4 times faster.</li>
+<li>The &quot;<a href="#Fast">Fast</a>&quot; quality is useful to optimize the settings of the mosaic, however the &quot;<a href="#HQ">High quality</a>&quot; option usually is needed for the final image.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Limitations__">
+   <h3 class="pidoc_sectionTitle">5&emsp;Limitations</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Limitations', this );">[hide]</p>
+   <div id="Limitations">
+
+<ul class="pidoc_list">
+<li>Since this script requires to know the geometry of the images it can only work with images that can be plate solved. This is usually only possible for deep sky images where enough stars can be detected and matched to a catalog.</li>
+<li>The maximum size of the image result of the creation of a mosaic is the same as the maximum size that PixInsight can open. The algorithm used in the script requires that the result of the alignment for each image is kept in memory, but each image is processed independently so it only keeps in memory one of the images.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> E. W. Greisen, M. R. Calabretta (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075</p>
+      <p id="__reference_2__"><strong>[2]</strong> M. R. Calabretta, E. W. Greisen (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122</p>
+      <p id="__reference_3__"><strong>[3]</strong> Wikipedia contributors, <em><a href="http://en.wikipedia.org/wiki/Gnomonic_projection" title="http://en.wikipedia.org/wiki/Gnomonic_projection">Gnomonic projection</a></em>, Wikipedia, The Free Encyclopedia</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>, <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>, <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>, <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2013, Andrés del Pozo</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:37 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

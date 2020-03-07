@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | GradientHDRCompression</title>
+   <meta name="keywords" content="gradient domain, hdr, hdr compression, dynamic range, fine detail, HDRMultiscaleTransform" />
+   <meta name="author" content="Georg Viehoever" />
+   <meta name="description" content="Implements a method that enhances fine contrast details. It can be applied to any image with large contrast differences, including HDR images." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>GradientHDRCompression</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Implements a method that enhances fine contrast details. It can be applied to any image with large contrast differences, including HDR images. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> GradientDomain, HDR</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> gradient domain, hdr, hdr compression, dynamic range, fine detail, HDRMultiscaleTransform</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Parameters__">2.1&emsp;Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Usage_Hints__">2.2&emsp;Usage Hints</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/GradientHDRCompression_GUI.png" alt=""/>
+<p>The GradientHDRCompression tool implements a reduction of strong contrasts (=gradients), thereby enhancing faint structures that are otherwise overwhelmed by high contrast structures in a image. At the same time, strong structures such as stars are reduced in brightness. The process can be applied to multi-channel images, where it changes the luminance, or to single channel images, where it just changes the single channel. The method can be applied to any high-contrast image, including HDR type images. The overall effect is quite different from <a href="../../tools/HDRMultiscaleTransform/HDRMultiscaleTransform.html" title="../../tools/HDRMultiscaleTransform/HDRMultiscaleTransform.html">HDRMultiscaleTransform.</a></p>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRCompression_Effect.png" alt=""/>
+</div>
+<p>The image above shows the original HDR image on the left, and the compressed image on the right. Both images have only been processed with the Auto-STF functionality. Note the fine nebular structures that become visible, while stars as high contrast structures are suppressed. The resulting image usually does <em>not</em> have a natural look. It most likely needs combination with other images to achive a pleasant result.</p>
+<p>GradientHDRCompression can be applied to both linear and nonlinear images. While regions with unchanged gradients will remain linear, the process in general will remove linearity from an image.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+
+<div style="text-align:center;">
+<img src="images/GradientHDRCompression_GUI.png" alt=""/>
+</div>
+<p>The gradients in an image are defined by the difference between neighboring pixels. Because pixel values in PixInsight are always in the [0,1] range, gradients are always in the [-1,+1] range. GradientHDRCompression works by manipulating those gradients and restoring the image from the gradient information. For multi-channel images, only the luminance component is changed; for single channel images only the single channel is manipulated.</p>
+<div class="pidoc_subsection" id="__Usage_:_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Parameters</h4>
+<p>The GradientHDRCompression interface allows you to define the amount of processing applied to your image:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Max. log10(gradient)</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRCompression_Max.png" alt=""/>
+</div>
+<p>This parameter takes values in the [-7,0] range. It defines the maximum gradient in the image. Gradient values are replaced by <span class="pidoc_code">sign(gradient)*min(pow(10,value),abs(gradient))</span>. As a result, gradients that are stronger than <span class="pidoc_code">pow(10,value)</span> are reduced to <span class="pidoc_code">pow(10,value)</span>, preserving the gradient sign. In effect, strong gradients are reduced, making small contrasts more visible. The neutral value is zero (since <span class="pidoc_code">pow(10,0)=1</span>), smaller values are stronger. The image shows the effect for a value of -7, strongly reducing stars and enhancing fine nebular structures.</p>
+</dd>
+<dt>
+<p>Min. log10(gradient)</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRCompression_Min.png" alt=""/>
+</div>
+<p>This parameter takes values in the [-7,0] range. It defines the minimum gradient in the image. Absolute gradient values smaller than <span class="pidoc_code">pow(10,value)</span> are replaced by 0. As a result, small gradients are suppressed, which can help in controlling image noise. Usually, however, this just leads to posterization. Handle with care! Setting it to -7 (neutral value) disables this filter. Larger values are stronger. The image shows the effect for a value of -4: Faint structures are almost completely gone.</p>
+</dd>
+<dt>
+<p>Exponent (gradient)</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRCompression_Exp.png" alt=""/>
+</div>
+<p>This parameter is defined in the [0.001,1.1] range. It defines how the gradient is transformed after filtering with max. and min. log10(gradient). The gradient is transformed using the formula <span class="pidoc_code">sign(gradient)*pow(abs(gradient),value)</span>. Values smaller than one move small gradients close to 1, increasing their importance. The effect can be similar to the max.log10(gradient) setting. The neutral value is 1; smaller values have stronger effects. The image shows the effect for a value of 0.19.</p>
+</dd>
+<dt>
+<p>Rescale to [0,1]</p>
+</dt>
+<dd>
+<p>When activated (default), the result image is rescaled to [0,1]; otherwise it is rescaled to its original range.</p>
+</dd>
+<dt>
+<p>Preserve Color</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRCompression_Preserve.png" alt=""/>
+</div>
+<p>When activated (default), the color is preserved by using the original R:G:B ratios in the result image. If disabled, the result image just gets new luminance values, which typically leads to rather pale colors (especially in conjunction with Rescale to [0,1]). While Preserve Colors keeps as much of the color information as possible, the preserved colors can seem a little bit psychedelic. The screenshot shows the original and result images with Preserve Color on and off. Note the color on the blackboard.</p>
+</dd>
+</dl>
+
+<p>Note: The process offers a realtime preview functionality (experimental) that tries to generate an approximation of the whole processed image.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Usage_Hints__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Usage Hints</h4>
+
+<ul class="pidoc_list">
+<li>GradientHDRCompression is an experimental module.</li>
+<li>Best results are probably achieved by using this filter to enhance faint structures, and combining the result with another image; see for example the tutorial in <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+<a href='http://pixinsight.com/tutorials/NGC7023-HDR/en.html' title='http://pixinsight.com/tutorials/NGC7023-HDR/en.html'>Vicent Peris, <em>Dynamic Range and Local Contrast</em> (tutorial)</a>">[3]</a></sup>.</li>
+<li>If you have large scale gradients in the result, you may want to use the DynamicBackgroundExtraction (DBE) or AutomaticBackgroundExtractor (ABE) tools.</li>
+<li>An alternative to Preserve Color is the use of the ColorSatutation tool. It will generally lead to more natural results, but can usually not restore the full color of faint structures.</li>
+</ul>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> <a href="http://www.umiacs.umd.edu/~aagrawal/ICCV2007Course/index.html" title="http://www.umiacs.umd.edu/~aagrawal/ICCV2007Course/index.html">Amit Agrawal and Ramesh Raskar, <em>Gradient Domain Manipulation Techniques in Vision and Graphics</em></a></p>
+      <p id="__reference_2__"><strong>[2]</strong> <a href="http://pixinsight.com/forum/index.php?topic=3295.0" title="http://pixinsight.com/forum/index.php?topic=3295.0">Georg Viehoever et. al., <em>Gradient Domain Operations</em></a></p>
+      <p id="__reference_3__"><strong>[3]</strong> <a href="http://pixinsight.com/tutorials/NGC7023-HDR/en.html" title="http://pixinsight.com/tutorials/NGC7023-HDR/en.html">Vicent Peris, <em>Dynamic Range and Local Contrast</em> (tutorial)</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/HDRMultiscaleTransform/HDRMultiscaleTransform.html" title="../../tools/HDRMultiscaleTransform/HDRMultiscaleTransform.html">HDRMultiscaleTransform</a>, <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a>, <a href="../../tools/ColorSaturation/ColorSaturation.html" title="../../tools/ColorSaturation/ColorSaturation.html">ColorSaturation</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Georg Viehoever, published under LGPL 2.1. With contributions in terms of code, tests, ideas, etc. Carlos Milovic, Harry Page, and others.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:18 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | AdaptiveStretch</title>
+   <meta name="keywords" content="adaptive nonlinear intensity transformation, contrast manipulation" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Adaptive nonlinear intensity transformation based on existing pixel-to-pixel relations." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>AdaptiveStretch</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Adaptive nonlinear intensity transformation based on existing pixel-to-pixel relations. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> IntensityTransformations</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> adaptive nonlinear intensity transformation, contrast manipulation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;Noise threshold</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;Contrast protection</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;Maximum curve points</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;Region of interest</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Exponential_Controls__">3.1&emsp;Exponential Controls</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Using_AdaptiveStretch_in_RealTime_Preview_Mode__">3.2&emsp;Using AdaptiveStretch in Real-Time Preview Mode</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Using_AdaptiveStretch_in_RealTime_Preview_Mode_:_Curve_Graphs__">3.2.1&emsp;Curve Graphs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img src="images/AdaptiveStretch.png" alt=""/>
+<p>AdaptiveStretch is a general contrast and brightness manipulation tool in PixInsight. It implements a nonlinear intensity transformation computed from existing pairwise pixel relations in the target image. The process is mainly controlled through a single <em>noise threshold</em> parameter. Basically, brightness differences below the noise threshold are regarded as due to the noise and other spurious variations, and are thus attenuated or not enhanced. Brightness differences above the noise threshold are interpreted as significant changes in the image, so the process tends to enhance them.</p>
+<p>Our implementation is based on the algorithm described by Maria and Costas Petrou. <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Maria Petrou and Costas Petrou, <em>Image Processing: The Fundamentals, Second Edition</em>, John Wiley and Sons Ltd., 2010, pp. 377&ndash;382.">[1]</a></sup> All brightness differences between adjacent pairs of pixels are first computed and classified to form two disjoint sets: <em>positive forces</em>, due to significant variations, and <em>negative forces</em>, or variations due to the noise. Positive forces tend to increase the contrast of the image, while negative forces act in the opposite direction, protecting the image. The process uses these two forces to compute a nonlinear mapping curve, which is then used to transform the image by interpolation.</p>
+<p>The following list summarizes the main features and advantages of the AdaptiveStretch tool:</p>
+
+<ul class="pidoc_list">
+<li>It is essentially a one-parameter process (a second contrast-limiting parameter is optional).</li>
+<li class="pidoc_spaced_list_item">The computed transformation curve is optimal, in the sense that it maximizes contrast without intensifying spurious data.</li>
+<li class="pidoc_spaced_list_item">It allows to find an optimal curve very easily in a completely objective and unbiased way. The same curve can be very difficult to find using manual adjustments.</li>
+<li class="pidoc_spaced_list_item">The transformation guarantees that no pixel will be clipped, neither at the shadows nor at the highlights. Initially clipped pixels, or pixels that are either black or white in the original image, will be preserved in the transformed image.</li>
+<li class="pidoc_spaced_list_item">Provides full real-time preview functionality, including real-time generation of curve graphs.</li>
+<li class="pidoc_spaced_list_item">In difficult cases, a region of interest (ROI) can be defined to restrict analysis of pairwise pixel variations to a significant area of the image.</li>
+<li class="pidoc_spaced_list_item">The computed mapping curve can be converted into a <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a> instance automatically.</li>
+<li class="pidoc_spaced_list_item">Can be used to stretch linear raw CCD monochrome and OSC CCD / DSLR color data.</li>
+<li class="pidoc_spaced_list_item">Provides excellent results with both astronomical and daylight raw images.</li>
+</ul>
+
+<p>The two main tools for nonlinear intensity transformations in PixInsight are <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a> and <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation.</a> With AdaptiveStretch we don't intend to replace those fundamental tools, but to provide an alternative way to perform brightness/contrast manipulations, including the initial nonlinear stretching step of raw data. The most interesting feature of AdaptiveStretch is that it works by analyzing the true contents of the image. Other tools require purely manual work, and hence their results depend more on the knowledge and ability of the user to understand the image. Understanding subtle relations between different image structures can be difficult, and in this sense AdaptiveStretch can be seen as a powerful tool for objective analysys.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;Noise threshold</h4>
+<p>The AdaptiveStretch process computes a nonlinear curve to enhance existing brightness differences above the <em>noise threshold</em> parameter. Brightness differences smaller than the noise threshold will be diminished or not enhanced in the processed image. Decrease this parameter to apply a more aggressive nonlinear transformation. In general, you should fine tune this parameter along with <a href="#contrast_protection">contrast protection</a> to find an optimal combination.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;" src="images/NoiseThresholdExample_1.jpg" alt=""/>
+<img style="float:right;" src="images/NoiseThresholdExample_2.jpg" alt=""/>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:1em;">
+<img style="float:left;" src="images/NoiseThresholdExample_3.jpg" alt=""/>
+<img style="float:right;" src="images/NoiseThresholdExample_4.jpg" alt=""/>
+</div>
+<p><strong>A comparison of different results obtained by varying the noise threshold parameter</strong> of AdaptiveStretch. The original image is a 16-bit raw DSLR image taken with a Canon EOS 450D camera.</p>
+<p><strong>(a)</strong> Top left: De-Bayered linear image.<br/>
+ <strong>(b)</strong> Top right: Noise threshold = 1&times;10<sup>-2</sup><br/>
+ <strong>(c)</strong> Bottom left: Noise threshold = 3&times;10<sup>-3</sup><br/>
+ <strong>(d)</strong> Bottom right: Noise threshold = 5&times;10<sup>-4</sup></p>
+</div>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;<a id="contrast_protection"></a> Contrast protection</h4>
+<p>The contrast protection parameter limits the increase of contrast on very bright and dark areas. Increasing this parameter can help control excessive intensification of highlights and darkening of shadows. Irrespective of its value, this parameter can be disabled or enabled; it is disabled by default. This feature allows for quick comparisons between the results with and without contrast protection applied.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;" src="images/ContrastProtectionExample_1.jpg" alt=""/>
+<img style="float:right;" src="images/ContrastProtectionExample_2.jpg" alt=""/>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:1em;">
+<img style="float:left;" src="images/ContrastProtectionExample_3.jpg" alt=""/>
+<img style="float:right;" src="images/ContrastProtectionExample_4.jpg" alt=""/>
+</div>
+<p><strong>An example of use of the contrast protection parameter</strong> of AdaptiveStretch. As in the preceding example, the original is a 16-bit raw image shot with a Canon EOS 450D camera.</p>
+<p><strong>(a)</strong> Top left: De-Bayered linear image.<br/>
+ <strong>(b)</strong> Top right: Noise threshold = 1&times;10<sup>-3</sup>, no contrast protection.<br/>
+ <strong>(c)</strong> Bottom left: Noise threshold = 5&times;10<sup>-3</sup>, no contrast protection.<br/>
+ <strong>(d)</strong> Bottom right: Noise threshold = 1&times;10<sup>-4</sup>, contrast protection = 8&times;10<sup>-2</sup></p>
+</div>
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;Maximum curve points</h4>
+<p>This is the maximum number of points computed to build the transformation curve. The default value is 10<sup>6</sup> points. For 8-bit and 16-bit integer images, AdaptiveStretch can compute a maximum of 256 and 65536 curve points. Note that in these cases computing more curve points would make no sense because the minimum possible nonzero difference between two pixels is one discrete unit. For 32-bit integer images the theoretical limit is 2<sup>32</sup> curve points, which is impractical for obvious reasons.</p>
+<p>For 32-bit and 64-bit floating point images a maximum of 10<sup>7</sup> and 10<sup>8</sup> curve points can be calculated, respectively. Note that lowering the number of curve points can limit the ability of the algorithm to detect very small brightness changes between adjacent pixels, which are essential to account for variations due to the noise in the image. In practice, however, the default limit of 10<sup>6</sup> discrete values is more than sufficient for most 32-bit floating point images. Increasing this parameter can improve the result for very rich floating point and 32-bit integer images, usually resulting from deep HDR compositions. Keep in mind that large curves will increase computation times considerably, so they should only be used when actually required. In most cases, the default value of this parameter is quite appropriate.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;Region of interest</h4>
+<p>By default, the AdaptiveStretch process analyzes pairwise pixel brightness differences on the whole target image. Normally this is the best option if there are no big differences in brightness, or if some big differences can be safely ignored. A typical example is an indoor daylight scene where we decide that it is OK to burn a window completely. However, there are more difficult cases where these simple assumptions are unacceptable, or where they simply don't work. In these cases a region of interest (ROI) can be defined to restrict the analysis to a rectangular region of the image. The ROI is defined by the X and Y pixel coordinates of its upper left corner, and by its width and height in pixels. The process will ignore a ROI with less than 16&times;16 pixels, or a ROI that lies completely outside the image.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;" src="images/ROIExample1_1.jpg" alt=""/>
+<img style="float:right;" src="images/ROIExample1_2.jpg" alt=""/>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:1em;">
+<img style="float:left;" src="images/ROIExample1_3.jpg" alt=""/>
+<img style="float:right;" src="images/ROIExample1_4.jpg" alt=""/>
+</div>
+<p><strong>An example of the use of regions of interest</strong> (ROI) to control the AdaptiveStretch process. As a whole, this image as quite <em>flat,</em> or in other words, it is dominated by an overwhelmingly large amount of pixels with intermediate values. This is more evident on the result of a histogram transformation shown in section (b). Using the whole image to analyze pairwise pixel differences yields a too contrasted result (c), where the dimmest areas are too dark and the brightest regions are too flat. This happens because the AdaptiveStretch algorithm computes a transformation to optimize contrast for a dominant subset of the analyzed pixels.</p>
+<p>By restricting the analysys to a smaller area, where bright and dark structures are equally well sampled, and intermediate pixel values are no longer dominant, the result (d) allows us to show much better the entire range of structures in the image. This is a nice example of complex image dynamics. Note however that the result achieved in section (c) can be improved using HDR compression techniques in PixInsight, for example with the <a href="../../tools/HDRMultiscaleTransform/HDRMultiscaleTransform.html" title="../../tools/HDRMultiscaleTransform/HDRMultiscaleTransform.html">HDRMultiscaleTransform</a> tool, which opens a completely different path for processing. Image courtesy of Ivette Rodríguez and Oriol Lehmkuhl.</p>
+<p><strong>(a)</strong> Top left: The linear image with an automatic screen stretch (STF) applied (note that the automatic STF transformation clips pixels at the shadows).</p>
+<p><strong>(b)</strong> Top right: Result achieved with the <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a> tool by clipping unused histogram sections at both ends and applying a midtones balance value of 0.005.</p>
+<p><strong>(c)</strong> Bottom left: Result of AdaptiveStretch, noise threshold = 10<sup>-4</sup>, curve computed for the whole image (no region of interest).</p>
+<p><strong>(d)</strong> Bottom right: Result of AdaptiveStretch, noise threshold = 1.2&times;10<sup>-4</sup>, region of interest set to the green rectangle shown on (a).</p>
+</div>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;" src="images/ROIExample2_1.jpg" alt=""/>
+<img style="float:right;" src="images/ROIExample2_2.jpg" alt=""/>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:1em;">
+<img style="float:left;" src="images/ROIExample2_3.jpg" alt=""/>
+<img style="float:right;" src="images/ROIExample2_4.jpg" alt=""/>
+</div>
+<p><strong>Another example of AdaptiveStretch with a region of interest</strong> (ROI). In this example, a ROI covering the main subject has been used to prevent the excessive contrast increase in the processed image. The relative lack of color saturation can be easily compensated with a color saturation curve.</p>
+<p><strong>(a)</strong> Top left: The linear image. This is a de-Bayered raw DSLR image acquired with a Canon 450D camera.</p>
+<p><strong>(b)</strong> Top right: Result of AdaptiveStretch with noise threshold = 8.7&times;10<sup>-4</sup> and contrast protection = 0.355, no ROI.</p>
+<p><strong>(c)</strong> Bottom left: Result of AdaptiveStretch, noise threshold = 6.7&times;10<sup>-4</sup>, contrast protection = 0.375, ROI set to the green rectangle shown on (a).</p>
+<p><strong>(d)</strong> Bottom right: The result of (c) after a color saturation curve applied with <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation.</a></p>
+</div>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Exponential_Controls__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Exponential Controls</h4>
+<p>The noise threshold and contrast protection parameters of AdaptiveStretch are extremely sensitive. They can vary in the range from zero to one with eight digits of fractional precision. This extended precision is necessary to process 32-bit floating point and integer images. For 16-bit integer images, usually 4 or 5 decimal digits are required. As a result, the usual edit and slider combined controls that are ubiquitous in the PixInsight platform, are just too rough to control these parameters.</p>
+<p>For these parameters we have implemented a specialized control with three subcontrols: an edit field to enter the parameter value with 8 decimal digits; an edit/slider combo to specify the coefficient in <a href="http://en.wikipedia.org/wiki/Scientific_notation" title="http://en.wikipedia.org/wiki/Scientific_notation">scientific notation</a>, with 2 decimal digts in the range from 1 to 9.99; and a spin box to specify the exponent in the 0 to -8 range.</p>
+
+<div style="text-align:center;">
+<img style="margin-top:1em;margin-bottom:1em;" src="images/ExponentialControls.png" alt=""/>
+</div>
+<p>For example, in the figure above, the value of the noise threshold parameter is 0.000275, which is equivalent to 2.75&times;10<sup>-4</sup> in scientific notation. By increasing and decreasing the exponent by one unit, you can quickly change the scale of the parameter by one order of magnitude. By moving the slider, you can fine tune the coefficient. This allows you to control a sensitive parameter very easily with the mouse without needing to write numeric values.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Using_AdaptiveStretch_in_RealTime_Preview_Mode__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Using AdaptiveStretch in Real-Time Preview Mode</h4>
+<p>Despite being a rather automatic process, AdaptiveStretch is a highly interactive tool. In fact, you actually cannot apply this tool properly unless you fine tune its two main parameters during a real-time preview session. The reason for this is that this is an <em>adaptive</em> tool: it computes a transformation based on the existing brightness differences between adjacent pairs of pixels in the target image. Of course, you can also adjust AdaptiveStretch parameters using standard previews in PixInsight, which allows you to achieve very accurate results, but the real-time preview is just more convenient and easy to use. Once you have found good parameters with the real-time preview, nothing stops you to refine them using standard previews, if necessary.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<img src="images/RealTimePreviewExample1.jpg" alt=""/>
+<p><strong>Working with the AdaptiveStretch tool in real-time preview mode</strong> on a raw CCD image of NGC 1808. Image courtesy of jack Harvey / SSRO.</p>
+</div>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_6__"></a>
+<p class="pidoc_figure_title">Figure 6</p>
+<img src="images/RealTimePreviewExample2.jpg" alt=""/>
+<p><strong>The RealTimePreview virtual view can be used to inspect the histogram</strong> of the transformed image on the <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a> tool during an AdaptiveStretch real-time session. The histogram and the curve graph provide you with a wealth of information to control the final image.</p>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Using_AdaptiveStretch_in_RealTime_Preview_Mode_:_Curve_Graphs__">
+   <h5 class="pidoc_subsectionTitle">3.2.1&emsp;Curve Graphs</h5>
+<p>One of the most useful features of AdaptiveStretch is its ability to generate a real-time curve graph. This graph represents the transformation curve being computed as a function of the current process parameters. The graph is drawn on an auxiliary window when the tool is working in real-time preview mode, if the <em>real-time curve graph</em> check box is checked.</p>
+<p>The curve graph allows you to fully evaluate and understand the transformation being applied, while you can see the result on the real-time preview window, and even its histogram on the <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a> tool with the RealTimePreview virtual view selected (an example of this is shown on the figure above). Two buttons on the AdaptiveStretch Curve Graph window allow you to render the graph as a new image window (as an 8-bit RGB color image) and to convert the current AdaptiveStretch curve into a <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a> instance. This is useful to apply the same transformation curve to a set of images. Since the AdaptiveStretch process depends on the contents of the image being processed, each running instance applies a different transformation to each particular image; however, CurvesTransformation is not an adaptive process and hence does not have this limitation.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;">
+<a id="__figure_7__"></a>
+<p class="pidoc_figure_title">Figure 7</p>
+<img style="float:left;margin-right:8px;" src="images/CurvesTransformationExample.png" alt=""/>
+<p><strong>An AdaptiveStretch curve</strong> and its equivalent <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a> instance.</p>
+</div>
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Maria Petrou and Costas Petrou, <em>Image Processing: The Fundamentals, Second Edition</em>, John Wiley and Sons Ltd., 2010, pp. 377&ndash;382.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a>, <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a>, <a href="../../tools/AutoHistogram/AutoHistogram.html" title="../../tools/AutoHistogram/AutoHistogram.html">AutoHistogram</a>, <a href="../../tools/LocalHistogramEqualization/LocalHistogramEqualization.html" title="../../tools/LocalHistogramEqualization/LocalHistogramEqualization.html">LocalHistogramEqualization</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:21 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

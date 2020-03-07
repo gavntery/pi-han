@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xri version="1.0" xmlns="http://www.pixinsight.com/xri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.pixinsight.com/xri http://pixinsight.com/xri/xri-1.0.xsd">
+   <package fileName="20191223-script.zip" sha1="1fed28eea7a4045c1d91250470f8a0b36a1d068b" type="script" repo="https://pixinsight.com/update/1.8.8-3/" releaseDate="20191223" installDate="20200115104822" title="LinearDefectDetection and LinearPatternSubtraction scripts (update)">
+      <description>
+         <p>
+            This update installs the new LinearDefectDetection and LinearPatternSubtraction scripts, written by PTeam member Vicent Peris. These scripts implement a new methodology for correction of linear defects in astronomical images. For a detailed description of the scripts and the implemented algorithms, see the following article by the author:
+         </p>
+         <p>
+            <strong>
+               Correcting Defective Lines in PixInsight, by Vicent Peris (PTeam/OAUV)
+            </strong>
+            <br/>
+            <strong>
+               https://pixinsight.com/tutorials/LDD-LPS/
+            </strong>
+         </p>
+         <p>
+            Copyright (C) 2019 Vicent Peris. All Rights Reserved.
+         </p>
+         <p>
+            Copyright (C) 2003-2019 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20191224-script.zip" sha1="3d4b7c9983d422136be256e562dc39d32a0a49a9" type="script" repo="https://pixinsight.com/update/1.8.8-3/" releaseDate="20191224" installDate="20200115104822" remove="src/scripts/BatchChannelExtraction" title="BatchChannelExtraction script version 2.0.0 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the BatchChannelExtraction for PixInsight core 1.8.8-3. This is an update/bugfix release contributed by Roberto Sartori:
+         </p>
+         <ul>
+            <li>
+               The script now reflects the same flexibility of the ChannelExtraction process allowing to choose any number of color channels form any color space.
+            </li>
+            <li>
+               The interface has been completely redesigned.
+            </li>
+            <li>
+               FITS header FILTER is now optionally saved depending on a settings checkbox.
+            </li>
+            <li>
+               Code has been entirely revised.
+            </li>
+         </ul>
+         <p>
+            Copyright (C) 2010-2017 S J Brown
+            <br/>
+            Copyright (C) 2017 Michael Covington
+            <br/>
+            Copyright (C) 2019 Roberto Sartori
+            <br/>
+            Copyright (C) 2003-2019 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200114-macosx-x64-1-module.tar.gz" sha1="47bcf0feed63bb3577bbe39e7a0e08e8c6e51679" type="module" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200114" installDate="20200115104910" title="Debayer module version 1.8.2 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the standard Debayer module. Version 1.8.2 is an update/bugfix release available for PixInsight core version 1.8.8-4:
+         </p>
+         <p>
+            <b>
+               * Debayer:
+            </b>
+            Fixed a bug where XBAYROFF and YBAYROFF FITS keywords were not parsed correctly when keyword values where representations of floating point scalars, such as &apos;1.&apos;.
+         </p>
+         <p>
+            <b>
+               * Debayer:
+            </b>
+            Improved management of keyword parsing errors.
+         </p>
+         <p>
+            Copyright (C) 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200114-macosx-x64-2-module.tar.gz" sha1="07d3ef3d4477f58ebc81256a6745ef0806225265" type="module" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200114" installDate="20200115104910" title="Update to all standard file format support modules (bugfix)">
+      <description>
+         <p>
+            This update installs new versions of all standard file format support modules. This includes the BMP, FITS, JPEG2000, JPEG, RAW, TIFF and XISF modules. This is a bugfix release available for PixInsight core version 1.8.8-4:
+         </p>
+         <p>
+            *
+            <b>
+               All format support modules:
+            </b>
+            Fixed a bug where image property data types were reported incorrectly via core API function calls. This bug was preventing correct propagation of image properties in some important scripts, including the BatchFormatConversion script.
+         </p>
+         <p>
+            Copyright (C) 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200114-script.zip" sha1="cb23ac6d3311137794e77415fd3b1910aababbdf" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200114" installDate="20200115104910" remove="src/scripts/BatchFormatConversion" title="BatchFormatConversion script version 1.4.0 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the BatchFormatConversion for PixInsight core 1.8.8-4. This is an update/bugfix release:
+         </p>
+         <ul>
+            <li>
+               Added support for image properties, which are now correctly loaded and preserved for output formats able to store XISF properties. This means that conversion from digital camera raw formats to XISF is now fully supported and 100% functional.
+            </li>
+            <li>
+               Improved error management.
+            </li>
+            <li>
+               Improved tooltips.
+            </li>
+            <li>
+               Code has been entirely revised.
+            </li>
+         </ul>
+         <p>
+            Copyright (C) 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200120-script.zip" sha1="13c40d2be6445b58a297be2f04e7f2f243f32346" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200120" installDate="20200120191115" remove="src/scripts/WeightedBatchPreprocessing" title="WeightedBatchPreprocessing script version 1.4.3 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the Weighted Batch Preprocessing script (WBPP), by Roberto Sartori and Tommaso Rubechi. This is an update/bugfix release.
+         </p>
+         <ul>
+            <li>
+               New StackEngine.masterDarkIncludesBias property. Contributed by Armando Beneduce. This new parameter allows using pre-calibrated master dark frames, i.e. bias-subtracted master darks. This adds flexibility to the WBPP script, but deviates from our recommended best practices. Appropriate diagnostics and warning messages are shown when this property is set to false.
+               <br/>
+
+            </li>
+            <li>
+               Bugfix: Fixed broken acquisition of exposure times from FITS ketywords. Contributed by Armando Beneduce.
+               <br/>
+
+            </li>
+            <li>
+               Bugfix: Don&apos;t generate diagnostics errors for light file lists smaller than three frames when StackEngine.calibrateOnly is true and/or StackEngine.integrate is false.
+               <br/>
+
+            </li>
+            <li>
+               Bugfix: Non-function-call use of StackEngine.exposuresToString in StackEngine.doLight().
+               <br/>
+
+            </li>
+            <li>
+               Improved numeric error checks in image weights computation routines.
+            </li>
+         </ul>
+         <p>
+            ________________________________________________________________
+         </p>
+         <p>
+            Copyright (c) 2012 Kai Wiechen. All Rights Reserved.
+         </p>
+         <p>
+            Copyright (c) 2019-2020 Roberto Sartori. All Rights Reserved.
+         </p>
+         <p>
+            Copyright (c) 2019-2020 Tommaso Rubechi. All Rights Reserved.
+         </p>
+         <p>
+            Copyright (c) 2012-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200123-1-script.zip" sha1="906d52cc62230465969e1572e2a6129952a7b128" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200123" installDate="20200124201056" remove="src/scripts/mschuster/MureDenoise" title="MureDenoise script version 1.27 (update)">
+      <description>
+         <p>
+            This update installs a new version of the MureDenoise script, written by Mike Schuster. Version 1.27 is an update release:
+         </p>
+         <ul>
+            <li>
+               Improve flatfield compensation accuracy and ease of use. Restrict flatfield view selection to a main view. The sizes of the main view of the image selected for denoising and the main view of the flatfield must be equal.
+               <br/>
+
+            </li>
+            <li>
+               Enable by default the option &quot;Include gradient classifier&quot;.
+               <br/>
+
+            </li>
+            <li>
+               Improve documentation and tooltips.
+            </li>
+         </ul>
+         <p>
+            Copyright © 2012-2020 Mike Schuster. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200123-2-script.zip" sha1="0468bd08aeeed8006debc410fb4ca8e4229784ee" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200123" installDate="20200124201056" remove="src/scripts/mschuster/MureDenoiseDetectorSettings" title="MureDenoiseDetectorSettings script version 1.2 (update)">
+      <description>
+         <p>
+            This update installs a new version of the MureDenoiseDetectorSettings script, written by Mike Schuster. Version 1.2 is an update release:
+         </p>
+         <ul>
+            <li>
+               Improve error messages.
+            </li>
+         </ul>
+         <p>
+            Copyright © 2012-2020 Mike Schuster. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200124-1-script.zip" sha1="1ac148306318b6928e6f20e9ed67b762a9257bbe" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200124" installDate="20200124201056" remove="src/scripts/PIDocCompiler" title="Documentation Compiler script version 1.6.5 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the Documentation Compiler script for PixInsight 1.8.8-4. Version 1.6.5 is an update/bugfix release:
+         </p>
+         <ul>
+            <li>
+               Fixed wrong generation of HTML id attribute values for &quot;Related...&quot; sections.
+               <br/>
+
+            </li>
+            <li>
+               Improved tooltip documentation for the Target System directory edit control, describing in more detail the required file access permissions and the different options available for authoring development documentation on the local machine.
+               <br/>
+
+            </li>
+         </ul>
+         <p>
+            Copyright © 2010-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200124-2-script.zip" sha1="f960f0056b5b7ccfb8c5fca833176599e1cd10c2" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200124" installDate="20200124201056" remove="src/scripts/WeightedBatchPreprocessing" title="WeightedBatchPreprocessing script version 1.4.4 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the Weighted Batch Preprocessing script (WBPP), by Roberto Sartori and Tommaso Rubechi. This is a cumulative update/bugfix release for PixInsight 1.8.8-4.
+         </p>
+         <ul>
+            <li>
+               New StackEngine.masterDarkIncludesBias property. Contributed by Armando Beneduce. This new parameter allows using pre-calibrated master dark frames, i.e. bias-subtracted master darks. This adds flexibility to the WBPP script, but deviates from our recommended best practices. Appropriate diagnostics and warning messages are shown when this property is set to false.
+               <br/>
+
+            </li>
+            <li>
+               The
+               <i>
+                  Calibrate master darks
+               </i>
+               checkbox is now only enabled, and can only be unchecked, if the
+               <i>
+                  Use master dark
+               </i>
+               option is enabled. This update removes potential problems and confusion regarding the meaning of disabling master dark calibration when single darks are provided.
+               <br/>
+
+            </li>
+            <li>
+               Bugfix: Fixed broken acquisition of exposure times from FITS ketywords. Contributed by Armando Beneduce.
+               <br/>
+
+            </li>
+            <li>
+               Bugfix: Don&apos;t generate diagnostics errors for light file lists smaller than three frames when StackEngine.calibrateOnly is true and/or StackEngine.integrate is false.
+               <br/>
+
+            </li>
+            <li>
+               Bugfix: Non-function-call use of StackEngine.exposuresToString in StackEngine.doLight().
+               <br/>
+
+            </li>
+            <li>
+               Improved numeric error checks in image weights computation routines.
+               <br/>
+
+            </li>
+         </ul>
+         <p>
+            ________________________________________________________________
+         </p>
+         <p>
+            Copyright © 2012 Kai Wiechen. All Rights Reserved.
+            <br/>
+            Copyright © 2019-2020 Roberto Sartori. All Rights Reserved.
+            <br/>
+            Copyright © 2019-2020 Tommaso Rubechi. All Rights Reserved.
+            <br/>
+            Copyright © 2012-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200124-3-script.zip" sha1="3fa2f347282de37bee0301dee9933e9340a59da2" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200124" installDate="20200124201056" remove="src/scripts/kkretzschmar" title="BatchFrameAcquisition script version 0.2.1 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the BatchFrameAcquisition script, written by Klaus Kretzschmar, for PixInsight 1.8.8-4. Version 0.2.1 is an update/bugfix release:
+         </p>
+         <ul>
+            <li>
+               Code revision and refactoring. Adapted to the new Indigo-based INDIClient module.
+               <br/>
+
+            </li>
+         </ul>
+         <p>
+            Copyright © 2015-2020 Klaus Kretzschmar. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200124-macosx-x64-module.tar.gz" sha1="7bfd1ed4f4cde0fe8c9370e0ce385692b5b104cb" type="module" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200124" installDate="20200124201056" title="INDIClient module version 1.2.0 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the INDIClient module, written by Klaus Kretzschmar. Version 1.2.0 is an update/bugfix release available for PixInsight core version 1.8.8-4:
+         </p>
+         <ul>
+            <li>
+               Fixed a problem related to changing pier sides during synchronization with pointing models.
+               <br/>
+
+            </li>
+            <li>
+               Fix potential buffer overrun when copying client name strings.
+               <br/>
+
+            </li>
+            <li>
+               Complete code revision.
+               <br/>
+
+            </li>
+         </ul>
+         <p>
+            Copyright © 2014-2020 Klaus Kretzschmar. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200128-1-script.zip" sha1="7ceccf33048df44b593d99811bd4e870645b31f5" type="script" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200128" installDate="20200219064953" remove="src/scripts/FITSFileManager" title="FITSFileManager script version 1.5.1 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the FITSFileManager, written by Jean-Marc Lugrin. Version 1.5.1 is a cumulative update/bugfix release for PixInsight 1.8.8-4:
+         </p>
+         <ul>
+            <li>
+               Regression (in version 1.5): Assignment to undeclared variable &apos;i&apos; in FITSFileManager-gui.jsh, which breaks the FITS keyword selection dialog.
+               <br/>
+               
+            </li>
+            <li>
+               Corrected error regarding the initialization of RegExp in the regexp list, thanks to &apos;wfcashwell&apos;.
+               <br/>
+               
+            </li>
+            <li>
+               Regression: text values resulting in an empty string are allowed but considered as missing value.
+               <br/>
+               
+            </li>
+            <li>
+               Multi HDU files are accepted, as the second HDU may be the thumbnail generated by PI or other programs.
+               <br/>
+               
+            </li>
+            <li>
+               Document that we can convert to the XISF file format, disable move/copy if a conversion is required, log the reason of disable in the Verify action.
+               <br/>
+               
+            </li>
+            <li>
+               Fixed most GUI layout problems on all platforms.
+               <br/>
+               
+            </li>
+         </ul>
+         <p>
+            Copyright © 2012-2020 Jean-Marc Lugrin. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200201-macosx-x64-module.tar.gz" sha1="c6a35fa9fa0dfa345db6ff262f4e267c9a4da28c" type="module" repo="https://pixinsight.com/update/1.8.8-4/" releaseDate="20200201" installDate="20200219064953" title="ColorCalibration module version 1.4.2 (update/bugfix)">
+      <description>
+         <p>
+            This update installs a new version of the standard ColorCalibration module. Version 1.4.2 is an update/bugfix release available for PixInsight core version 1.8.8-4:
+         </p>
+         <ul>
+            <li>
+               PhotometricColorCalibration: Fixed a bug where the Online Coordinate Search dialog was creating a plain text file (for debugging purposes) on the system /tmp directory. The /tmp directory does not exist on Windows, where this bug was breaking the coordinate search functionality.
+               <br/>
+               
+            </li>
+            <li>
+               PhotometricColorCalibration: Improved retrieval and generation of image metadata necessary for plate solving and photometric analysis, including XISF properties (first option) and FITS keywords (fallback option).
+               <br/>
+               
+            </li>
+            <li>
+               PhotometricColorCalibration: The Online Coordinate Search dialog uses now the new pcl::OnlineObjectSearchDialog component. Among other improvements, this component allows now to select a SIMBAD database server. Currently the master SIMBAD service in France (CDS Strasbourg) and its mirror site in the USA (CFA Harvard) can be selected. This selection is a global item stored in global settings and restored by each new instance of the online search dialog.
+               <br/>
+               
+            </li>
+         </ul>
+         <p>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="../1.8.8-3/20191213-refdoc.zip" sha1="aa12d1a03dd79f1bec8baf977c7c3ad169575a96" type="doc" repo="https://pixinsight.com/update-doc/1.8.8-4/" releaseDate="20191213" installDate="20200219072646" remove="doc/docs doc/scripts doc/tools" title="PixInsight Reference Documentation - 2019/12/13 Release">
+      <description>
+         <p>
+            This package installs the current version of the PixInsight Reference Documentation for PixInsight Core 1.8.8-3 Ripley. This is a monolithic package including reference documentation for tools and scripts. Released 2019 December 13.
+         </p>
+         <p>
+            Copyright © 2003-2019 Pleiades Astrophoto S.L. All Rights Reserved.
+            <br/>
+            Copyright © 2016-2019 Klaus Kretzschmar. All Rights Reserved.
+            <br/>
+            Copyright © 2014-2019 Ian Lauwerys. All Rights Reserved.
+            <br/>
+            Copyright © 2017-2019 Cameron Leger. All Rights Reserved.
+            <br/>
+            Copyright © 2015-2019 Andres del Pozo. All Rights Reserved.
+            <br/>
+            Copyright © 2017-2019 Mark Shelley. All Rights Reserved.
+            <br/>
+            Copyright © 2016-2019 Mike Schuster. All Rights Reserved.
+            <br/>
+            Copyright © 2011-2019 Georg Viehoever. All Rights Reserved.
+            <br/>
+            Copyright © 2011-2019, Zbynek Vrastil. All Rights Reserved.
+            <br/>
+            Copyright © 2017-2019 Frank Weidenbusch. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200123-refdoc.zip" sha1="8c786928cb90355d9289180d08e8b9270213c643" type="doc" repo="https://pixinsight.com/update-doc/1.8.8-4/" releaseDate="20200123" installDate="20200219074159" remove="doc/scripts/MureDenoise doc/scripts/MureDenoiseDetectorSettings" title="Updated Reference Documentation for the MureDenoise (v1.27) and MureDenoiseDetectorSettings (v1.2) Scripts">
+      <description>
+         <p>
+            This package installs updated reference documentation for the MureDenoise and MureDenoiseDetectorSettings scripts, written by Mike Schuster (script versions 1.27 and 1.2, respectively).
+         </p>
+         <p>
+            Copyright © 2012-2020 Mike Schuster. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+   <package fileName="20200128-refdoc.zip" sha1="d96decaf69d587b1391f4dd810b110dd39dea50f" type="doc" repo="https://pixinsight.com/update-doc/1.8.8-4/" releaseDate="20200128" installDate="20200219075038" remove="doc/scripts/FITSFileManager" title="Updated Reference Documentation for the FITSFileManager Script (v1.5)">
+      <description>
+         <p>
+            This package installs updated reference documentation for the FITSFileManager script, written by Jean-Marc Lugrin (version 1.5).
+         </p>
+         <p>
+            Copyright © 2012-2020 Jean-Marc Lugrin. All Rights Reserved.
+            <br/>
+            Copyright © 2003-2020 Pleiades Astrophoto S.L. All Rights Reserved.
+         </p>
+      </description>
+   </package>
+</xri>

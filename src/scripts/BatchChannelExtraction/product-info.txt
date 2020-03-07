@@ -1,0 +1,1 @@
+This file is part of BatchChannelExtraction script version 2.0.0

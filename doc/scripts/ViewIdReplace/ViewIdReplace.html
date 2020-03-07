@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ViewIdReplace</title>
+   <meta name="keywords" content="view identifier replacement" />
+   <meta name="author" content="Mike Schuster" />
+   <meta name="description" content="Script that renames a view with some or all matches of a pattern replaced by a replacement." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ViewIdReplace</h1>
+
+<div id="authors">
+<p>By Mike Schuster</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script that renames a view with some or all matches of a pattern replaced by a replacement. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> view identifier replacement</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Example_string_pattern__">1.1&emsp;Example: string pattern</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Example_regular_expression_pattern__">1.2&emsp;Example: regular expression pattern</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Example_append_string__">1.3&emsp;Example: append string</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Example_prepend_string__">1.4&emsp;Example: prepend string</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Example_replace_any__">1.5&emsp;Example: replace any</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Example_append_string_preserve_suffix__">1.6&emsp;Example: append string, preserve suffix</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_ViewIdReplace__">2.1&emsp;ViewIdReplace</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_ViewIdReplace_:_Pattern__">2.1.1&emsp;Pattern</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_ViewIdReplace_:_Replacement__">2.1.2&emsp;Replacement</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Button_pane__">2.2&emsp;Button pane</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<p>ViewIdReplace renames a view with some or all matches of a pattern replaced by a replacement. The pattern may be a regular expression of the form /pattern/flags or a string. The replacement is a string. A number of special replacement patterns are supported.</p>
+<p>The script provides an alternative to manually renaming multiple views when the renaming can be expressed as a regular expression or string replacement.</p>
+<p>Typical usage is as follows: Launch the script, specify pattern and replacement, drag an instance to the workspace, dismiss the script, drag the instance onto one or more views to rename.</p>
+<p>Multiple instances of the script with different patterns and replacements may be created in the workspace. Drag the appropriate instance onto the view.</p>
+<p>This document describes ViewIdReplace Version 1.4.</p>
+<div class="pidoc_subsection" id="__Description_:_Example_string_pattern__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;Example: string pattern</h4>
+<img style="margin-left:36pt;" src="images/clone_work_dialog.png" alt=""/>
+<p>Replace the string &quot;clone&quot; with the replacement &quot;work&quot;. Example input &quot;integration_clone&quot;, output &quot;integration_work&quot;.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Example_regular_expression_pattern__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;Example: regular expression pattern</h4>
+<img style="margin-left:36pt;" src="images/clone_clone_star_work.png" alt=""/>
+<p>Replace the string &quot;clone&quot; followed by zero or more occurances of the string &quot;_clone&quot; with the replacement &quot;work&quot;. Example input &quot;integration_clone_clone&quot;, output &quot;integration_work&quot;. Pattern * matches the preceeding parenthesized item zero or more times.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Example_append_string__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;Example: append string</h4>
+<img style="margin-left:36pt;" src="images/append_work.png" alt=""/>
+<p>Append the string &quot;_work&quot;. Example input &quot;integration&quot;, output &quot;integration_work&quot;. Pattern $ matches end of input.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Example_prepend_string__">
+   <h4 class="pidoc_subsectionTitle">1.4&emsp;Example: prepend string</h4>
+<img style="margin-left:36pt;" src="images/prepend_work.png" alt=""/>
+<p>Prepend the string &quot;work_&quot;. Example input &quot;integration&quot;, output &quot;work_integration&quot;. Pattern ^ matches beginning of input.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Example_replace_any__">
+   <h4 class="pidoc_subsectionTitle">1.5&emsp;Example: replace any</h4>
+<img style="margin-left:36pt;" src="images/any_work.png" alt=""/>
+<p>Replace any string with &quot;work&quot;. Example input &quot;light_012&quot;, output &quot;work&quot;. Pattern . matches any character. Pattern * matches the preceeding item zero or more times.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Example_append_string_preserve_suffix__">
+   <h4 class="pidoc_subsectionTitle">1.6&emsp;Example: append string, preserve suffix</h4>
+<img style="margin-left:36pt;" src="images/append_preserve_work.png" alt=""/>
+<p>Append the string &quot;_work&quot; while preserving suffix underscore and digits. Example input &quot;light_012&quot;, output &quot;light_work_012&quot;. Pattern \d matches any digit. Pattern * matches the preceeding item zero or more times. The parenthesized item is remembered as the 1st parenthesized submatch string. Pattern $ matches end of input. The replacement pattern $1 inserts the 1st parenthesized submatch string.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_ViewIdReplace__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;ViewIdReplace</h4>
+<img style="margin-left:36pt;" src="images/clone_work_dialog.png" alt=""/>
+<img style="margin-left:36pt;" src="images/clone_clone_star_work.png" alt=""/>
+<div class="pidoc_subsection" id="__Usage_:_ViewIdReplace_:_Pattern__">
+   <h5 class="pidoc_subsectionTitle">2.1.1&emsp;Pattern</h5>
+<p>A regular expression or a string.</p>
+<p>If a regular expression of the form /pattern/flags, the match or matches are replaced with the string specified by replacement parameter.</p>
+<p>If a string, it is treated as a verbatim string. Only the first occurrence will be replaced.</p>
+<p>An abbreviated list of pattern meanings in regular expressions.</p>
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Character classes</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>.</p>
+</td>
+<td><p>Matches any single character.</p>
+</td>
+</tr>
+<tr>
+<td><p>\d</p>
+</td>
+<td><p>Matches any digit character, equivalent to [0-9].</p>
+</td>
+</tr>
+<tr>
+<td><p>\D</p>
+</td>
+<td><p>Matches any character that is not a digit, equivalent to [^0-9].</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Character sets</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>[xyz] <br/>
+ [a-c]</p>
+</td>
+<td><p>A character set. Matches any one of the enclosed characters. You can specify a range of characters by using a hyphen.</p>
+</td>
+</tr>
+<tr>
+<td><p>[^xyz] <br/>
+ [^a-c]</p>
+</td>
+<td><p>A negated or complemented character set. That is, it matches anything that is not enclosed in the brackets. You can specify a range of characters by using a hyphen.</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Alternation</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>x|y</p>
+</td>
+<td><p>Matches either x or y.</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Boundaries</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>^</p>
+</td>
+<td><p>Matches beginning of input.</p>
+</td>
+</tr>
+<tr>
+<td><p>$</p>
+</td>
+<td><p>Matches end of input.</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Grouping and back references</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>(x)</p>
+</td>
+<td><p>Matches x and remembers the match as a parenthesized submatch string.</p>
+</td>
+</tr>
+<tr>
+<td><p>\n</p>
+</td>
+<td><p>Where n is a positive integer, a back reference to the substring matching the nth parenthesized submatch string.</p>
+</td>
+</tr>
+<tr>
+<td><p>(?:x)</p>
+</td>
+<td><p>Matches x but does not remember the match.</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Quantifiers</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>x*</p>
+</td>
+<td><p>Matches the preceding item x 0 or more times.</p>
+</td>
+</tr>
+<tr>
+<td><p>x+</p>
+</td>
+<td><p>Matches the preceding item x 1 or more times.</p>
+</td>
+</tr>
+<tr>
+<td><p>x?</p>
+</td>
+<td><p>Matches the preceding item x 0 or 1 time.</p>
+</td>
+</tr>
+<tr>
+<td><p>x*? <br/>
+ x+? <br/>
+ x??</p>
+</td>
+<td><p>Matches the preceding item x like *, +, and ?, however the match is the smallest possible match.</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<caption>
+<div style="text-align:left;">
+<p>Assertions</p>
+</div>
+</caption>
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>x(?=y)</p>
+</td>
+<td><p>Matches x only if x is followed by y.</p>
+</td>
+</tr>
+<tr>
+<td><p>x(?!y)</p>
+</td>
+<td><p>Matches x only if x is not followed by y.</p>
+</td>
+</tr>
+</table>
+
+<p>If specified, flags can have any combination of the following values:</p>
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<tr>
+<th><p>Flag</p>
+</th>
+<th><p>Meaning</p>
+</th>
+</tr>
+<tr>
+<td><p>g</p>
+</td>
+<td><p>Global match; find all matches rather than stopping after the first match.</p>
+</td>
+</tr>
+<tr>
+<td><p>i</p>
+</td>
+<td><p>Ignore character case.</p>
+</td>
+</tr>
+</table>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_ViewIdReplace_:_Replacement__">
+   <h5 class="pidoc_subsectionTitle">2.1.2&emsp;Replacement</h5>
+<p>The string that replaces the substring specified by the pattern parameter. A number of special replacement patterns are supported:</p>
+
+<table class="pidoc_table" style="margin-left:36pt;width:500pt;">
+<tr>
+<th><p>Pattern</p>
+</th>
+<th><p>Inserts</p>
+</th>
+</tr>
+<tr>
+<td><p>$&amp;</p>
+</td>
+<td><p>Inserts the matched substring.</p>
+</td>
+</tr>
+<tr>
+<td><p>$`</p>
+</td>
+<td><p>Inserts the portion of the string that precedes the matched substring.</p>
+</td>
+</tr>
+<tr>
+<td><p>$'</p>
+</td>
+<td><p>Inserts the portion of the string that follows the matched substring.</p>
+</td>
+</tr>
+<tr>
+<td><p>$n</p>
+</td>
+<td><p>Where n is a positive integer, inserts the nth parenthesized submatch string, provided the pattern parameter was a regular expression.</p>
+</td>
+</tr>
+</table>
+
+<p>Replacement characters not in the set [A-Za-z0-9_] are themselves replaced with underscore.</p>
+<p>If the output is not a unique view id, one or more digits will be appended.</p>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Button_pane__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Button pane</h4>
+<img style="margin-left:36pt;" src="images/clone_work_dialog.png" alt=""/>
+<img style="margin-left:36pt;" src="images/clone_clone_star_work.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<img src="images/new_instance.png" alt=""/>
+</dt>
+<dd>
+<p>Create a new instance.</p>
+</dd>
+<dt>
+<img src="images/browse_documentation.png" alt=""/>
+</dt>
+<dd>
+<p>Open a browser to view documentation.</p>
+</dd>
+<dt>
+<img src="images/reset.png" alt=""/>
+</dt>
+<dd>
+<p>Reset all parameters.</p>
+</dd>
+<dt>
+<img src="images/diagnostics.png" alt=""/>
+</dt>
+<dd>
+<p>Check the pattern for syntax errors.</p>
+</dd>
+<dt>
+<p>Dismiss</p>
+</dt>
+<dd>
+<p>Dismiss the dialog.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012-2017 Mike Schuster. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:36 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

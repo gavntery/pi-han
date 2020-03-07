@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | SubframeSelector</title>
+   <meta name="keywords" content="subframe evaluation, subframe selection, subframe weighting, star detection, star fitting, star profile full width at half maximum, FWHM, star profile eccentricity, subframe signal to noise ratio weight" />
+   <meta name="author" content="Cameron Leger" />
+   <meta name="description" content="Facilitates subframe evaluation, selection and weighting based on several subframe quality related measurements." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>SubframeSelector</h1>
+
+<div id="authors">
+<p>By Cameron Leger</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Facilitates subframe evaluation, selection and weighting based on several subframe quality related measurements. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> ImageInspection, Preprocessing</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> subframe evaluation, subframe selection, subframe weighting, star detection, star fitting, star profile full width at half maximum, FWHM, star profile eccentricity, subframe signal to noise ratio weight</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Overall_Layout__">1.1&emsp;Overall Layout</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Measurement_and_Presentation__">1.2&emsp;Measurement and Presentation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Subframe_Approval__">1.3&emsp;Subframe Approval</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Subframe_Weighting__">1.4&emsp;Subframe Weighting</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Output_Subframes__">1.5&emsp;Output Subframes</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Subframe_Properties__">1.6&emsp;Subframe Properties</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Subframe_Expressions__">1.7&emsp;Subframe Expressions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Subframe_Approval_Expression__">1.8&emsp;Subframe Approval Expression</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Subframe_Weighting_Expression__">1.9&emsp;Subframe Weighting Expression</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Subframes__">2.1&emsp;Subframes</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_System_Parameters__">2.2&emsp;System Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Star_Detector__">2.3&emsp;Star Detector</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Outputs__">2.4&emsp;Outputs</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Expressions__">2.5&emsp;Expressions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Table__">2.6&emsp;Table</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Plots__">2.7&emsp;Plots</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img src="images/SubframeSelector.png" alt=""/>
+<p>The SubframeSelector script facilitates subframe evaluation, selection and weighting based on several subframe quality related measurements, including estimates of star profile <a href="#subframe_property_FWHM"><em>full width at half maximum</em></a> (FWHM), star profile <a href="#subframe_property_Eccentricity"><em>eccentricity</em></a> and subframe <a href="#subframe_property_SNRWeight"><em>signal to noise ratio weight</em></a>.</p>
+<p>SubframeSelector provides the following functions:</p>
+
+<ul class="pidoc_list">
+<li><a href="#measurement_and_presentation">Measurement and Presentation</a> of subframe quality related <a href="#Subframe_Properties">properties</a>, with the option of saving the measurements in a <em>comma separated value</em> .csv file for postprocessing. This facility is intended to help with subframe quality evaluation.</li>
+<li>A <a href="#subframe_approval">subframe approval facility</a>, with the option of copying/overwriting the approved subframes to output directories for postprocessing. Choosing a subset of subframes that meet certain quaility requirements for integration is an example usage of this facility.</li>
+<li>A <a href="#subframe_weighting">subframe weighting facility</a>, with the option of recording subframe weights in FITS headers for postprocessing. Assigning integration weights to subframes is an example usage of this facility. Another example is the determination of the &quot;best&quot; subframe for use as a registration reference.</li>
+</ul>
+
+<p>SubframeSelector relies on a C++ reimplementation of the PJSR StarDetector Script for star detection, the PSF-related code from the PixInsight <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> process for star fitting, and PixInsight's multiresolution support noise estimation capabilites<sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Jean-Luc Starck and Fionn Murtagh, <em>Automatic Noise Estimation from the Multiresolution Support</em>, Publications of the Royal Astronomical Society of the Pacific, vol. 110, February 1998, pp. 193-199">[1]</a></sup>. The script employs custom algorithms for data reduction and presentation. The subframe approval and weighting facilities rely on the <a href="https://pixinsight.com/developer/pjsr/index.html" title="https://pixinsight.com/developer/pjsr/index.html"><em>PixInsight JavaScript Runtime</em></a>.</p>
+<div class="pidoc_subsection" id="__Description_:_Overall_Layout__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;<a id="windows"></a>Overall Layout</h4>
+<p>The Subframe Selector is comprised of three windows that serve different functions.</p>
+<p>The main window titled <em>SubframeSelector</em> is always available and has icons located top-right that open the other windows if they are not already open. This window is where you will &quot;initialize&quot; your settings (most of which will not change unless your imaging setup does), load the subframes to work on, and perform actions such as &quot;Measure Subframes&quot; or &quot;Output Subframes&quot;.</p>
+<p>The next window is titled <em>SubframeSelector | Expressions</em> and offers a large area to create and apply your Approval and Weighting expressions. More on that later!</p>
+<p>The last window is titled <em>SubframeSelector | Measurements</em> and offers multiple ways of visualizing the information gathered about your subframes.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Measurement_and_Presentation__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;<a id="measurement_and_presentation"></a>Measurement and Presentation</h4>
+<img src="images/Subframes.png" alt=""/>
+<p>The <a href="#Routine_combo">Routine</a> section offers the choice of procedure to run when Executed Globally. The default option is appropriate to start measuring.</p>
+<p>In the <a href="#Target_Subframes_section">Subframes</a> section, add all target subframes. Subframes may be raw, calibrated or registered, but all should be the same type, have their overscan regions (if any) applied and cropped, be compatible for registration (if unregistered) and be compatible for integration. Measurements are typically most accurate on calibrated but unregistered subframes.</p>
+<p>All subframes should be observations of the same target. Small variations in targeting are acceptable, such as those due to dithering and meridian flipping. Larger variations in targeting will result in incomparable property measurements.</p>
+<img src="images/SystemParameters.png" alt=""/>
+<p>Set the parameters in the <a href="#System_Parameters_section">System Parameters</a> section.</p>
+<img src="images/StarDetectorParameters.png" alt=""/>
+<p>Adjust the <a href="#Star_Detector_section">Star Detector</a> section parameters if necessary so that between several hundred and several thousand stars are detected and fitted per subframe. The number of stars detected and fitted per subframe is provided by the <a href="#subframe_property_Stars">Stars</a> property once the measurement process has completed. A map of detected stars for the first subframe may also be generated by using the &quot;Star Detection Preview&quot; option in the <a href="#Routine_combo">Routine</a> dropdown.</p>
+<p>Select a <a href="#Star_Detector_Point_spread_function">Point spread function</a> (PSF). The PSF functions are defined in the <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> process documentation. Star images will be fit to the selected PSF model. The quality of the fit on each subframe is provided by the <a href="#subframe_property_StarResidual">StarResidual</a> and <a href="#subframe_property_StarResidualMeanDev">StarResidualMeanDev</a> properties once the measurement process has completed.</p>
+<img src="images/MeasureProcess.png" alt=""/>
+<p>With the default &quot;Measure Subframes&quot; option in the <a href="#Routine_combo">Routine</a> dropdown selected, Execute the process Globally. Review the measurements presented in the table and the plots.</p>
+<img src="images/MeasurementsOverview.png" alt=""/>
+<p>The table contains one row per subframe with the subframe's <a href="#subframe_property_Index">Index</a>, <a href="#subframe_property_Approved">Approval Status</a>, <a href="#subframe_property_Locked">Locked Status</a>, and <a href="#subframe_property_Filename">Filename</a> in the first few column and its <a href="#Subframe_Properties">subframe properties</a> listed in the remaining columns. The table may be sorted by column by selecting a <a href="#Table_Sort_table_by_column">table sort column</a> and a <a href="#Table_Sort_Table_by_ordering">table sort ordering</a>.</p>
+<p>The table may be saved as a <em>comma separated value</em> .csv file for postprocessing by clicking the <a href="#Table_CSV">Save CSV</a> button.</p>
+<p>The most important properties measured by SubframeSelector are <a href="#subframe_property_FWHM">FWHM</a>, <a href="#subframe_property_Eccentricity">Eccentricity</a>, <a href="#subframe_property_SNRWeight">SNRWeight</a>, <a href="#subframe_property_Median">Median</a>, <a href="#subframe_property_MedianMeanDeviation">Median Mean Deviation</a> and <a href="#subframe_property_Noise">Noise</a>. The remaining properties <a href="#subframe_property_NoiseRatio">NoiseRatio</a>, <a href="#subframe_property_Stars">Stars</a>, <a href="#subframe_property_StarResidual">StarResidual</a>, <a href="#subframe_property_FWHMMeanDev">FWHMMeanDev</a>, <a href="#subframe_property_EccentricityMeanDev">EccentricityMeanDev</a> and <a href="#subframe_property_StarResidualMeanDev">StarResidualMeanDev</a> provide supporting information of secondary importance.</p>
+<img src="images/FWHM.png" alt=""/>
+<p>Select a plot ordinate from the <a href="#Plots_ordinate">Ordinate</a> list to view plots of the selected <a href="#Subframe_Properties">subframe property</a>.</p>
+<p>The first is a rather simple line plot and its abscissa represents subframes identified by their <a href="#subframe_property_Index">Index</a> property whose value equals the index of the subframe in the <a href="#Target_Subframes_section">Subframes</a> list. The plot's left hand ordinate axis is labeled in units selected either in the <a href="#System_Parameters_section">System Parameters</a> section or in the ordinate's natural units. The solid blue line represents the value of the selected ordinate. The plot's right hand ordinate axis and dashed line is the <a href="#subframe_property_Weight">Weight</a> of each subframe.</p>
+<p>The central horizontal black line corresponds to the median of the property across all subframes. The two gradations surrounding the median line correspond to one and two mean absolute deviation units greater than and less than the median, respectively.</p>
+<p>The vertical lines are visual aids to help associate subframes with their points. The points corresponding to adjacent subframes in index order.</p>
+<p>The second plot contains a histogram and Empirical Distribution Function, which is a Cumulative Distribution Function applied to existing data. Whereas the first plot shows all subframes and their values, this plot shows all values and the amount of subframes in the bin's range. This plot's abscissa represents the total range in values for the property. The plot's left hand ordinate axis and solid blue bars represent the count of subframes within a certain value range. The plot's right hand ordinate axis and solid black line is the EDF. Essentially, for any x value, it will represent the count of subframes whose property is less than or equal to that value. In the example picture above, you can determine from this graph that nearly all subframes have a fairly standard distrubtion of FWHM values, but a couple are very large comparatively.</p>
+<p>The selected plot may be saved as a PDF file for archival by clicking the <a href="#Plots_PDF">PDF</a> button.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Subframe_Approval__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;<a id="subframe_approval"></a>Subframe Approval</h4>
+<p>The SubframeSelector script includes a subframe approval facility, with the option of copying/overwriting all approved/rejected subframes to output directories for postprocessing. Choosing a subset of subframes that meet certain quaility requirements for integration is an example usage of this facility.</p>
+<p>A subframe may be approved or rejected by any of the following four ways:</p>
+
+<ul class="pidoc_list">
+<li>By double-clicking the checkbox in the approval column for the subframe's row in the table.</li>
+<li>By selecting the subframe's row in the table and clicking the <a href="#Table_Toggle_Approve">Toggle Approve</a> button.</li>
+<li>By clicking the subframe's point in a plot.</li>
+<li>By specifying a <a href="#subframe_approval_expression">subframe approval expression</a> that defines a condition on subframe properities that must be satisfied for approval.</li>
+</ul>
+
+<p>An approved subframe is indicated by a check-mark in the table column for <a href="#subframe_property_Approved">Approval Status</a> and a dot shaped point in the plot. A rejected subframe is indicated by an cross-mark in the table column for <a href="#subframe_property_Approved">Approval Status</a> and a cross shaped point in the plot.</p>
+<p>A subframe approved or rejected by one of the first three ways listed above will also be <em>locked</em>. The <a href="#subframe_approval_expression">subframe approval expression</a> will not modify the approved/rejected state of locked subframes. This locking mechanism provides a convienient way to override <a href="#subframe_approval_expression">subframe approval expression</a> dispositions. A locked subframe is indicated with a lock icon in the table column for <a href="#subframe_property_Locked">Locked Status</a> in the table and by a circle around its point in the plot. A locked subframe may be unlocked by any of these three ways:</p>
+
+<ul class="pidoc_list">
+<li>By double-clicking the lockbox in the locked column for the subframe's row in the table.</li>
+<li>By selecting the subframe's row in the table and clicking the <a href="#Table_Toggle_Locked">Toggle Lock</a> button.</li>
+<li>By shift-clicking the subframe's point in a plot.</li>
+</ul>
+
+<p>Examples of subframe approval and rejection are shown below.</p>
+<img src="images/LockedFWHM.png" alt=""/>
+<p>In the plot above note that the <a href="#subframe_property_FWHM">FWHM</a> of subframe 63 is the highest. The subframe can be rejected by clicking either its checkbox in the table or its point in the plot. The rejection is indicated by a cross-mark in the table and a cross shaped point. The subframe is also locked by this action. This lock is indicated by the lock icons.</p>
+<img src="images/RemovalFWHM.png" alt=""/>
+<p>On second thought, we definitely don't want to include these results as they are also influencing the mean deviation of an otherwise normal graph. These two subframes will be <em>removed</em> by selecting them and pressing the <a href="#Table_Remove">Remove</a> button.</p>
+<img src="images/RemovedFWHM.png" alt=""/>
+<p>In the plot above note that after the two strong outliers were removed, the graph is more stable and useful for inspection.</p>
+<img src="images/ApprovalEccentricitySigma.png" alt=""/>
+<p>In the plot above the expression <em>EccentricitySigma &lt; 2</em> was entered as a <a href="#subframe_approval_expression">subframe approval expression</a>. This expression states that an approved subframe's deviation of the <a href="#subframe_property_Eccentricity">Eccentricity</a> from the median is lower than 3. All subframes not satisfying this requirement are rejected.</p>
+<p>When entering expressions, you should use the icon to the right of the text entry in order to apply the expression to the subframes. Note that all subframes are unlocked since we removed the locked ones earlier, but different subframes are rejected by the approval expression.</p>
+<p>Once subframe approval/rejection descisions have been completed, the approved/rejected subframes may be optionally copied/moved to output directories for postprocessing. See the section <a href="#Output_Subframes">Output Subframes</a> for details.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Subframe_Weighting__">
+   <h4 class="pidoc_subsectionTitle">1.4&emsp;<a id="subframe_weighting"></a>Subframe Weighting</h4>
+<p>The SubframeSelector tool includes a subframe weighting facility which records subframe weights in FITS headers for postprocessing. Assigning integration weights to subframes is a very common example usage of this facility. Another example is the determination of the &quot;best&quot; subframe for use as a registration reference. Note that you do not have to remember these weights yourself. If you keep the SubframeSelector window open, or if you drag it into an icon in your workspace, you can reference them later. Even if the window and process were closed, the SubframeSelector caches the measurements, which means that running the process again on the same subframes and settings will be instantaneous! At this point, however, you'd have to remember or roughly recreate your Weighting eExpression. It's probably most helpful to determine a 'standard' Approval or Weighting Expression that you save into your workspace and project, such that each time you open the process it is there for your tweaking.</p>
+<p>Subframe weights are assigned by specifying a <a href="#subframe_weighting_expression">subframe weighting expression</a>. This expression is an arithmetic combination of a subframe properties whose value is interpreted as a subframe's weight.</p>
+<p>Examples of subframe weighting are shown below.</p>
+<img src="images/SNRWeight.png" alt=""/>
+<p>The expression <em>SNRWeight</em> was entered as a <a href="#subframe_weighting_expression">subframe weighting expression</a> as a very simple weighting function. Note that you can now see a secondary dashed line on the second y-axis that represents the subframe weight, and in the table the Weight column is equal to that of the SNRWeight. This is because `SNRWeight` is a property understood by the expression, and simply used as-is for the Weight.</p>
+<p><a href="#subframe_property_SNRWeight">SNRWeight</a> is an unnormalized approximation of the current <em>NoiseEvaluation</em> weight used by the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> process. See the definition of the <a href="#subframe_property_SNRWeight">SNRWeight</a> property for more information.</p>
+<p><a href="#subframe_property_SNRWeight">SNRWeight</a> weights are typically assigned to calibrated but unregistered subframes. These weights are carried through the <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> registration process in the FITS headers and used by <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> for weighting purposes.</p>
+<img src="images/FWHMSigmaWeight.png" alt=""/>
+<p>The goal of this example is to develop a subframe weighting that combines aspects of both <a href="#subframe_property_FWHM">FWHM</a> and <a href="#subframe_property_SNRWeight">SNRWeight</a>. In other words we want to find subframes that have both low <a href="#subframe_property_FWHM">FWHM</a> and high <a href="#subframe_property_SNRWeight">SNRWeight</a>. The best of these subframes might be used as a registration reference for the <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> process, for example.</p>
+<p>The approach taken here to develop such a weight is to combine sigma normalized property values. Appending the suffix <em>Sigma</em> to a property name provides the property's value normalized in its sigma units. This value is scaled by the factor -3 in this example and used as the weighting expression. The absolute value 3 is choosen because all subframes are within 3 sigma values of the median. A negative value is choosen because larger <a href="#subframe_property_FWHM">FWHM</a> values correspond to smaller weights.</p>
+<p>As a result, subframes whose <a href="#subframe_property_FWHM">FWHM</a> value equals the median are assigned weight 0, subframes with <a href="#subframe_property_FWHM">FWHM</a> smaller than the median are assigned positive weights, and subframes with <a href="#subframe_property_FWHM">FWHM</a> larger than the median are assigned negative weights. Furthermore, a subframe with a <a href="#subframe_property_FWHM">FWHM</a> three sigmas larger than the median (the rejection threshold) is assigned weight -1. Note that although the Weight and FWHM values are on the same graph, the y-axis has different units.</p>
+<img src="images/SNRWeightSigmaWeight.png" alt=""/>
+<p>Next a similar process is applied to <a href="#subframe_property_SNRWeight">SNRWeight</a>. Here is it divided by 3 because the best SNRWeightSigma values are higher, not lower. The frames with a relatively lower SNRWeight have smaller weights.</p>
+<img src="images/FWHMSigmaSNRWeightSigmaWeight.png" alt=""/>
+<p>Finally, the two scaled, sigma normalized property values are combined by summation. In a similar fashion, EccentricitySigma is also included. Each 'set' has been grouped by parenthesis only for clarity. Additionally, the FHWMSigma portion is doubled to relatively emphasize FWHM over the other parameters, which have less variance overall. An absolute value of 3 is added to the result because I prefer weights to start at 0, and this was enough to bump the negative weights past that point.</p>
+<p>The results are shown against the FWHM by choosing the plot ordinate <a href="#subframe_property_FWHM">FWHM</a>. Of course, different normalization factors may be choosen to modify the relative significance of <a href="#subframe_property_FWHM">FWHM</a> and <a href="#subframe_property_SNRWeight">SNRWeight</a> in the combination, and other parameters may be introduced to influence the weight.</p>
+<p>Clearly a weighting scheme such as this is subjective in nature. The assigned weights depend on the underlying subframe property statistics as well as the choice of normalization factors. However, there may be no &quot;proper&quot; way to combine disparate measures like <a href="#subframe_property_FWHM">FWHM</a>, <a href="#subframe_property_SNRWeight">SNRWeight</a> and other subframe properties. Judgement is required given the intended use of the weights and the relative importance of subframe properties with respect to that use.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Output_Subframes__">
+   <h4 class="pidoc_subsectionTitle">1.5&emsp;<a id="Output_Subframes"></a>Output Subframes</h4>
+<img src="images/Outputs.png" alt=""/>
+<p>Once subframes have been approved or rejected, and optionally subframe weights applied, the approved subframes may be copied and/or overwritten to output directories by selecting &quot;Output Subframes&quot; option of the the <a href="#Routine_combo">Routine</a> dropdown and Executing the process Globally. Output directories for approved subframes may be specified in the <a href="#Output_directory">Output directory</a> field. If a directory field is left blank, the associated subframes will be written to the same directories as their corresponding target files. The prefix and postfix fields specify prefixes and postfixes that will be prepended and appended to the file name of each copied or overwritten subframe. To record subframe weights in the FITS headers of the copies specify a FITS keyword in the <a href="#Output_Weight_keyword">Weight keyword</a> field.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Subframe_Properties__">
+   <h4 class="pidoc_subsectionTitle">1.6&emsp;<a id="Subframe_Properties"></a>Subframe Properties</h4>
+<p>SubframeSelector provides values of the following properties for each measured subframe.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="subframe_property_Index"></a> Index</p>
+</dt>
+<dd>
+<p>The <em>index</em> number of the subframe in the <a href="#Target_subframes_list">Target subframes list</a>.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Approved"></a> Approved</p>
+</dt>
+<dd>
+<p>The <em>approved/rejected</em> status of the subframe shown as a checkmark or crossmark.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Locked"></a> Locked</p>
+</dt>
+<dd>
+<p>The <em>locked/unlocked</em> status of the subframe shown as a locked or unlocked lock.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Filename"></a> Filename</p>
+</dt>
+<dd>
+<p>The <em>filename</em> of the subframe in the <a href="#Target_subframes_list">Target subframes list</a>.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Weight"></a> Weight</p>
+</dt>
+<dd>
+<p>The <em>weight</em> of the subframe as determined by the <a href="#subframe_weighting_expression">subframe weighting expression</a>.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_FWHM"></a> FWHM</p>
+</dt>
+<dd>
+<p>The weighted mean star profile <em>full width at half maximum</em> (FWHM) estimate for the subframe in arcseconds or pixels. The FWHM is a well-known and standardized measurement of the size of a star as seen on the subframe. It is the width normalized in arcseconds or pixels of a functional fit to a star image, measured horizontally at half its maximum value. For all stars fit in an image, their FWHM is weighted by the <a href="#subframe_property_StarResidual">StarResidual</a> value to minimize the influence of bad fits.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Eccentricity"></a> Eccentricity</p>
+</dt>
+<dd>
+<p>The weighted mean star profile <em>eccentricity</em> estimate for the subframe. Eccentricity is a measure of star profile distortion. Given an elliptical star profile with major axis diameter <em>a</em> and minor axis diameter <em>b</em> where <em>a</em> is greater than or equal to <em>b</em>, the star profile <em>eccentricity</em> equals (1 - <em>b</em><sup>2</sup> / <em>a</em><sup>2</sup>)<sup>0.5</sup>, the star profile <em>aspect ratio</em> equals <em>b</em> / <em>a</em> and the star profile <em>flatness</em> equals <em>a</em> / <em>b</em> - 1. For all stars fit in an image, their Eccentricity is weighted by the <a href="#subframe_property_StarResidual">StarResidual</a> value to minimize the influence of bad fits. A distortion with an eccentricity less than about 0.42 is not perceptible to most people. The table below shows the relationship between these measures.</p>
+
+<table class="pidoc_table">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1</span></caption>
+<tr>
+<th><p>Eccentricity</p>
+</th>
+<th><p>Aspect Ratio</p>
+</th>
+<th><p>Flatness</p>
+</th>
+</tr>
+<tr>
+<td><p>0.20</p>
+</td>
+<td><p>0.98</p>
+</td>
+<td><p>0.02</p>
+</td>
+</tr>
+<tr>
+<td><p>0.22</p>
+</td>
+<td><p>0.98</p>
+</td>
+<td><p>0.03</p>
+</td>
+</tr>
+<tr>
+<td><p>0.24</p>
+</td>
+<td><p>0.97</p>
+</td>
+<td><p>0.03</p>
+</td>
+</tr>
+<tr>
+<td><p>0.26</p>
+</td>
+<td><p>0.97</p>
+</td>
+<td><p>0.04</p>
+</td>
+</tr>
+<tr>
+<td><p>0.28</p>
+</td>
+<td><p>0.96</p>
+</td>
+<td><p>0.04</p>
+</td>
+</tr>
+<tr>
+<td><p>0.30</p>
+</td>
+<td><p>0.95</p>
+</td>
+<td><p>0.05</p>
+</td>
+</tr>
+<tr>
+<td><p>0.32</p>
+</td>
+<td><p>0.95</p>
+</td>
+<td><p>0.06</p>
+</td>
+</tr>
+<tr>
+<td><p>0.34</p>
+</td>
+<td><p>0.94</p>
+</td>
+<td><p>0.06</p>
+</td>
+</tr>
+<tr>
+<td><p>0.36</p>
+</td>
+<td><p>0.93</p>
+</td>
+<td><p>0.07</p>
+</td>
+</tr>
+<tr>
+<td><p>0.38</p>
+</td>
+<td><p>0.92</p>
+</td>
+<td><p>0.08</p>
+</td>
+</tr>
+<tr>
+<td><p>0.40</p>
+</td>
+<td><p>0.92</p>
+</td>
+<td><p>0.09</p>
+</td>
+</tr>
+<tr>
+<td><p>0.42</p>
+</td>
+<td><p>0.91</p>
+</td>
+<td><p>0.10</p>
+</td>
+</tr>
+<tr>
+<td><p>0.44</p>
+</td>
+<td><p>0.90</p>
+</td>
+<td><p>0.11</p>
+</td>
+</tr>
+<tr>
+<td><p>0.46</p>
+</td>
+<td><p>0.89</p>
+</td>
+<td><p>0.13</p>
+</td>
+</tr>
+<tr>
+<td><p>0.48</p>
+</td>
+<td><p>0.88</p>
+</td>
+<td><p>0.14</p>
+</td>
+</tr>
+<tr>
+<td><p>0.50</p>
+</td>
+<td><p>0.87</p>
+</td>
+<td><p>0.15</p>
+</td>
+</tr>
+<tr>
+<td><p>0.52</p>
+</td>
+<td><p>0.85</p>
+</td>
+<td><p>0.17</p>
+</td>
+</tr>
+<tr>
+<td><p>0.54</p>
+</td>
+<td><p>0.84</p>
+</td>
+<td><p>0.19</p>
+</td>
+</tr>
+<tr>
+<td><p>0.56</p>
+</td>
+<td><p>0.83</p>
+</td>
+<td><p>0.21</p>
+</td>
+</tr>
+<tr>
+<td><p>0.58</p>
+</td>
+<td><p>0.81</p>
+</td>
+<td><p>0.23</p>
+</td>
+</tr>
+<tr>
+<td><p>0.60</p>
+</td>
+<td><p>0.80</p>
+</td>
+<td><p>0.25</p>
+</td>
+</tr>
+</table>
+
+</dd>
+<dt>
+<p><a id="subframe_property_SNRWeight"></a> SNRWeight</p>
+</dt>
+<dd>
+<p>The <em>signal to noise ratio weight</em> estimate for the subframe. SNRWeight equals <a href="#subframe_property_MedianMeanDeviation">Median Mean Deviation</a><sup>2</sup> / <a href="#subframe_property_Noise">Noise</a><sup>2</sup>. SNRWeight is unnormalized approximation to the current <em>NoiseEvaluation</em> weight used by the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> process when configured to use the average absolute deviation from the median as a scale estimator. In a subframe integration, the ratio between a subframe's SNRWeight and the reference subframe's SNRWeight approximately equals the <em>NoiseEvaluation</em> weight of the subframe.</p>
+<p>The significance of the unnormalized SNRWeight and the normalized <em>NoiseEvaluation</em> weight is that a weighted subframe integration using these weights is an approximate maximum likelyhood estimator for pixel values that correspond to background limited targets, without requiring additional information such as exposure times or sensor parameters. See the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> documentation for more information.</p>
+<p>Note that SNRWeight and <em>NoiseEvaluation</em> weight are relative and not absolute measures of signal to noise ratio. Their formulation assumes that the subframes represent observations of the same target with the same filter and that the subframes have similar background gradients.</p>
+<p>Frames with higher numbers are better, eg., less camera noise, less light pollution and sky background, more transparent skies and less atmospheric extinction, more exposure time, etc.</p>
+<p>Note SNRWeight is not foolproof. You still should blink your frames. Strongly differing gradients, bright star halos from high thin clouds, etc, can result in bogus SNRWeight values.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Median"></a> Median</p>
+</dt>
+<dd>
+<p>The <em>median</em> of the subframe in electrons or Data Numbers.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_MedianMeanDeviation"></a> MedianMeanDev</p>
+</dt>
+<dd>
+<p>The <em>mean absolute deviation from the median</em> of the subframe in electrons or Data Numbers.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Noise"></a> Noise</p>
+</dt>
+<dd>
+<p>An estimate of the <em>standard deviation of Gaussian noise</em> for the subframe in electrons or Data Numbers. Noise is currently determined by a wavelet-based multiscale algorithm<sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Jean-Luc Starck and Fionn Murtagh, <em>Automatic Noise Estimation from the Multiresolution Support</em>, Publications of the Royal Astronomical Society of the Pacific, vol. 110, February 1998, pp. 193-199">[1]</a></sup>.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_NoiseRatio"></a> NoiseRatio</p>
+</dt>
+<dd>
+<p>The ratio of number of pixels in the subframe deemed free of image structure to the total number of pixels, so this value is always between [0,1]; used to estimate <a href="#subframe_property_Noise">Noise</a>.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_Stars"></a> Stars</p>
+</dt>
+<dd>
+<p>The number of stars detected and fitted in the subframe and used to estimate <a href="#subframe_property_FWHM">FWHM</a>, <a href="#subframe_property_Eccentricity">Eccentricity</a>, <a href="#subframe_property_FWHMMeanDev">FWHMMeanDev</a> and <a href="#subframe_property_EccentricityMeanDev">EccentricityMeanDev</a>.</p>
+<p>Stars may sometimes be used as a measure of subframe quality, as worse observing conditions such as clouds, less exposure time, etc, will result in fewer detectable stars. Note however that for undersampled subframes, stars are tiny and the dimmest usually will be rejected as hot pixels. Better focus, better seeing, and better tracking will result in even smaller stars, higher hot pixel rejection, and smaller Stars values. So a smaller Stars may indicate a better subframe.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_StarResidual"></a> StarResidual</p>
+</dt>
+<dd>
+<p>The <em>mean absolute deviation from the median residual</em> of the star fitting process for the subframe. Residuals are currently measured as the mean absolute deviation between the fitted <a href="#Star_Detector_Point_spread_function">PSF</a> model and the star image data in normalized units.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_FWHMMeanDev"></a> FWHMMeanDev</p>
+</dt>
+<dd>
+<p>The mean absolute deviation from the median star profile <em>full width at half maximum</em> (FWHM) estimate for the subframe in arcseconds or pixels.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_EccentricityMeanDev"></a> EccentricityMeanDev</p>
+</dt>
+<dd>
+<p>The mean absolute deviation from the median star profile <em>eccentricity</em> estimate for the subframe.</p>
+</dd>
+<dt>
+<p><a id="subframe_property_StarResidualMeanDev"></a> StarResidualMeanDev</p>
+</dt>
+<dd>
+<p>The mean absolute deviation from the median <em>residual</em> of the star fitting process for the subframe.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Subframe_Expressions__">
+   <h4 class="pidoc_subsectionTitle">1.7&emsp;<a id="subframe_expressions"></a>Subframe Expressions</h4>
+<p>SubframeSelector utilizes the <a href="https://pixinsight.com/developer/pjsr/index.html" title="https://pixinsight.com/developer/pjsr/index.html"><em>PixInsight JavaScript Runtime</em></a> for expression evaluation to aid in subframe approval and weighting. This facility is extremely similar to the Script version of the SubframeSelector and it provides a few enhancements. An expression's characters are white-listed to ensure this module runs correctly and predictably.</p>
+<p>Basically all <a href="#Subframe_Properties">Subframe Properties</a> are defined as variables to be used in the expression; their variables names are listed below. Expressions must evaluate to a single value, so the input JavaScript expression can simply be compared to a single-line mathematical equation, such as <em>x = ...</em> where <em>x</em> is either a boolean-like value (e.g. true, false, 0, 1) for <em>approval</em> or a numerical value for <em>weighting</em>.</p>
+<p><em>variable</em> = [ <a href="#subframe_property_Index">Index</a> | <a href="#subframe_property_Weight">Weight</a> | WeightSigma | <a href="#subframe_property_FWHM">FWHM</a> | FWHMSigma | <a href="#subframe_property_Eccentricity">Eccentricity</a> | EccentricitySigma | <a href="#subframe_property_SNRWeight">SNRWeight</a> | SNRWeightSigma | <a href="#subframe_property_Median">Median</a> | MedianSigma | <a href="#subframe_property_MedianMeanDeviation">MedianMeanDev</a> | MedianMeanDevSigma | <a href="#subframe_property_Noise">Noise</a> | NoiseSigma | <a href="#subframe_property_NoiseRatio">NoiseRatio</a> | NoiseRatioSigma | <a href="#subframe_property_Stars">Stars</a> | StarsSigma | <a href="#subframe_property_StarResidual">StarResidual</a> | StarResidualSigma | <a href="#subframe_property_FWHMMeanDev">FWHMMeanDev</a> | FWHMMeanDevSigma | <a href="#subframe_property_EccentricityMeanDev">EccentricityMeanDev</a> | EccentricityMeanDevSigma | <a href="#subframe_property_StarResidualMeanDev">StarResidualMeanDev</a> | StarResidualMeanDevSigma ]</p>
+<p>Due to the restrictions on Subframe Expressions, there are only a few types of JavaScript expressions and operators that are worth knowing.</p>
+
+<ul class="pidoc_list">
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Comparison_Operators"><em>Comparison operators</em></a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator"><em>Conditional operators</em></a> are useful in <em>Approval expressions</em> because they evaluate to boolean-like values.</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator"><em>Conditional operators</em></a> might also be useful in <em>Weighting expressions</em> because they can provide different values according to the input.</li>
+<li>Standard <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators"><em>Arithmetic operators</em></a> are useful in <em>Approval and Weighting expressions</em>, and some of the more advanced operators can be applicable.</li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence"><em>Operator precedence</em></a> Describes how these pieces are evaluated.</li>
+<li>The remaining JavaScript operators are either not useful or restricted.</li>
+</ul>
+
+<p>The <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math"><em>Math Object</em></a> in JavaScript is another helpful resource for expression creation. It provides many standard mathematical functions, such as <em>Math.abs(x)</em> for making an absolute number from an input <em>x</em>.</p>
+<p>SubframeSelector performs a very simple check on the expressions to first determine if they are invalid. A checkmark to the left of each expression represents the validity of the current expression as you type. When the enter key is pressed or the field loses focus, all subframes are updated according to the expression. Since the initial check is not complex, it's possible for errors to occur at this time. If an error occurs, the subframes are not updated and the error is displayed in the console.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Subframe_Approval_Expression__">
+   <h4 class="pidoc_subsectionTitle">1.8&emsp;<a id="subframe_approval_expression"></a>Subframe Approval Expression</h4>
+<p>Subframe approval expressions specify constraints on subframe properties. Subframes with properties that satisfy a subframe approval expression are considered <em>approved</em> by that expression. Subframes that do not satisfy a subframe selector expression are considered <em>rejected</em> by that expression. All subframes satisfy a blank (empty) subframe approval expression.</p>
+<p>Subframe approval expressions must evaluate to a boolean-like value. In JavaScript, this is not only a true/false value; for more information see <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Equality_comparisons_and_sameness"><em>Equality comparisons and sameness</em></a>.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Subframe_Weighting_Expression__">
+   <h4 class="pidoc_subsectionTitle">1.9&emsp;<a id="subframe_weighting_expression"></a>Subframe Weighting Expression</h4>
+<p>The value of a subframe's <a href="#subframe_property_Weight">Weight</a> property is specified by a subframe weighting expression. A blank (empty) subframe weighting expression assigns a zero weight.</p>
+<p>Subframe weighting expressions must evaluate to a numeric value.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Subframes__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;<a id="Target_Subframes_section"></a>Subframes</h4>
+<img src="images/Subframes.png" alt=""/>
+<p>Use these controls to define and manage a list of subframes to be processed by SubframeSelector.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="Routine_combo"></a> Routine</p>
+</dt>
+<dd>
+<p>This parameter specifies the working method to operate when Executing Globally. Options are Measure Subframes, Output Subframes, and Star Detector Preview.</p>
+</dd>
+<dt>
+<p><a id="Window_icons"></a> Window Icons</p>
+</dt>
+<dd>
+<p>Use these two icons to show the Expressions and Measurements windows if they have been closed.</p>
+</dd>
+<dt>
+<p><a id="Target_subframes_list"></a> Target subframes list</p>
+</dt>
+<dd>
+<p>This control is a list with all the subframes currently selected for measurement. On this list you can:</p>
+
+<ul class="pidoc_list">
+<li>Double-click on a item's checkbox to toggle its state. Unchecked target subframes will be ignored during the measurement process of SubframeSelector.</li>
+<li>Double-click on a item's filename to open the subframe image in a new image window.</li>
+<li>View full file paths as tool tip messages because the list shows just file names.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Add Files</p>
+</dt>
+<dd>
+<p>Click this button to open a file dialog where you can select existing subframe files, which will be appended to the current list of target subframes.</p>
+</dd>
+<dt>
+<p>Invert</p>
+</dt>
+<dd>
+<p>Click to invert the selection of subframes in the list, such that selected items are deselected and vice versa.</p>
+</dd>
+<dt>
+<p>Toggle</p>
+</dt>
+<dd>
+<p>Click to toggle the checked/unchecked state of the current selection in the list of target subframes. Unchecked target subframes will be ignored during the measurement and output processes of SubframeSelector.</p>
+</dd>
+<dt>
+<p>Remove</p>
+</dt>
+<dd>
+<p>Click to remove current selection from the list of target subframes.</p>
+</dd>
+<dt>
+<p>Clear</p>
+</dt>
+<dd>
+<p>Click to clear the list of target subframes.</p>
+</dd>
+<dt>
+<p>File Cache</p>
+</dt>
+<dd>
+<p>This checkbox determines whether or not the SubframeSelector will use already-computed measurements from a cache instead of measuring the subframes again. Usually, this will always be on to speed up the measurement process if it was done once before.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_System_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;<a id="System_Parameters_section"></a>System Parameters</h4>
+<img src="images/SystemParameters.png" alt=""/>
+<p>This section provides access to parameters that specify subframe, camera, observation site, presentation units and pedestal information.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Subframe Scale</p>
+</dt>
+<dd>
+<p>This parameter specifies target subframe scale in arcseconds per pixel. All target subframes must share the same subframe scale value.</p>
+<p>SubframeSelector will represent <a href="#subframe_property_FWHM">FWHM</a> and <a href="#subframe_property_FWHMMeanDev">FWHMMeanDev</a> properties in either arcseconds or pixels depending on the value of the <a href="#System_Parameters_Scale_unit">Scale Unit</a> parameter.</p>
+</dd>
+<dt>
+<p><a id="System_Parameters_Camera_gain"></a> Camera Gain</p>
+</dt>
+<dd>
+<p>This parameter specifies camera gain in electrons per Data Number. All target subframes must share the same camera gain value.</p>
+<p>By using the values of this parameter and <a href="#System_Parameters_Camera_resolution">Camera Resolution</a>, SubframeSelector will represent all <a href="#subframe_property_Median">Median</a>, <a href="#subframe_property_MedianMeanDeviation">Median Mean Deviation</a> and <a href="#subframe_property_Noise">Noise</a> property values in either electrons or Data Numbers depending on the value of the <a href="#System_Parameters_Data_unit">Data Unit</a> parameter.</p>
+</dd>
+<dt>
+<p><a id="System_Parameters_Camera_resolution"></a> Camera Resolution</p>
+</dt>
+<dd>
+<p>This parameter specifies camera resolution in bits per pixel. All target subframes must share the same camera resolution value.</p>
+<p>By using the values of this parameter and <a href="#System_Parameters_Camera_gain">Camera Gain</a>, SubframeSelector will represent all <a href="#subframe_property_Median">Median</a>, <a href="#subframe_property_MedianMeanDeviation">Median Mean Deviation</a> and <a href="#subframe_property_Noise">Noise</a> property values in either electrons or Data Numbers depending on the value of the <a href="#System_Parameters_Data_unit">Data Unit</a> parameter.</p>
+</dd>
+<dt>
+<p><a id="System_Parameters_Site_local_midnight"></a> Site local midnight</p>
+</dt>
+<dd>
+<p>This parameters specifies the Coordinated Universal Time (UTC) of local midnight at the site of target subframe observation, rounded to the nearest hour from 0 to 23. If this time is unknown or varies by more than six hours for the target subframes, set this parameter to 24.</p>
+<p>SubframeSelector does not currently use this parameter.</p>
+</dd>
+<dt>
+<p><a id="System_Parameters_Scale_unit"></a> Scale Unit</p>
+</dt>
+<dd>
+<p>This parameter specifies the camera pixel scale unit used for measurement presentation. Options are arcseconds and pixels.</p>
+</dd>
+<dt>
+<p><a id="System_Parameters_Data_unit"></a> Data Unit</p>
+</dt>
+<dd>
+<p>This parameter specifies the camera pixel data unit used for measurement presentation. Options are electrons and Data Numbers.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Star_Detector__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;<a id="Star_Detector_section"></a>Star Detector</h4>
+<img src="images/StarDetectorParameters.png" alt=""/>
+<p>This section provides access to parameters that control the star detection and fitting processes of SubframeSelector.</p>
+<p>The star detection parameters should be tuned to detect between several hundred and several thousand stars per subframe. In most cases fewer than several hundred detected stars may risk compromising the accuracy of the measured statistics and more than several thousand detected stars wastes computation time and memory without any additional improvement in accuracy. The number of stars detected and fitted per subframe is provided by the <a href="#subframe_property_Stars">Stars</a> property once the measurement process has completed. A map of detected stars for the first subframe may also be generated by using the &quot;Star Detection Preview&quot; option in the <a href="#Routine_combo">Routine</a> dropdown</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Structure Layers</p>
+</dt>
+<dd>
+<p>This parameter specifies the number of wavelet layers used for star detection.</p>
+
+<ul class="pidoc_list">
+<li>With more wavelet layers larger stars and perhaps also some nonstellar objects will be detected.</li>
+<li>Fewer wavelet layers favors detection of smaller, and hence more, stars.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Noise Layers</p>
+</dt>
+<dd>
+<p>This parameter specifies the number of wavelet layers used for noise reduction. Noise reduction prevents detection of bright noise structures as false stars, including hot pixels and cosmic rays.</p>
+<p>This parameter can also be used to control the sizes of the smallest detected stars (increase to exclude more stars).</p>
+</dd>
+<dt>
+<p>Hot Pixel Filter</p>
+</dt>
+<dd>
+<p>This parameter specifies the radius in pixels of median filter applied before star detection to remove hot pixels.</p>
+<p>To disable hot pixel removal, set this parameter to zero.</p>
+</dd>
+<dt>
+<p>Apply Hot Pixel Filter to Detection Image</p>
+</dt>
+<dd>
+<p>Whether the hot pixel filter removal should be applied to the image used for star detection, or only to the working image used to build the structure map.</p>
+<p>By setting this parameter to true, the detection algorithm is completely robust to hot pixels (of sizes not larger than Hot Pixel Filter), but it is also less sensitive, so less stars will in general be detected. With the default value of false, some hot pixels may be wrongly detected as stars but the number of true stars detected will generally be larger.</p>
+</dd>
+<dt>
+<p>Noise Reduction Filter</p>
+</dt>
+<dd>
+<p>Half size in pixels of a Gaussian convolution filter applied for noise reduction. Useful for star detection in low-SNR images.</p>
+<p>Setting the value of this parameter &gt; 0 implies Hot Pixel Filter To Detection Image.</p>
+</dd>
+<dt>
+<p>Sensitivity</p>
+</dt>
+<dd>
+<p>The sensitivity of the star detection algorithm is measured with respect to the <em>local background</em> of each detected star. Given a star with estimated brightness <em>s</em> and local background <em>b</em>, sensitivity is the minimum value of (<em>s</em> - <em>b</em>) / <em>b</em> necessary to trigger star detection.</p>
+<p>Decrease this parameter to favor detection of fainter stars or stars on brighter backgrounds. Increase it to restrict detection to brighter stars or stars on dimmer backgrounds.</p>
+</dd>
+<dt>
+<p>Peak Response</p>
+</dt>
+<dd>
+<p>This parameter specifies star peak response. If you decrease this parameter, stars will need to have more prominent peaks to be detected by the star detection algorithm. By increasing this parameter, the star detection algorithm will be more permissive with relatively flat stars.</p>
+</dd>
+<dt>
+<p>Max Distortion</p>
+</dt>
+<dd>
+<p>This parameter specifies maximum star distortion. Star distortion is the fractional area of the star's bounding box covered by the star. The distortion of a perfectly circular star is about 0.75 (actually, π/4). Decrease this parameter to detect stars with larger elongation.</p>
+</dd>
+<dt>
+<p>Upper Limit</p>
+</dt>
+<dd>
+<p>Stars with peak values larger than this value won't be measured. This feature may be used to avoid the measurement of saturated and bloomed stars. To disable this feature, set this parameter to one. To disable star detection entirely, set this parameter to zero.</p>
+</dd>
+<dt>
+<p><a id="Star_Detector_Point_spread_function"></a> Point Spread Function</p>
+</dt>
+<dd>
+<p>This parameter specifies the <em>point spread function</em> (PSF) used to fit star images. SubframeSelector can fit circular or elliptical <em>Gaussian</em> functions, <em>Moffat</em> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+Moffat, A. F. J., <em>A Theoretical Investigation of Focal Stellar Images in the Photographic Emulsion and Application to Photographic Photometry</em>, Astronomy and Astrophysics, Vol. 3, p. 455 (1969)">[2]</a></sup> functions with a selected &beta; parameter, and <em>Lorentzian</em> functions. These functions have been selected because their shapes make them particularly suitable to model stellar objects represented on most deep-sky images. The PSF functions are defined in the <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> process documentation.</p>
+<p>Note that FWHM and eccentricity measurements for Gaussian, Moffat and Lorentzian functions are in general not compatible and should not be mutually compared. Also avoid comparing FWHM and eccentricity measurements with results obtained in other applications. Each application implements different methods in different ways and the results are in general not compatible.</p>
+</dd>
+<dt>
+<p>Circular (point spread function)</p>
+</dt>
+<dd>
+<p>Enable this option to fit circular point spread functions. Disable it to fit elliptical functions.</p>
+<p>Circular functions can provide more robust and useful results in cases of strong undersampling or high noise levels.</p>
+</dd>
+<dt>
+<p>Pedestal</p>
+</dt>
+<dd>
+<p>This parameters specifies a (usually small) quantity that is subtracted from each target subframe prior to the measurement process. This value is represented in Data Numbers of the currently selected Camera Resolution parameter.</p>
+</dd>
+<dt>
+<p>Subframe Region</p>
+</dt>
+<dd>
+<p>This parameter defines a rectangular region of each target subframe that will be measured. The successive values specify the left, top, width and height of the region. To measure the entire area of each subframe set all four values to zero.</p>
+<p>This parameter only applies to the Star Detection and Fitting stage of measurements; image-related measurements such as Median are calculated on the whole image. So, the Star Detection portion can be sped up significantly with a smaller region, but the Image Calculations will remain the same.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Outputs__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;<a id="Output_section"></a>Outputs</h4>
+<img src="images/Outputs.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="Output_directory"></a> Output directory</p>
+</dt>
+<dd>
+<p>This is the directory where all approved subframes will be copied. Rejected subframes are ignored.</p>
+<p>If this field is left blank, approved subframes will be copied to the same directories as their corresponding target files.</p>
+</dd>
+<dt>
+<p>Prefix</p>
+</dt>
+<dd>
+<p>This is a prefix that will be prepended to the file name of each copied approved subframe.</p>
+</dd>
+<dt>
+<p>Postfix</p>
+</dt>
+<dd>
+<p>This is a postfix that will be appended to the file name of each copied approved subframe.</p>
+</dd>
+<dt>
+<p><a id="Output_Weight_keyword"></a> Keyword</p>
+</dt>
+<dd>
+<p>This is the custom FITS keyword used to record subframe weights in copied subframes.</p>
+<p>If this field is left blank, subframe weights will not be recorded.</p>
+</dd>
+<dt>
+<p>Overwrite existing files</p>
+</dt>
+<dd>
+<p>If this option is enabled the script will overwrite existing files with the same names as generated output files. This can be dangerous because the original contents of the overwritten files will be lost.</p>
+<p><strong>Warning: Use this option <u>at your own risk</u></strong>.</p>
+</dd>
+<dt>
+<p>On error</p>
+</dt>
+<dd>
+<p>This parameter specifies what to do if there are errors during the output process of SubframeSelector.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Continue</p>
+</dt>
+<dd>
+<p>The process will continue with the next target subframe, if there is one.</p>
+</dd>
+<dt>
+<p>Abort</p>
+</dt>
+<dd>
+<p>The process will be aborted immediately after an error condition.</p>
+</dd>
+<dt>
+<p>Ask user</p>
+</dt>
+<dd>
+<p>A dialog box will be shown where you'll have to specify whether to continue or to abort the process.</p>
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Expressions__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;Expressions</h4>
+<img src="images/Expressions.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>Approval</p>
+</dt>
+<dd>
+<p>This parameter specifies the <a href="#subframe_approval_expression">subframe approval expression</a>, a constraint on subframe properties used to approve and reject subframes.</p>
+<p>A cross icon to the left of the <a href="#subframe_approval_expression">subframe approval expression</a> indicates that the expression is invalid and that all unlocked subframes will be approved.</p>
+<p>The icon on the right will apply the current <a href="#subframe_approval_expression">subframe approval expression</a> to the measured frames.</p>
+</dd>
+<dt>
+<p>Weighting</p>
+</dt>
+<dd>
+<p>This parameter specifies the <a href="#subframe_weighting_expression">subframe weighting expression</a>, an arithmetic combination of subframe properties used to assign subframe weights.</p>
+<p>A cross icon to the left of the <a href="#subframe_weighting_expression">subframe weighting expression</a> indicates that the expression is invalid and that zero will be used as a substitute weight.</p>
+<p>The icon on the right will apply the current <a href="#subframe_weighting_expression">subframe weighting expression</a> to the measured frames.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Table__">
+   <h4 class="pidoc_subsectionTitle">2.6&emsp;Table</h4>
+<img src="images/MeasurementsTable.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="Table_Sort_table_by_column"></a> Sort table by column</p>
+</dt>
+<dd>
+<p>This parameter specifies a table sort column.</p>
+</dd>
+<dt>
+<p><a id="Table_Sort_Table_by_ordering"></a> Sort table by ordering</p>
+</dt>
+<dd>
+<p>This parameter specifies a table sort ordering.</p>
+</dd>
+<dt>
+<p><a id="Table_Counts"></a> Approved/Locked Counts</p>
+</dt>
+<dd>
+<p>The text here conveniently shows the total count of subframes, how many are currently Approved, and how many are currently Locked.</p>
+</dd>
+<dt>
+<p><a id="Table_Toggle_Approve"></a> Toggle Approve</p>
+</dt>
+<dd>
+<p>Toggle the approved/rejected state of the currently selected subframes. The toggled subframes will also be locked.</p>
+<p>Rejected subframes will be ignored during the output subframes process of SubframeSelector. The <a href="#subframe_approval_expression">subframe approval expression</a> will not modify the approved/rejected state of locked subframes.</p>
+</dd>
+<dt>
+<p><a id="Table_Toggle_Locked"></a> Toggle Lock</p>
+</dt>
+<dd>
+<p>Toggle the locked/unlocked state of the currently selected subframes.</p>
+</dd>
+<dt>
+<p><a id="Table_Invert"></a> Invert</p>
+</dt>
+<dd>
+<p>Inverts the selection of the table, such that selected subframes are deselected and vice versa.</p>
+</dd>
+<dt>
+<p><a id="Table_Remove"></a> Remove</p>
+</dt>
+<dd>
+<p>Removes the selections in the table, such that selected subframes no longer measured and do not influence the median or mean deviation.</p>
+</dd>
+<dt>
+<p><a id="Table_Clear"></a> Clear</p>
+</dt>
+<dd>
+<p>Clears the entire list of measurements.</p>
+</dd>
+<dt>
+<p><a id="Table_CSV"></a> Save CSV</p>
+</dt>
+<dd>
+<p>Click this button to save the table as a <em>comma separated value</em> .csv file for postprocessing.</p>
+</dd>
+<dt>
+<p>Subframes table</p>
+</dt>
+<dd>
+<p>The table contains one row per subframe with the subframe's <a href="#subframe_property_Index">Index</a>, <a href="#subframe_property_Approved">Approval Status</a>, <a href="#subframe_property_Locked">Locked Status</a>, and <a href="#subframe_property_Filename">Filename</a> in the first few column and its <a href="#Subframe_Properties">subframe properties</a> listed in the remaining columns. The table may be sorted by column by selecting a <a href="#Table_Sort_table_by_column">table sort column</a> and a <a href="#Table_Sort_Table_by_ordering">table sort ordering</a>.</p>
+<p>On this table you can:</p>
+
+<ul class="pidoc_list">
+<li>Double-click on an item's approval status to toggle its approved/rejected state. The subframe will also be locked.</li>
+<li>Double-click on an item's locked status to toggle its locked/unlocked state.</li>
+<li>Double-click on an item's filename to open the subframe in a new image window.</li>
+<li>View subframe full file paths as tool tip messages in the first column and subframe file names as tool tip mesages in the other columns.</li>
+</ul>
+
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Plots__">
+   <h4 class="pidoc_subsectionTitle">2.7&emsp;<a id="Plots_section"></a>Plots</h4>
+<img src="images/FWHM.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>Left Plot</p>
+</dt>
+<dd>
+<p>The plot displays values of the selected plot ordinate. On this plot you can:</p>
+
+<ul class="pidoc_list">
+<li>Click a subframe's point to toggle its approved/rejected state. The subframe will also be locked.</li>
+<li>Shift-click a subframe's point to unlock the subframe.</li>
+<li>Hover over a point to display the subframe's Weight, plot value, plot value in sigma units, and the median of the plot values.</li>
+<li>Click-and-drag a selection to zoom in on a region.</li>
+<li>Double-click to reset the viewport.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Right Plot</p>
+</dt>
+<dd>
+<p>The plot displays a histogram and Empirical Distribution Function for the selected plot ordinate. On this plot you can:</p>
+
+<ul class="pidoc_list">
+<li>Hover over a point to display the subframe's Weight, plot value, plot value in sigma units, and the median of the plot values.</li>
+<li>Click-and-drag a selection to zoom in on a region.</li>
+<li>Double-click to reset the viewport.</li>
+</ul>
+
+</dd>
+<dt>
+<p><a id="Plots_ordinate"></a> Ordinate</p>
+</dt>
+<dd>
+<p>This parameter specifies the plot ordinate.</p>
+</dd>
+<dt>
+<p><a id="Plots_PDF"></a> Save PDF</p>
+</dt>
+<dd>
+<p>Click this button to save the current plot as a PDF.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Jean-Luc Starck and Fionn Murtagh, <em>Automatic Noise Estimation from the Multiresolution Support</em>, Publications of the Royal Astronomical Society of the Pacific, vol. 110, February 1998, pp. 193-199</p>
+      <p id="__reference_2__"><strong>[2]</strong> Moffat, A. F. J., <em>A Theoretical Investigation of Focal Stellar Images in the Photographic Emulsion and Application to Photographic Photometry</em>, Astronomy and Astrophysics, Vol. 3, p. 455 (1969)</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a>, <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>, <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2017-2018 Cameron Leger. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:20 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

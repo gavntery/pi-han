@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | Projections</title>
+   <meta name="keywords" content="coordinates, annotation" />
+   <meta name="author" content="Andrés del Pozo" />
+   <meta name="description" content="Description of the projections supported by the WCS scripts." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-generic.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>Projections</h1>
+<div id="authors">
+<p>By Andrés del Pozo</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Description of the projections supported by the WCS scripts. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> coordinates, annotation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Projections__">2&emsp;Projections</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_Gnomonic__">2.1&emsp;Gnomonic</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_Stereographic__">2.2&emsp;Stereographic</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_Zenithal_Equal_Area__">2.3&emsp;Zenithal Equal Area</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_Mercator__">2.4&emsp;Mercator</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_PlateCarre__">2.5&emsp;Plate-Carrée</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_HammerAitoff__">2.6&emsp;Hammer-Aitoff</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Projections_:_Orthographic__">2.7&emsp;Orthographic</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>From the Wikipedia <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Wikipedia contributors, <em><a href='http://en.wikipedia.org/wiki/Map_projection' title='http://en.wikipedia.org/wiki/Map_projection'>Map projections</a></em>, Wikipedia, The Free Encyclopedia">[3]</a></sup> : <cite>A map projection is a systematic transformation of the latitudes and longitudes of locations on the surface of a sphere or an ellipsoid into locations on a plane. Map projections are necessary for creating maps. All map projections distort the surface in some fashion. Depending on the purpose of the map, some distortions are acceptable and others are not; therefore different map projections exist in order to preserve some properties of the sphere-like body at the expense of other properties. There is no limit to the number of possible map projections.</cite></p>
+<p>The scripts <a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a>, <a href="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html" title="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html">CatalogStarGenerator</a>, <a href="../../scripts/MosaicByCoordinates/MosaicByCoordinates.html" title="../../scripts/MosaicByCoordinates/MosaicByCoordinates.html">MosaicByCoordinates</a> and <a href="../../scripts/AlignByCoordinates/AlignByCoordinates.html" title="../../scripts/AlignByCoordinates/AlignByCoordinates.html">AlignByCoordinates</a> support several projections with characteristics suitable for different kinds of images.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Projections__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Projections</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Projections', this );">[hide]</p>
+   <div id="Projections">
+<p>This section contains brief descriptions of the supported projections. For more in-depth information you should click in the links available for each projection or read the document with the specification of the representation of celestial coordinates in FITS images <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+M. R. Calabretta, E. W. Greisen (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122">[2]</a></sup> <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+E. W. Greisen, M. R. Calabretta (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075">[1]</a></sup>.</p>
+<p>Each projection has two examples with a representation of the projection centered in the equator and in one of the poles. The parameters of these images are the same for all projections so they can be compared.</p>
+<div class="pidoc_subsection" id="__Projections_:_Gnomonic__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Gnomonic</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img style="width:49.5%;height:auto;" src="images/Gnomonic0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/Gnomonic90.jpg" alt=""/>
+</div>
+<p>The <a href="http://en.wikipedia.org/wiki/Gnomonic_projection" title="http://en.wikipedia.org/wiki/Gnomonic_projection">Gnomonic</a> projection is a variation of the Zenithal projection and it is the most commonly used projection since it can approximate how most optical systems project the images.</p>
+<p>This projection diverges for points more than 90 degree from the center of the projection and it heavily distorts the areas more than 10-20 degrees from the center. It should only be used for small areas.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Projections_:_Stereographic__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Stereographic</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="width:49.5%;height:auto;" src="images/Stereographic0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/Stereographic90.jpg" alt=""/>
+</div>
+<p>The <a href="http://en.wikipedia.org/wiki/Stereographic_projection" title="http://en.wikipedia.org/wiki/Stereographic_projection">Stereographic</a> projection is another variation of the Zenithal projection. It can be used for bigger areas than Gnomonic. It also diverges although only for the opposite point to the center of the projection.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Projections_:_Zenithal_Equal_Area__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Zenithal Equal Area</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+<img style="width:49.5%;height:auto;" src="images/ZenithalEA0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/ZenithalEA90.jpg" alt=""/>
+</div>
+<p><a href="http://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection" title="http://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection">Zenithal Equal Area</a> is a variation of the Zenithal projection. It can represent the whole sky.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Projections_:_Mercator__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Mercator</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+<img style="width:49.5%;height:auto;" src="images/Mercator0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/Mercator90.jpg" alt=""/>
+</div>
+<p><a href="http://en.wikipedia.org/wiki/Mercator_projection" title="http://en.wikipedia.org/wiki/Mercator_projection">Mercator</a> is a classical cylindrical projection which was widely used for navigation charts and currently is used for web mapping. Mercator keeps the shape and angles of small objects but it distorts the size and shape of large objects, as the scale increases from the Equator to the poles, where it becomes infinite.</p>
+<p>This projection is suitable for areas around the great-circle that crosses the reference point of the projection perpendicular to the axis of the cylinder.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Projections_:_PlateCarre__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;Plate-Carrée</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<img style="width:49.5%;height:auto;" src="images/PlateCarree0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/PlateCarree90.jpg" alt=""/>
+</div>
+<p><a href="http://en.wikipedia.org/wiki/Equirectangular_projection" title="http://en.wikipedia.org/wiki/Equirectangular_projection">Plate-Carrée</a> is a very simple projection that maps the right ascension and declination directly to the coordinates x and y of the map.</p>
+<p>Despite of its simplicity it can be used for all-sky maps.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Projections_:_HammerAitoff__">
+   <h4 class="pidoc_subsectionTitle">2.6&emsp;Hammer-Aitoff</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_6__"></a>
+<p class="pidoc_figure_title">Figure 6</p>
+<img style="width:49.5%;height:auto;" src="images/HammerAitoff0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/HammerAitoff90.jpg" alt=""/>
+</div>
+<p>The <a href="http://en.wikipedia.org/wiki/Hammer_projection" title="http://en.wikipedia.org/wiki/Hammer_projection">Hammer-Aitoff</a> projection is an all-sky projection with the property of being equal-area.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Projections_:_Orthographic__">
+   <h4 class="pidoc_subsectionTitle">2.7&emsp;Orthographic</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_7__"></a>
+<p class="pidoc_figure_title">Figure 7</p>
+<img style="width:49.5%;height:auto;" src="images/Orthographic0.jpg" alt=""/>
+<img style="width:49.5%;height:auto;" src="images/Orthographic90.jpg" alt=""/>
+</div>
+<p>The <a href="http://en.wikipedia.org/wiki/Orthographic_projection_%28cartography%29" title="http://en.wikipedia.org/wiki/Orthographic_projection_%28cartography%29">Orthographic</a> projection maps a hemisphere of the sky to a circle. It can be used for modelling the projection of images taken with some fisheye lenses.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> E. W. Greisen, M. R. Calabretta (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075</p>
+      <p id="__reference_2__"><strong>[2]</strong> M. R. Calabretta, E. W. Greisen (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122</p>
+      <p id="__reference_3__"><strong>[3]</strong> Wikipedia contributors, <em><a href="http://en.wikipedia.org/wiki/Map_projection" title="http://en.wikipedia.org/wiki/Map_projection">Map projections</a></em>, Wikipedia, The Free Encyclopedia</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>, <a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a>, <a href="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html" title="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html">CatalogStarGenerator</a>, <a href="../../scripts/MosaicByCoordinates/MosaicByCoordinates.html" title="../../scripts/MosaicByCoordinates/MosaicByCoordinates.html">MosaicByCoordinates</a>, <a href="../../scripts/AlignByCoordinates/AlignByCoordinates.html" title="../../scripts/AlignByCoordinates/AlignByCoordinates.html">AlignByCoordinates</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2013, Andrés del Pozo</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:37 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

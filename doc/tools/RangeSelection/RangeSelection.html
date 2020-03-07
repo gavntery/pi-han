@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | RangeSelection</title>
+   <meta name="keywords" content="mask generation, pixel selection, fuzzy sets" />
+   <meta name="author" content="Javier Sanchis Muñoz, PTeam" />
+   <meta name="description" content="Generates a mask defined by a range of selected pixel values with optional fuzziness, smoothness, mask inversion and lightness/RGBK source components." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>RangeSelection</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Generates a mask defined by a range of selected pixel values with optional fuzziness, smoothness, mask inversion and lightness/RGBK source components. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> MaskGeneration</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> mask generation, pixel selection, fuzzy sets</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;Lower limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;Upper limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;Link range limits</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;Fuzziness</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter005__">2.5&emsp;Smoothness</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter006__">2.6&emsp;Screening</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter007__">2.7&emsp;Lightness</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter008__">2.8&emsp;Invert</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Target_Mode__">3.1&emsp;Target Mode</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_Mode__">3.2&emsp;Output Mode</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/RangeSelection.png" alt=""/>
+<p>RangeSelection allows you to generate a mask by defining a range of pixel values. Those pixels whose values fall within the selected range will be rendered as white pixels on the mask, while pixels outside the selected range will be rendered as black mask pixels. This simple mechanism can be combined with a <em>fuzziness</em> parameter. Fuzziness can be used to introduce a degree of <em>uncertainty</em> in the boundaries of the selection range, as described below. RangeSelection allows you to generate either a binary mask or a mask from source pixels through a mechanism that we call <em>screening,</em> also explained later in this document. Finally, you can generate a mask from the nominal RGB/K image components or from the lightness (CIE L*) component of a color image, with optional smoothening and inversion of the output mask.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;<a id="lower_limit_parameter"></a> Lower limit</h4>
+<p>Defines the lower boundary of the selection range. This parameter can take values in the entire normalized [0,1] range, but it cannot be greater than the value of the <a href="#upper_limit_parameter">upper limit</a> parameter. The default value is zero. The output mask will always be zero (black) for pixels from the target image whose values are below the lower limit parameter.</p>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;<a id="upper_limit_parameter"></a> Upper limit</h4>
+<p>Defines the upper boundary of the selection range. This parameter can take values in the entire normalized [0,1] range, but it cannot be less than the value of the <a href="#lower_limit_parameter">lower limit</a> parameter. The default value is one. The output mask will always be zero (black) for pixels from the target image whose values are above the upper limit parameter.</p>
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;<a id="link_range_limits_parameter"></a> Link range limits</h4>
+<p>By enabling this checkbox the lower and upper selection boundaries remain linked. Any changes applied to the <a href="#lower_limit_parameter">Lower limit</a> slider will have the same effect on the <a href="#upper_limit_parameter">Upper limit</a> slider, and vice-versa, preserving the current interval between both limits. By default this option is disabled, so you can move both sliders freely.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;<a id="fuzziness_parameter"></a> Fuzziness</h4>
+<p>This parameter acts like a <em>tolerance factor</em> or <em>uncertainty</em> for the limits of the selection range. It can be used to avoid strong transitions in the output mask. Increase this parameter to soften the transitions between the masked and unmasked regions, or set it to zero (default value) to get strict binary or screening masks &mdash;see the <a href="#binary_mask_fuzziness"><em>binary mask with fuzziness</em></a> and <a href="#screening_mask_fuzziness"><em>screening mask with fuzziness</em></a> sections for a detailed explanation with examples.</p>
+</div>
+
+      </div>
+      <div id="__parameter005__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.5&emsp;<a id="smoothness_parameter"></a> Smoothness</h4>
+<p>This parameter defines the standard deviation of a Gaussian filter that can be applied by convolution to the output mask. By increasing this parameter the mask will be blurred, which can be useful to make it less dependent on local intensity variations. Set this parameter to zero (default value) to avoid any blurring.</p>
+</div>
+
+      </div>
+      <div id="__parameter006__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.6&emsp;<a id="screening_parameter"></a> Screening</h4>
+<p>When this option is selected, RangeSelection multiplies each mask pixel by its corresponding target image pixel. This has no consequence for black mask pixels, but nonzero mask pixels are replaced by target image pixels, as if these would be projected on a screen through a neutral filter of variable opacity. When this option is disabled (default state) the mask is generated as a binary mask, whose pixels are either zero or one</p>
+</div>
+
+      </div>
+      <div id="__parameter007__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.7&emsp;<a id="lightness_parameter"></a> Lightness</h4>
+<p>When this option is enabled, the mask is built from the CIE L* component (in the <a href="http://en.wikipedia.org/wiki/CIE_L*a*b*" title="http://en.wikipedia.org/wiki/CIE_L*a*b*">CIE L*a*b* color space</a>) of each target image pixel, and hence the resulting mask is a grayscale image. Color space conversions take place in the <a href="../../tools/RGBWorkingSpace/RGBWorkingSpace.html" title="../../tools/RGBWorkingSpace/RGBWorkingSpace.html">RGB working space (RGBWS)</a> of the target image. When this option is disabled (default state) the mask is generated from the nominal <a href="http://en.wikipedia.org/wiki/RGB_color_space" title="http://en.wikipedia.org/wiki/RGB_color_space">RGB/K image components</a>. This parameter is ignored for grayscale images.</p>
+</div>
+
+      </div>
+      <div id="__parameter008__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.8&emsp;<a id="invert_parameter"></a> Invert</h4>
+<p>If this parameter is enabled, the output mask is inverted as the very last step of the RangeSelection process.</p>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<img style="border:1px solid black;float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/Options.png" alt=""/>
+<p>RangeSelection has two <em>target modes</em> and three <em>output modes</em>, which we describe below. On the RangeSelection interface, these modes can be selected through several checkbox controls: <em>Lightness</em> defines the target mode, while <em>Screening</em> and <em>Invert</em> select the output working mode.</p>
+<div class="pidoc_subsection" id="__Usage_:_Target_Mode__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;<a id="target_image_mode"></a>Target Mode</h4>
+<p>The <em>target mode</em> determines whether the process works on the nominal color/gray image components, or on the lightness component of a color target image.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="color_mode"></a> Color Mode</p>
+</dt>
+<dd>
+<p>The <em>color mode</em> is selected when the <em>Lightness</em> checkbox is unchecked. In this mode, the process works on the nominal RGB/K components of the target image.</p>
+</dd>
+<dt>
+<p>Lightness Mode</p>
+</dt>
+<dd>
+<p>When the <em>Lightness</em> checkbox is checked, the process works on the lightness (CIE L* component) of the target image. For grayscale target images the state of the <em>Lightness</em> checkbox is ignored.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_Mode__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Output Mode</h4>
+<p>The <em>output mode</em> selects one among different techniques available to generate the output mask from the target image component(s) defined by the current <a href="#target_image_mode">target mode</a> (RGB/K or lightness).</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="binary_mask_mode"></a> Binary Mask Mode</p>
+</dt>
+<dd>
+<p><strong>Binary mask without fuzziness</strong></p>
+<p>In this output mode the RangeSelection process evaluates each pixel of the target image. If the pixel under evaluation is within the selection range, the resulting mask pixel is one (white); otherwise the resulting mask pixel is zero (black).</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/BinaryMask_1.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/OriginalExample.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/BinaryMask_2.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/BinaryMask_3.png" alt=""/>
+</div>
+<p>The top left picture shows an example of <em>binary mask</em> after processing the image at the top right corner. The bottom left graphic describes the process to generate a binary mask without any other processing argument. The bottom right picture shows the parameters of RangeSelection used to obtain this mask.</p>
+</div>
+<p><strong><a id="binary_mask_fuzziness"></a> Binary mask with fuzziness</strong></p>
+<p>Combining the binary mask mode with the <em>Fuzziness</em> parameter we can define a degree of <em>uncertainty</em> at the boundaries of the selection range. The fuzziness parameter has been implemented as progressive linear transitions between the selected and unselected pixel sets. The transition slope depends directly on the fuzziness parameter, as described on the figure below.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/BinaryMaskWithFuzziness_1.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/OriginalExample.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/BinaryMaskWithFuzziness_2.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/BinaryMaskWithFuzziness_3.png" alt=""/>
+</div>
+<p>The top left picture shows how the fuzziness parameter can be used to soften selection transitions. Compare it with the corresponding result in the <em>binary mask mode</em> example. The bottom left graphic describes the procedure to generate a <em>fuzzy mask</em>. To understand the effect of the fuzziness parameter, pay special attention to the transition slopes and their analytical expressions.</p>
+</div>
+</dd>
+<dt>
+<p>Screening Mask Mode</p>
+</dt>
+<dd>
+<p>This mode is similar to the <a href="#binary_mask_mode">binary mask mode</a>, but each pixel of the output mask is multiplied by the corresponding pixel of the target image.</p>
+<p><strong>Screening mask without fuzziness</strong></p>
+<p>In this case all target pixels falling within the selection range are copied directly to the corresponding pixels of the output mask, while target pixels outside the selection range are discarded and the corresponding mask pixels are set to zero (black).</p>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/ScreeningMask_1.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/OriginalExample.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/ScreeningMask_2.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/ScreeningMask_3.png" alt=""/>
+</div>
+<p>The top left picture shows a screening mask, where the pixels inside the selection range have been copied directly from the target image. The graphic at the bottom left corner shows how all values inside the selection range (the interval between A and B) remain in the mask, while values outside this interval are discarded and the corresponding mask pixels are set to zero (black).</p>
+</div>
+<p><strong><a id="screening_mask_fuzziness"></a> Screening mask with fuzziness</strong></p>
+<p>The combination of the <em>screening mask</em> mode with the fuzziness parameter is similar to the <a href="#binary_mask_fuzziness">binary mask with fuzziness</a>, but in this case each pixel of the output mask is multiplied by the original target pixel, as in the <em>screening mask without fuzziness</em> mode.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/ScreeningMaskWithFuzziness_1.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/OriginalExample.png" alt=""/>
+<img style="border:1px solid black;float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/ScreeningMaskWithFuzziness_2.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/ScreeningMaskWithFuzziness_3.png" alt=""/>
+</div>
+<p>A mask built with screening and fuzziness enabled. The top left picture shows soft transitions between the masked and unmasked areas. These transitions correspond to the transition zones of the bottom left graphic.</p>
+</div>
+</dd>
+<dt>
+<p>Invert mode</p>
+</dt>
+<dd>
+<p>When the <em>Invert</em> checkbox is checked, the output mask is inverted. Note that mask inversion reverses the meaning of the generated mask pixels in terms of <em>mask protection</em>. Irrespective of the inversion state, always bear in mind that white mask pixels allow full processing, while black mask pixels prevent processing of the masked image.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/StarMask/StarMask.html" title="../../tools/StarMask/StarMask.html">StarMask</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:20 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

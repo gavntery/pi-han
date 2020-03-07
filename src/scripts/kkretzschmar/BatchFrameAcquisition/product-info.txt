@@ -1,0 +1,1 @@
+This file is part of BatchFrameAcquisition Script version 0.2.1

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ArcsinhStretch</title>
+   <meta name="keywords" content="arcsinh stretch, inverse hyperbolic sine, hyperbolic arcsine, intensity transformation, color preservation" />
+   <meta name="author" content="Mark Shelley" />
+   <meta name="description" content="Apply an inverse hyperbolic sine function to the image intensity while preserving the original color." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ArcsinhStretch</h1>
+
+<div id="authors">
+<p>By Mark Shelley</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Apply an inverse hyperbolic sine function to the image intensity while preserving the original color. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> IntensityTransformations</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> arcsinh stretch, inverse hyperbolic sine, hyperbolic arcsine, intensity transformation, color preservation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;Stretch Factor</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;Black Point</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;Protect Highlights</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;Use RGB Working Space</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Assumptions__">3.1&emsp;Assumptions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Using_the_RealTime_Preview_Window__">3.2&emsp;Using the Real-Time Preview Window</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Using_the_RealTime_Preview_Window_:_Highlight_Clipped_Values__">3.2.1&emsp;Highlight Clipped Values</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Using_the_RealTime_Preview_Window_:_Estimate_Black_Point__">3.2.2&emsp;Estimate Black Point</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Known_Issues__">3.3&emsp;Known Issues</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Possible_Future_Work__">4&emsp;Possible Future Work</a></li>
+<li class="pidoc_tocItem"><a href="#__Mathematical_Description__">5&emsp;Mathematical Description</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:16px;" src="images/ArcsinhStretch.png" alt=""/>
+<p><em>Arcsinh stretch</em> is a method of stretching image data while preserving the orignal color (i.e. the original R,G,B ratios) in every pixel of the image. Color is retained from the very faintest object to the very brightest unsaturated star. Contrast this to a traditional gamma curve stretch where the brighter objects become desaturated (i.e. bleached) during the stretch.<br class="pidoc_clearfix"/></p>
+<p>The user interface has been kept as simple as possible. There are two important parameters: the black point and the stretch factor. The process also relies very heavily on the real-time preview window, so the results can be judged interactively while adjusting the sliders that control those two key parameters.</p>
+<p>The ArcsinhStretch process is designed to be run on linear (i.e. unstretched) data which has been white balanced and background extracted. When using the real-time preview window, a screen transfer function should not be active because this will upset the appearance of the data in the real-time preview window.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;Stretch Factor</h4>
+<p>The <em>Stretch factor</em> slider has a logarithmic response which allows the same degree of relative control at each end of the scale, i.e. near 1 and near 1000. Values near 1.0 are useful when applying a second iteration of ArcsinhStretch, for instance.</p>
+<p>Note that when stretching the faint signal, the background noise is amplified by the same stretch factor. This amplified background noise will typically be the main constraint on how much stretch you wish to apply. If the maximum stretch level of 1000 is insufficient, then a second iteration of ArcsinhStretch can be applied to the image.</p>
+<p>In the example below, the black point has been set and a stretch factor of 50 has been used:</p>
+<img src="images/Stretch50.jpg" alt=""/>
+<p>Increasing the stretch factor to 300 makes a big difference to this image:</p>
+<img src="images/Stretch300.jpg" alt=""/>
+<p><strong>Useful Hint:</strong> For some images it can be advantageous to apply the stretch iteratively. For instance, the example below shows the third iteration using a stretch factor of 6.70. Since the product of 6.7 three times is approximately 300 (6.7 &times; 6.7 &times; 6.7 = 300.7), the effect is similar but not identical to the above single stretch of 300. However, the iterative approach has made the nebulosity appear more dramatic.</p>
+<img src="images/ThreeIterations.jpg" alt=""/>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;Black Point</h4>
+<p>On the ArcsinhStretch interface it can be seen that the black point adjuster has two sliders. Users of the <a href="../../tools/Convolution/Convolution.html" title="../../tools/Convolution/Convolution.html">Convolution</a> process will already be familiar with the concept of having two sliders to control a single parameter, one being a coarse adjustment and the other being a fine adjustment.</p>
+<p>The lower slider of the two is for fine adjustment. Think of it as analogous to a <em>fine focusing</em> knob. The slider re-centers itself whenever you move the mouse away from the slider, so you can always finely adjust both up and down from the background level you already have.</p>
+<p>The black point has six decimal places of precision, and using the keyboard Up/Down arrows on the fine adjustment slider will nudge the final digit. PgUp/PgDn gives an adjustment 10x as much. The mouse wheel gives an adjustment 3x as much. Failing that, just type the background number in the box&mdash;it's easy to overtype the final digit as required.</p>
+<p>When stretching by a factor of 100 or more, the very tiniest adjustment of the background value makes a very noticeable difference to the image, because its effects are also magnified by a factor of 100 or more! However, the keyboard keys Up, Down, PgUp, PgDn and the mouse wheel work fine for nudging the value.</p>
+<p><strong>Useful Hint:</strong> It is easiest to set the black point with the real-time preview window activated and with the <em>highlight clipped values</em> option enabled.</p>
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;Protect Highlights</h4>
+<p>Stretching the image data can cause some data values to saturate (i.e. clip with a value of 1.0). The <em>Protect highlights</em> option will identify such pixels and linearly scale the whole image to avoid any individual pixel values becoming saturated. This will make the final image to appear darker.</p>
+<p>For users who want a mathematical example of how such clipping can occur, consider an image pixel with RGB value (0.98, 0.25, 0.25). Since the luminance is less than 1.0, the image pixel will be stretched and this could force the red component to exceed 1.0 and therefore clip.</p>
+<p>However, there is a known issue with the <em>Protect highlights</em> option. Under some circumstances the stretched image will end up darker than indicated by its real-time preview. This is because the real-time preview works on a smaller sample of the whole image and may not see some of the brighter pixels that exist in the entire image.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;Use RGB Working Space</h4>
+<p>By default, the luminance value of the pixel is calculated from equally weighted RGB values (1/3, 1/3, 1/3). Setting the <em>Use RGB working space</em> option will use whatever weights are used by the current RGB Working Space (RGBWS); e.g. (0.22, 0.72, 0.06). These weights can be changed by applying the <a href="../../tools/RGBWorkingSpace/RGBWorkingSpace.html" title="../../tools/RGBWorkingSpace/RGBWorkingSpace.html">RGBWorkingSpace</a> process to the data. This can have subtle but interesting results because although individual pixels will still have the correct color balance after stretching, the RGBWS can affect the look of the image as a whole by for instance, emphasizing or de-emphasizing areas of red H-alpha emissions or blue reflection nebulosity.</p>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The ArcsinhStretch process has been designed to be simple, intuitive, and fast to use. When using it for the first time, simply perform the following steps:</p>
+
+<ul class="pidoc_list">
+<li>Ensure the source image window has no screen transfer function (STF) active.</li>
+<li class="pidoc_spaced_list_item">Activate the real-time preview window and click the <em>Estimate Black Point</em> button.</li>
+<li class="pidoc_spaced_list_item">Increase the amount of stretch until the faint data appears.</li>
+<li class="pidoc_spaced_list_item">Finely adjust the black point to increase/decrease the number of pixels that are being clipped to zero.</li>
+<li class="pidoc_spaced_list_item">Apply the stretch to the image (by dragging the New Instance icon to the image, by clicking the Apply button, or by pressing F5).</li>
+</ul>
+
+<div class="pidoc_subsection" id="__Usage_:_Assumptions__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Assumptions</h4>
+<p>The ArcsinhStretch process works best on linear data that has been white balanced and background extracted. The data should also be linear, i.e. no previous non-linear transformation should have been applied (e.g. by using <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation,</a> or by adjusting the midtones on <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation).</a> In addition, if it is desired to take advantage of the powerful real-time preview, it is important that no STF (screen transfer function) is active on the image.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Using_the_RealTime_Preview_Window__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Using the Real-Time Preview Window</h4>
+<p>The real-time preview functionality is a key element for obtaining good results, but first make sure that a screen transfer function is not active because that will upset the appearance of the preview.</p>
+<p>The real-time preview window is activated in the usual manner, by clicking the Real-Time Preview icon on the bottom left of the tool. When the real-time preview window is activated, the <em>Estimate Black Point</em> button and <em>Highlight values clipped to zero</em> check box are no longer greyed out. They are explained in the next sections.</p>
+<div class="pidoc_subsection" id="__Usage_:_Using_the_RealTime_Preview_Window_:_Highlight_Clipped_Values__">
+   <h5 class="pidoc_subsectionTitle">3.2.1&emsp;Highlight Clipped Values</h5>
+<p>This control is accessible only when the real-time preview window is active, and only affects what is displayed in the real-time preview window. The color of the highlighted pixels indicates which colors have been clipped to zero.</p>
+<img src="images/EstimateBlackPoint.jpg" alt=""/>
+<p>In the example above, the highlighted pixels are mainly red. This shows that the red channel is weaker and is the first to clip. It might be an indication that better background modeling and correction is required. As the black point level is increased, the red and green channels will also clip, and the color of the highlighted pixels will turn to white.</p>
+<p><strong>Useful Hint:</strong> Temporarily reduce the stretch factor to make it easier to distinguish the highlighted clipped pixels from the rest of the image.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Using_the_RealTime_Preview_Window_:_Estimate_Black_Point__">
+   <h5 class="pidoc_subsectionTitle">3.2.2&emsp;Estimate Black Point</h5>
+<p>This control is accessible only when the real-time preview window is active. It will set the black point at a level where a 2% of pixel values are clipped to zero. This provides a good starting point in most cases. Sometimes the clipped values are clumped together in a few areas of the image rather than being spread across the image. This might indicate that further work is required on background modeling and correction.</p>
+<p>From this starting point of 2% pixel clipping, the fine adjustment slider can be used to adjust the black point up or down, according to preference.</p>
+<img src="images/EstimateBlackPoint.jpg" alt=""/>
+<p>In the example above, the <em>Estimate Black Point</em> button has been clicked to estimate and set the black point, and the <em>Highlight values clipped to zero</em> option is activated. The user can then judge whether to adjust the black point up or down from this level.</p>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Known_Issues__">
+   <h4 class="pidoc_subsectionTitle">3.3&emsp;Known Issues</h4>
+<p>The following is a list of known issues of which the user should be aware.</p>
+
+<ul class="pidoc_list">
+<li>In the stretched image, the centers of the brightest stars can sometimes appear discolored, typically pink. This is caused by the camera sensor being saturated by those stars in the original exposures used to create the image. ArcsinhStretch will faithfully preserve the discoloration found in the original data. It can be treated in various ways, for instance an additional <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a> step or some kind of operation carried out on star centers using an appropriate star mask.</li>
+<li class="pidoc_spaced_list_item">In many images the brighter areas can suffer from a lack of contrast after stretching, compared with some alternative intensity transformations. This is because a wide range of pixel values have been &quot;squashed&quot; into a narrow range. Approaches such as <a href="../../tools/MultiscaleLinearTransform/MultiscaleLinearTransform.html" title="../../tools/MultiscaleLinearTransform/MultiscaleLinearTransform.html">MultiscaleLinearTransform</a> may help to ameliorate this lack of contrast.</li>
+<li class="pidoc_spaced_list_item">As mentioned earlier, there is a known issue with the <em>Protect highlights</em> option. Under some circumstances the stretched image will end up darker than indicated by its real-time preview. This is because the real-time preview works on a smaller sample of the whole image, and may not see some of the brighter pixels that exist in the entire image.</li>
+</ul>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Possible_Future_Work__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Possible Future Work</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Possible_Future_Work', this );">[hide]</p>
+   <div id="Possible_Future_Work">
+<p>There is actually no need to restrict the functional form of the transfer fucntion to be the inverse hyperbolic sine. Any kind of &quot;curves&quot; function will do just as well. The key point is that to preserve color the calculated pixel multiplier must be simultaneously applied to all channels (R,G,B) in the pixel.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Mathematical_Description__">
+   <h3 class="pidoc_sectionTitle">5&emsp;Mathematical Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Mathematical_Description', this );">[hide]</p>
+   <div id="Mathematical_Description">
+<p>The methodology is based on a paper by Lupton <em>et al.</em><sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Robert Lupton <em>et al.</em> (2004), <em>Preparing Red-Green-Blue (RGB) Images from CCD Data</em>, Publications of the Astronomical Society of the Pacific, 116:133&ndash;137">[1]</a></sup> whose aim was to stretch astronomical images in such a way that color, especially star color, is preserved.</p>
+<p>The image data is first scaled into the range [0,1] and then a transfer function is applied to the luminance to boost the intensity of the faint data. The inverse hyperbolic sine (or hyperbolic <em>arc sine</em>) is the tranfer function suggested by the paper. This function is linear near zero and becomes increasingly logarithmic as it approaches unity. Lupton's paper specifies a softening parameter, namely <img style="vertical-align:middle;" src="images/eqn_0001.svg" alt=""/>, whose purpose is to control the point at which the gradual change from linear to logarithmic takes place. Color preservation is ensured by applying the same multiplier to the nominal RGB color components.</p>
+<p>The softening factor used by Lupton is rather unintuitive, so in this implementation a more intuitve stretch factor has been introduced in its place. This is the multiplicative scalar that is applied to the faintest parts of the image. Internally, the ArcsinhStretch process calculates the required softening factor that achieves the amount of stretch requested by the user. This can be written as follows:</p>
+<div class="pidoc_equation"><img src="images/eqn_0002.svg" alt=""/></div>
+<p>where <img style="vertical-align:middle;" src="images/eqn_0003.svg" alt=""/>, <img style="vertical-align:middle;" src="images/eqn_0004.svg" alt=""/>, <img style="vertical-align:middle;" src="images/eqn_0005.svg" alt=""/> are the nominal components in the RGB color space in the range [0,1], <img style="vertical-align:middle;" src="images/eqn_0001.svg" alt=""/> is the softening factor, <img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> is the calculated stretch factor, and <img style="vertical-align:middle;" src="images/eqn_0007.svg" alt=""/>, <img style="vertical-align:middle;" src="images/eqn_0008.svg" alt=""/>, <img style="vertical-align:middle;" src="images/eqn_0009.svg" alt=""/> are the resulting stretched color components.</p>
+<p>Note that when <img style="vertical-align:middle;" src="images/eqn_0010.svg" alt=""/> (i.e., when the luminance is at its maximum value of one) no stretching takes place because <img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> is also one. When <img style="vertical-align:middle;" src="images/eqn_0011.svg" alt=""/> the stretch factor is <img style="vertical-align:middle;" src="images/eqn_0012.svg" alt=""/>, which is the asymptote of <img style="vertical-align:middle;" src="images/eqn_0013.svg" alt=""/> as <img style="vertical-align:middle;" src="images/eqn_0014.svg" alt=""/> reduces to zero.</p>
+<p>The ArcsinhStretch process calculates the value of the softening factor <img style="vertical-align:middle;" src="images/eqn_0001.svg" alt=""/> which gives the user-requested stretch at <img style="vertical-align:middle;" src="images/eqn_0011.svg" alt=""/>.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Robert Lupton <em>et al.</em> (2004), <em>Preparing Red-Green-Blue (RGB) Images from CCD Data</em>, Publications of the Astronomical Society of the Pacific, 116:133&ndash;137</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a>, <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a>, <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">ScreenTransferFunction</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2017 Mark Shelley. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:26 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

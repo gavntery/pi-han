@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ColorCalibration</title>
+   <meta name="keywords" content="color calibration, white reference, background reference" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Calibrates the color of a linear deep-sky image based on documentary criteria." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ColorCalibration</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Calibrates the color of a linear deep-sky image based on documentary criteria. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> ColorCalibration</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> color calibration, white reference, background reference</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Working_Images__">1.1&emsp;Working Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Preconditions__">1.2&emsp;Preconditions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Working_Modes__">1.3&emsp;Working Modes</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;White reference: Reference image</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;White reference: Lower limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;White reference: Upper limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;White reference: Region of Interest</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter005__">2.5&emsp;Structure detection</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter006__">2.6&emsp;Structure layers</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter007__">2.7&emsp;Noise layers</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter008__">2.8&emsp;Manual white balance</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter009__">2.9&emsp;Manual red, green and blue factors</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter010__">2.10&emsp;Output white reference mask</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter011__">2.11&emsp;Background reference: Reference image</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter012__">2.12&emsp;Background reference: Lower limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter013__">2.13&emsp;Background reference: Upper limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter014__">2.14&emsp;Background reference: Region of Interest</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter015__">2.15&emsp;Output background reference mask</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/ColorCalibration.png" alt=""/>
+<p>The ColorCalibration tool performs a balancing of the colors of a linear RGB deep-sky image based on the following <em>documentary criteria:</em></p>
+
+<ul class="pidoc_list">
+<li>Maximize information representation in the calibrated color image.</li>
+<li>Don't favor any particular color or spectral type as a white reference.</li>
+</ul>
+
+<p>Note that this is a spectrum-agnostic color calibration procedure, very different from other methods based on fixing a white reference with respect to a particular spectral type.<br class="pidoc_clearfix"/></p>
+<p>Our approach originates from the fact that &mdash;in our opinion&mdash; the concept of <em>real color</em> makes no sense in deep-sky astrophotography. Real color doesn't exist in the deep sky because, on one hand, the objects represented in a deep-sky image are far beyond the capabilities of the human vision system, and on the other hand, the physical nature, properties and conditions of the deep-sky objects are very different from those of the subjects that can be acquired under normal daylight conditions.</p>
+<div class="pidoc_subsection" id="__Description_:_Working_Images__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;Working Images</h4>
+<p>The ColorCalibration tool needs two reference images to work. One is the <em>background reference image,</em> whose pixels are used to compute a set of per-channel initial mean background values. The other working image is the <em>white reference image,</em> whose pixels allow computing per-channel color calibration factors, which are applied by multiplication to perform the color balancing. The color calibration procedure works in such a way that the average color of the white reference image would (or will) be neutral (unsaturated gray) after calibration. Note that one or both reference images can be (and use to be) the same image being calibrated, or a suitable subset of it.</p>
+<p>For the color calibration process to yield coherent results, two conditions must be met:</p>
+
+<ul class="pidoc_list">
+<li>The background reference image must provide a good sample of the <em>true background.</em> In general, this means that the background reference image should be a view or subimage whose pixels are strongly dominated (in the statistical sense) by the sky background, as it has been recorded on the image.</li>
+<li class="pidoc_spaced_list_item">The white reference image must provide a sample of a sufficiently rich set of objects, in the colorimetric sense. With a sufficiently large and varied set of objects included in the white reference image, no particular color will be favored and hence our spectral agnosticism will be preserved.</li>
+</ul>
+
+<p>Note that meeting the above conditions is the entire responsibility of the user; our ColorCalibration tool will yield incoherent and even wildly wrong results if the user does not provide valid reference images. With a little effort and care though, plausible background and white references can be defined to a sufficient approximation as to achieve excellent results in most practical cases.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Preconditions__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;Preconditions</h4>
+<p>Along with valid reference images, our color calibration procedure requires three further conditions:</p>
+
+<ul class="pidoc_list">
+<li>The images must be linear. ColorCalibration won't work with nonlinear (e.g., stretched) images. No consistent color calibration scheme can be implemented with nonlinear data.</li>
+<li class="pidoc_spaced_list_item">The image(s) must be accurately calibrated. In particular, illumination must be uniform for the whole corrected image and, if different images are used to define the background and/or white references, those images must also have uniform illumination throughout the entire field. This means that flat fielding must be correctly applied as part of the image calibration process, and any residual additive gradients must also be removed <em>before</em> attempting to perform a valid color calibration. For background modeling and equalization, you can use the <a href="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html" title="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html">DynamicBackgroundExtraction</a> and <a href="../../tools/AutomaticBackgroundExtraction/AutomaticBackgroundExtraction.html" title="../../tools/AutomaticBackgroundExtraction/AutomaticBackgroundExtraction.html">AutomaticBackgroundExtraction</a> tools in PixInsight.</li>
+<li class="pidoc_spaced_list_item">The mean background should be <em>neutral.</em> This is particularly important for the white reference image. Actually, a neutral background reference is not a necessary precondition for the ColorCalibration tool to work correctly; for example, in theory background neutralization could be applied after color calibration. In practice however, a non-neutral background will always contaminate the white reference to some extent, since due to the limited signal-to-noise ratio there is always some uncertainty in the selection of white reference pixels. With a neutral background, even if some background pixels enter the set of white reference pixels, their contribution in terms of color balance will be statistically insignificant, and hence the white reference will be more robust. To neutralize the background, the tool of choice is <a href="../../tools/BackgroundNeutralization/BackgroundNeutralization.html" title="../../tools/BackgroundNeutralization/BackgroundNeutralization.html">BackgroundNeutralization</a> in PixInsight.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Working_Modes__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;Working Modes</h4>
+<p>The ColorCalibration tool can work in three different modes:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="range_selection_mode"></a> Range Selection Mode</p>
+</dt>
+<dd>
+<p>In this mode ColorCalibration gathers all pixels of the white reference image within a prescribed range of pixel values, usually defined to prevent inclusion of black and nearly saturated pixels. This mode can be used to select a suitable astronomical object as white reference. In particular, this working mode allows selecting a <em>nearby spiral galaxy</em> to compute a white reference. The integrated light of a nearby spiral galaxy is a plausible white reference, since it provides a sample of all stellar populations and spectral types, and its redshift is negligible. This method has been proposed by PTeam member Vicent Peris, who first implemented it to calibrate a number of deep sky images taken with large telescopes. According to Vicent, ideal calibration galaxies should have the following properties:</p>
+
+<ul class="pidoc_list">
+<li>Closer than 50 mpc</li>
+<li>Hubble classifications Sa, Sb, Sc, Scd, SBa, SBb, SBc or SBcd</li>
+<li>Inclination less than 60 degrees</li>
+<li>Integrated intrinsic intergalactic and galactic reddening &lt; 0.5 mag in Johnson B</li>
+</ul>
+
+</dd>
+<dt>
+<p><a id="structure_detection_mode"></a> Structure Detection Mode</p>
+</dt>
+<dd>
+<p>By sampling a large set of unsaturated stars of varied spectral types, a plausible white reference can also be defined. To this purpose, ColorCalibration implements a wavelet-based structure detection algorithm that can be used to select all small-scale structures on the white reference image.</p>
+</dd>
+<dt>
+<p><a id="manual_mode"></a> Manual Mode</p>
+</dt>
+<dd>
+<p>In this mode you can specify three color correction factors, in case you have estimated them by other means, including a previous execution of the ColorCalibration tool with the same or a different image. This is useful to <em>transport</em> previously calculated color calibration factors between images.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;<a id="white_reference_image"></a> White reference: Reference image</h4>
+<p>ColorCalibration will use pixels read from this image to compute a set of three color calibration factors, one for each RGB channel. If you leave this field blank, or with its default &lt;target image&gt; value, the target image will be also the white reference image during the calibration process.</p>
+<p>The view you specify here should provide, <em>on average</em>, a suitable white reference. This normally requires restricting sampling white reference pixels to a particular region of the image. This can be done by specifying a preview, or even better, by using a <a href="#white_region_of_interest">region of interest</a> (ROI).</p>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;<a id="white_lower_limit_param"></a> White reference: Lower limit</h4>
+<p>Lower rejection bound for the set of white reference pixels, in the normalized [0,1] range. White reference pixels less than or equal to this value will be rejected for calculation of color correction factors. Note that since the minimum allowed value for this parameter is zero, black pixels are always excluded from the set of white reference pixels.</p>
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;<a id="white_upper_limit_param"></a> White reference: Upper limit</h4>
+<p>Upper rejection bound for the set of white reference pixels, in the normalized [0,1] range. White reference pixels greater than or equal to this value will be rejected for calculation of color correction factors. This parameter allows you to reject saturated pixels, or pixels with very high values pertaining to the nonlinear regions of most CCD response curves. Note that since the maximum allowed value for this parameter is one, white (saturated) pixels are always excluded from the set of white reference pixels.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;<a id="white_region_of_interest"></a> White reference: Region of Interest</h4>
+<p>When the whole image cannot be used to sample the white reference, a usual way to restrict sampling to white reference pixels is defining a preview and selecting it as the <a href="#white_reference_image">white reference image</a>. In these cases a much better solution is using a <em>region of interest</em> (ROI). In ColorCalibration, the white reference ROI defines a rectangular area of the white reference image that will be sampled to compute white balancing factors. The ROI is specified by four values expressed in pixels: the coordinates of its top left corner and its width and height. Instead of entering these values directly you can acquire them from an existing preview by clicking the <em>From Preview</em> button.</p>
+<p>To enable the white reference ROI section, you have to check the corresponding <em>Region of Interest</em> group title checkbox. ColorCalibration also provides a <a href="#background_region_of_interest">background ROI</a> to define its background reference, and the <a href="BackgroundNeutralization" title="BackgroundNeutralization">BackgroundNeutralization</a> tool also has a similar ROI functionality. When using ROIs, you usually will leave the white reference and background reference images with their default blank values (indicated as <em>&lt;target image&gt;</em> on the ColorCalibration interface). This has the advantage that the process instance so defined is <em>reusable:</em> it can be applied to any image without requiring existence of specific previews. This is especially important to integrate ColorCalibration instances with <a href="ProcessContainer" title="ProcessContainer">ProcessContainer.</a></p>
+</div>
+
+      </div>
+      <div id="__parameter005__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.5&emsp;Structure detection</h4>
+<p>When this option is selected, ColorCalibration will work in <a href="#structure_detection_mode"><em>structure detection mode</em></a>. In this mode ColorCalibration uses a multiscale, wavelet-based structure detection routine to isolate bright significant image structures within a prescribed range of dimensional scales &mdash;see the <a href="#structure_layers_param"><em>structure layers</em></a> and <a href="#noise_layers_param"><em>noise layers</em></a> parameters. This feature can be used to perform a color calibration based on the stars recorded in the white reference image, as we have <a href="#structure_detection_mode">described</a> in the introduction. This option is selected by default.</p>
+<p>When this option is disabled, ColorCalibration will work in <a href="#range_selection_mode"><em>range selection mode</em></a>, which you can use to calibrate with a nearby spiral galaxy, as we have also <a href="#range_selection_mode">described</a> in the introduction section of this document.</p>
+</div>
+
+      </div>
+      <div id="__parameter006__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.6&emsp;<a id="structure_layers_param"></a> Structure layers</h4>
+<p>This is the number of small-scale wavelet layers (in a dyadic scaling sequence) used for structure detection. More layers will use larger image structures for calculation of color calibration factors. The default value is 5, which corresponds to a scale of 32 pixels.</p>
+</div>
+
+      </div>
+      <div id="__parameter007__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.7&emsp;<a id="noise_layers_param"></a> Noise layers</h4>
+<p>Number of wavelet layers used for noise reduction. Noise reduction prevents detection of bright noise structures, including hot pixels and cosmic rays. This parameter can also be used to control the sizes of the smallest detected stars (increase it to exclude more stars).</p>
+</div>
+
+      </div>
+      <div id="__parameter008__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.8&emsp;Manual white balance</h4>
+<p>With this option selected, ColorCalibration will work in <a href="#manual_mode"><em>manual mode</em></a>. In this mode you can perform a manual white balance by specifying the three color correction factors literally. If you select this option, no automatic color calibration routine will be applied, and you'll be allowed to enter the correction factors for red, green and blue with the next three parameters. This option is disabled by default.</p>
+</div>
+
+      </div>
+      <div id="__parameter009__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.9&emsp;Manual red, green and blue factors</h4>
+<p>These three parameters are the manual color balancing factors for the red, green and blue channels, respectively, of the target image. These parameters are only enabled when ColorCalibration is working in <a href="#manual_mode"><em>manual mode</em></a>.</p>
+</div>
+
+      </div>
+      <div id="__parameter010__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.10&emsp;Output white reference mask</h4>
+<p>If this option is selected, ColorCalibration will create a new image window with a <em>white reference mask</em>. A white reference mask is white for pixels in the white reference image that have been used to calculate color correction factors, black anywhere else. You can use this mask to check whether the <a href="#white_lower_limit_param">lower</a> and <a href="#white_upper_limit_param">upper</a> limit parameters are doing a good job selecting the set of pixels that you intend to use as a white reference.</p>
+</div>
+
+      </div>
+      <div id="__parameter011__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.11&emsp;<a id="background_reference_image"></a> Background reference: Reference image</h4>
+<p>ColorCalibration will use pixels read from this image to compute an initial mean background level for each color channel. If you leave this field blank (or with its default &lt;target image&gt; value), the target image will be also the background reference image during the color calibration process.</p>
+<p>You should specify a view that represents the <em>true background</em> of the image. In most cases this means that you must select a view whose pixels are strongly dominated by the sky background, as it is being represented on the target image. A typical example involves defining a small preview over a free sky area of the target image, and selecting it as the background reference image. Even better than selecting a preview as a background reference image is using a <a href="#background_region_of_interest">region of interest</a> (ROI).</p>
+</div>
+
+      </div>
+      <div id="__parameter012__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.12&emsp;<a id="background_lower_limit_param"></a> Background reference: Lower limit</h4>
+<p>Lower bound of the set of background pixels. Background reference pixels below this value will be rejected for calculation of mean background values.</p>
+</div>
+
+      </div>
+      <div id="__parameter013__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.13&emsp;<a id="background_upper_limit_param"></a> Background reference: Upper limit</h4>
+<p>Upper bound of the set of background pixels. Background reference pixels above this value will be rejected for calculation of mean background values.</p>
+</div>
+
+      </div>
+      <div id="__parameter014__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.14&emsp;<a id="background_region_of_interest"></a> Background reference: Region of Interest</h4>
+<p>When the whole image cannot be used to sample the background, a usual way to restrict sampling to background pixels is defining a preview and selecting it as the <a href="#background_reference_image">background reference image</a>. In these cases a much better solution is using a <em>region of interest</em> (ROI). In ColorCalibration, the background reference ROI defines a rectangular area of the background reference image that will be sampled to compute mean background values. The ROI is specified by four values expressed in pixels: the coordinates of its top left corner and its width and height. Instead of entering these values directly you can acquire them from an existing preview by clicking the <em>From Preview</em> button.</p>
+<p>To enable the background reference ROI section, you have to check the corresponding <em>Region of Interest</em> group title checkbox. ColorCalibration also provides a <a href="#white_region_of_interest">white reference ROI</a> to define its white reference, and the <a href="BackgroundNeutralization" title="BackgroundNeutralization">BackgroundNeutralization</a> tool also has a similar ROI functionality. When using ROIs, you usually will leave the white reference and background reference images with their default blank values (indicated as <em>&lt;target image&gt;</em> on the ColorCalibration interface). This has the advantage that the process instance so defined is <em>reusable:</em> it can be applied to any image without requiring existence of specific previews. This is especially important to integrate ColorCalibration instances with <a href="ProcessContainer" title="ProcessContainer">ProcessContainer.</a></p>
+</div>
+
+      </div>
+      <div id="__parameter015__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.15&emsp;Output background reference mask</h4>
+<p>If this option is selected, ColorCalibration will create a new image window with a <em>background reference mask</em>. A background reference mask is white for pixels in the background reference image that have been used to calculate mean background levels, black anywhere else. You can use this mask to check whether the <a href="#background_lower_limit_param">lower</a> and <a href="#background_upper_limit_param">upper</a> limit parameters define a suitable range of values to select the pixels that you intend to use as background reference.</p>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/BackgroundNeutralization/BackgroundNeutralization.html" title="../../tools/BackgroundNeutralization/BackgroundNeutralization.html">BackgroundNeutralization</a>, <a href="../../tools/LinearFit/LinearFit.html" title="../../tools/LinearFit/LinearFit.html">LinearFit</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:20 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

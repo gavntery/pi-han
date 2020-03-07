@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | FlatSNREstimator</title>
+   <meta name="keywords" content="signal to temporal noise ratio estimation, gain estimation, frame quality evaluation, detector characterization" />
+   <meta name="author" content="Mike Schuster" />
+   <meta name="description" content="Estimates the signal to temporal noise ratio and gain of flat subframes or integrations." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>FlatSNREstimator</h1>
+
+<div id="authors">
+<p>By Mike Schuster</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Estimates the signal to temporal noise ratio and gain of flat subframes or integrations. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> signal to temporal noise ratio estimation, gain estimation, frame quality evaluation, detector characterization</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Parameters__">2.1&emsp;Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Results__">2.2&emsp;Results</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Push_buttons__">2.3&emsp;Push buttons</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Applications__">3&emsp;Applications</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Applications_:_Detector_gain_in_eDN_estimation__">3.1&emsp;Detector gain in e-/DN estimation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Applications_:_Bayer_CFA_detector_channel_SNR_and_gain_estimation__">3.2&emsp;Bayer CFA detector channel SNR and gain estimation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Applications_:_Subframe_integration_efficiency_and_quality_estimation__">3.3&emsp;Subframe integration efficiency and quality estimation</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Algorithm__">4&emsp;Algorithm</a></li>
+<li class="pidoc_tocItem"><a href="#__Limitations__">5&emsp;Limitations</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<p>This script estimates the signal to temporal noise ratio and gain of flat subframes or integrations. The information is useful for flat frame quality evaluation and detector characterization.</p>
+<p>This script requires as inputs two flats and, if the flats are uncalibrated (i.e. not flat dark or bias subtracted), either a flat dark or a bias, all equally sized, single channel subframes or integrations, and a foreground quantile parameter. Flat subframes must be similarly exposed within the linear operating region of the detector. Flat integrations must be similar combinations of the same number of similarly exposed subframes. The flats and flat dark or bias may be monochrome detector images, raw Bayer CFA detector images, or a CFA channel extracted from raw Bayer CFA detector images. Estimation accuracy will be compromised on RGB channels extracted from de-Bayered CFA images due to channel interpolation.</p>
+<p>The foreground quantile parameter specifies the brightest quantile of local regions in the flats used to estimate the signal to temporal noise ratio and gain.</p>
+<p>The signal component of the estimated signal to temporal noise ratio is an estimate of the typical exposure of the flats. Spurious signal noise (e.g. cosmic-ray hits and stars in sky flats) is discounted from the signal estimation by measuring the typical median of local regions in the normalized sum of the flat dark or bias subtracted, if uncalibrated, flats.</p>
+<p>The temporal noise component of the estimated signal to temporal noise ratio is an estimate of the typical standard deviation of temporal noise (e.g. photon noise, read noise, and dark noise) in the flats. Spatial noise (e.g. offset, sensitivity, and dark current nonuniformity) and spurious signal noise (e.g. cosmic-ray hits and stars in sky flats) are discounted from the temporal noise estimation by measuring the typical normalized Rousseeuw and Croux S<sub>n</sub> scale estimate <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+P.J. Rousseeuw and C. Croux (1993), <em>Alternatives to the Median Absolute Deviation</em>, Journal of the American Statistical Association, Vol. 88, pp. 1273-1283.">[1]</a></sup><sup>,</sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+C. Croux and P.J. Rousseeuw (1992), <em>Time-Efficient Algorithms for Two Highly Robust Estimators of Scale</em>, Computational Statistics, Vol. 1, pp. 411-428.">[2]</a></sup> of local regions in the normalized difference between the flats.</p>
+<p>Gain is estimated by the signal to squared temporal noise ratio of the flats. For flat subframes, gain is an estimate of detector gain. For flat integrations, gain is an estimate of the product of detector gain and the number of subframes combined in the integrations.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<img src="images/flat_result.png" alt=""/>
+<div class="pidoc_subsection" id="__Usage_:_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Parameters</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Flat 1</p>
+</dt>
+<dd>
+<p>Specifies a flat subframe or integration.</p>
+</dd>
+<dt>
+<p>Flat 2</p>
+</dt>
+<dd>
+<p>Specifies a flat subframe or integration.</p>
+</dd>
+<dt>
+<p>Flat dark or bias</p>
+</dt>
+<dd>
+<p>If the flats are uncalibrated (i.e. not flat dark or bias subtracted), specifies a flat dark or bias subframe or integration.</p>
+<p>If the flats are calibrated (i.e. flat dark or bias subtracted), no view must be selected.</p>
+</dd>
+<dt>
+<p>Foreground quantile</p>
+</dt>
+<dd>
+<p>Foreground quantile specifies the brightest quantile of local regions in the flats used to estimate the signal to temporal noise ratio and gain.</p>
+<p>To use all local regions in the estimation, set this parameter to 100%.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Results__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Results</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Signal</p>
+</dt>
+<dd>
+<p>Signal is an estimate of the exposure of the flats, in data number (DN 16-bit [0,65535]) units.</p>
+</dd>
+<dt>
+<p>Temporal noise</p>
+</dt>
+<dd>
+<p>Temporal noise is an estimate of the standard deviation of temporal noise (e.g. photon noise, read noise, and dark noise) in the flats, in data number (DN 16-bit [0,65535]) units.</p>
+</dd>
+<dt>
+<p>SNR</p>
+</dt>
+<dd>
+<p>SNR is an estimate of the signal to temporal noise ratio of the flats.</p>
+</dd>
+<dt>
+<p>Gain</p>
+</dt>
+<dd>
+<p>Gain is an estimate of the gain of the flats, defined by the signal to squared temporal noise ratio of the flats, in electron per data number (e-/DN 16-bit [0,65535]) units. For flat subframes, Gain is an estimate of detector gain. For flat integrations, Gain is an estimate of the product of detector gain and the number of subframes combined in the integrations.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Push_buttons__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Push buttons</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Browse Documentation</p>
+</dt>
+<dd>
+<p>Opens a browser to view the script's documentation.</p>
+</dd>
+<dt>
+<p>Reset</p>
+</dt>
+<dd>
+<p>Resets the dialog's parameters.</p>
+</dd>
+<dt>
+<p>Estimate</p>
+</dt>
+<dd>
+<p>Estimates the signal to temporal noise ratio and gain of the flats.</p>
+</dd>
+<dt>
+<p>Generate Mask</p>
+</dt>
+<dd>
+<img src="images/flat_mask.png" alt=""/>
+<p>Generates a foreground mask, which identifies the brightest quantile of local regions in the flats used to estimate the signal to temporal noise ratio and gain.</p>
+</dd>
+<dt>
+<p>Dismiss/Abort</p>
+</dt>
+<dd>
+<p>Dismisses the dialog or aborts the estimation.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Applications__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Applications</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Applications', this );">[hide]</p>
+   <div id="Applications">
+<div class="pidoc_subsection" id="__Applications_:_Detector_gain_in_eDN_estimation__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Detector gain in e-/DN estimation</h4>
+<p>Figure 1 show results for flat subframes from a Kodak KAF-8300 detector, each binned 2x2 and exposed 24 seconds with a 3nm Ha filter at -20&deg;C. The gain result provides an estimate of detector gain in e-/DN, which is computed as follows. For an estimated signal in DN, an estimated noise in DN, and some unknown gain in e-/DN, signal in e- equals signal * gain, and noise in e- equals noise * gain. Photon statistics says that noise in e- equals the square root of signal in e-. Hence noise * gain = (signal * gain)^0.5. Solving this equation for gain gives gain = signal / noise^2 in e-/DN. This solution provides the estimate of 1.055 e-/DN that is within 1% of the the camera vendor's supplied specification of 1.059 e-/DN.</p>
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img src="images/flat_result.png" alt=""/>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Applications_:_Bayer_CFA_detector_channel_SNR_and_gain_estimation__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Bayer CFA detector channel SNR and gain estimation</h4>
+<p>Figures 2, 3, 4, and 5 show results for the four CFA channels of raw Bayer CFA flat subframes from a 14-bit [0,16383] Canon EOS Rebel T3i DLSR camera, exposed 1/22 second at ISO 1600. The results are summarized in Table 1. The results for the two G channels are nearly equal as expected. The exposures of the R and B channels are smaller than the G channels due to the spectrum of the flat illumination and the differences in Bayer CFA filter bandwidth. The SNR estimates of the R and B channel are correspondingly lower than those of the G channels. On the other hand the gain estimates of all channels are nearly equal, as would be expected for currently manufactured Bayer CFA detector architectures.</p>
+
+<table class="pidoc_table">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1</span></caption>
+<tr>
+<th><p>Channel</p>
+</th>
+<th><p>Signal</p>
+</th>
+<th><p>Temporal noise</p>
+</th>
+<th><p>SNR</p>
+</th>
+<th><p>Gain</p>
+</th>
+</tr>
+<tr>
+<th></th>
+<th><p>DN</p>
+</th>
+<th><p>DN</p>
+</th>
+<th></th>
+<th><p>e-/DN</p>
+</th>
+</tr>
+<tr>
+<td><p>CFA_0 R</p>
+</td>
+<td><p>4674.87</p>
+</td>
+<td><p>183.21</p>
+</td>
+<td><p>25.5</p>
+</td>
+<td><p>0.139</p>
+</td>
+</tr>
+<tr>
+<td><p>CFA_1 G</p>
+</td>
+<td><p>7103.19</p>
+</td>
+<td><p>226.64</p>
+</td>
+<td><p>31.3</p>
+</td>
+<td><p>0.138</p>
+</td>
+</tr>
+<tr>
+<td><p>CFA_2 G</p>
+</td>
+<td><p>7146.81</p>
+</td>
+<td><p>227.90</p>
+</td>
+<td><p>31.4</p>
+</td>
+<td><p>0.138</p>
+</td>
+</tr>
+<tr>
+<td><p>CFA_3 B</p>
+</td>
+<td><p>4281.00</p>
+</td>
+<td><p>176.25</p>
+</td>
+<td><p>24.3</p>
+</td>
+<td><p>0.138</p>
+</td>
+</tr>
+</table>
+
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img src="images/cfa_0_result.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+<img src="images/cfa_1_result.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+<img src="images/cfa_2_result.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<img src="images/cfa_3_result.png" alt=""/>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Applications_:_Subframe_integration_efficiency_and_quality_estimation__">
+   <h4 class="pidoc_subsectionTitle">3.3&emsp;Subframe integration efficiency and quality estimation</h4>
+<p>Figures 6 and 7 show results for flat subframes and integrations from a Kodak KAF-8300 detector. The integrations are average combinations of 64 subframes with permissive outlier rejection. No flat dark or bias was specified in the integration analysis because the subframes were flat dark subtracted prior to the combination. All subframes were binned 2x2 and exposed 24 seconds with a 3nm Ha filter at -20&deg;C. The integration to subframe SNR ratio equals 1345.9 / 169.1 = 7.96, which is nearly equal to the expected square root of 64. The integration to subframe gain ratio equals 66.874 / 1.055 = 63.4, which is nearly equal to the expected 64. The gain increase is due to frame averaging, each DN unit corresponds to more e- units in an integration than in a subframe. These results indicate that the noise reduction achieved by the integration combination is near optimal. The SNR of the integration exceeds 1000, which is a good rule of thumb target for high quality flat masters.</p>
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_6__"></a>
+<p class="pidoc_figure_title">Figure 6</p>
+<img src="images/flat_result.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+
+<div class="pidoc_figure" style="float:left;">
+<a id="__figure_7__"></a>
+<p class="pidoc_figure_title">Figure 7</p>
+<img src="images/flat_integration_result.png" alt=""/>
+</div>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Algorithm__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Algorithm</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Algorithm', this );">[hide]</p>
+   <div id="Algorithm">
+<p>The algorithm computes the normalized sum and difference of the input images, measures the location and scale of local regions in the combinations, and finally estimates the location of these region measurements.</p>
+
+<ol class="pidoc_list">
+<li>Given flat images <em>f<sub>1</sub></em> and <em>f<sub>2</sub></em> and the optional flat dark or bias image <em>f<sub>db</sub></em>, compute the two channel combination image <em>sd</em>, with a normalized sum channel <em>s</em> equal to 0.5 * (<em>f<sub>1</sub></em> + <em>f<sub>2</sub></em>) - <em>f<sub>db</sub></em> if <em>f<sub>db</sub></em> is specified or 0.5 * (<em>f<sub>1</sub></em> + <em>f<sub>2</sub></em>) if <em>f<sub>db</sub></em> is not specified and a normalized difference channel <em>d</em> equal to 0.5<sup>0.5</sup> * (<em>f<sub>1</sub></em> - <em>f<sub>2</sub></em>).</li>
+<li>Partition the combination image <em>sd</em> into a grid of 8 x 8 pixel blocks.</li>
+<li>For each block of the partition, compute the statistics pair <em>ls</em>, with a location component <em>l</em> equal to the median of the <em>s</em> channel of the block and a scale component <em>s</em> equal to the normalized Rousseeuw and Croux S<sub>n</sub> scale parameter of the <em>d</em> channel of the block.</li>
+<li>Select the set of statistics pairs <em>ls</em> whose <em>l</em> component lies within the brightest quantile of <em>l</em> components as specified by the foreground quantile parameter.</li>
+<li>Compute a partition location estimate <em>l</em> equal the median of the <em>l</em> component of the selected statistics pairs <em>ls</em>.</li>
+<li>Compute a partition scale estimate <em>s</em> equal to the median of the <em>s</em> component of the selected statistics pairs <em>ls</em>.</li>
+<li>Iterate steps 2, 3, 4, 5, and 6, each iteration with a distinct, shifted partitioning grid on the combination image <em>sd</em>.</li>
+<li>The Signal estimate equals the mean of the partition location estimates <em>l</em>.</li>
+<li>The Temporal noise estimate equals the mean of the partition scale estimates <em>s</em>.</li>
+<li>The SNR estimate equals the Signal to Temporal noise ratio.</li>
+<li>The Gain estimate equals the Signal to squared Temporal noise ratio.</li>
+</ol>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Limitations__">
+   <h3 class="pidoc_sectionTitle">5&emsp;Limitations</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Limitations', this );">[hide]</p>
+   <div id="Limitations">
+
+<ul class="pidoc_list">
+<li>The script assumes that spatial noise in the flats is equal, otherwise spatial noise will not be properly discounted from the temporal noise estimate. The images should be captured within a time period short enough to guarantee negligible spatial noise drift.</li>
+<li>Estimation accuracy may be compromised if flat exposures are not similar.</li>
+<li>Flats and flat dark or bias for Bayer CFA detectors should be either raw Bayer CFA images or a CFA channel extracted from raw Bayer CFA images. Estimation accuracy will be compromised for RGB channels extracted from de-Bayered CFA images due to channel interpolation.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> P.J. Rousseeuw and C. Croux (1993), <em>Alternatives to the Median Absolute Deviation</em>, Journal of the American Statistical Association, Vol. 88, pp. 1273-1283.</p>
+      <p id="__reference_2__"><strong>[2]</strong> C. Croux and P.J. Rousseeuw (1992), <em>Time-Efficient Algorithms for Two Highly Robust Estimators of Scale</em>, Computational Statistics, Vol. 1, pp. 411-428.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/DarkBiasNoiseEstimator/DarkBiasNoiseEstimator.html" title="../../scripts/DarkBiasNoiseEstimator/DarkBiasNoiseEstimator.html">DarkBiasNoiseEstimator</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012-2014 Mike Schuster. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:28 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

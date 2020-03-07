@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ManualImageSolver</title>
+   <meta name="keywords" content="coordinates, annotation" />
+   <meta name="author" content="Andrés del Pozo" />
+   <meta name="description" content="Script for solving the coordinates of an astronomical image using control points defined by the user." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ManualImageSolver</h1>
+
+<div id="authors">
+<p>By Andrés del Pozo</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for solving the coordinates of an astronomical image using control points defined by the user. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> coordinates, annotation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Reference_image__">2.1&emsp;Reference image </a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Control_points__">2.2&emsp;Control points </a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Execution_of_ManualImageSolver__">2.3&emsp;Execution of ManualImageSolver </a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Advanced_tasks__">3&emsp;Advanced tasks</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Advanced_tasks_:_Solution_optimization__">3.1&emsp;Solution optimization</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Advanced_tasks_:_Manual_solving_of_many_images__">3.2&emsp;Manual solving of many images</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Advanced_tasks_:_Manual_solving_of_many_images_:_Method_1__Distortion_model__">3.2.1&emsp;Method 1 - Distortion model</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Advanced_tasks_:_Manual_solving_of_many_images_:_Method_2__Distortion_model_and_a_few_control_points__">3.2.2&emsp;Method 2 - Distortion model and a few control points</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Advanced_tasks_:_Manual_solving_of_many_images_:_Method_3__Manual_solve_and_optimize__">3.2.3&emsp;Method 3 - Manual solve and optimize</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Algorithm__">4&emsp;Algorithm</a></li>
+<li class="pidoc_tocItem"><a href="#__Limitations__">5&emsp;Limitations</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>The objective of <strong>ManualImageSolver</strong> is to solve the coordinates of images that <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> can not solve. The script <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> is able to find the coordinates of an astronomical image without more user interaction than a few starting parameters (approximate image center and resolution). The coordinates solution is stored in the image in keywords using the WCS convention <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+E. W. Greisen, M. R. Calabretta (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+M. R. Calabretta, E. W. Greisen (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122">[2]</a></sup>.</p>
+<p><a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> works well with clean images of medium/high resolution. However images with too much noise or a wide field are much harder to solve and sometimes <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> can not do it.</p>
+<p>ManualImageSolver is able to find the coordinates of astronomical images that can not be solved by <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>. This script uses a group of control points defined by the user that match points in the image that is being solved (<strong>Target image</strong>) with the corresponding point in an image with known coordinates (<strong>Reference image</strong>). Given enough control points the script can determine the coordinates of the image with quite good precision. This script can support images with strong distortions.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>This script is used in three steps:</p>
+
+<ul class="pidoc_list">
+<li><a href="#ReferenceImage">Creation of the reference image</a>.</li>
+<li>Creation of the <a href="#ControlPoints">control points</a> using the process <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>.</li>
+<li><a href="#RunScript">Execution of ManualImageSolver</a>.</li>
+</ul>
+
+<div class="pidoc_subsection" id="__Usage_:_Reference_image__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Reference image <a id="ReferenceImage"></a></h4>
+<p>ManualImageSolver requires a reference image that covers completely the target image. This image should be of good quality, it must have enough stars in the entire area of the target image and it must have a high quality coordinates solution. Although a real image can be used, the best results are achieved using a synthetic image generated using <a href="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html" title="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html">CatalogStarGenerator</a>. CatalogStarGenerator can easily generate a good quality image of any part of the sky.</p>
+
+<div style="text-align:center;">
+<img style="width:100%;height:auto;" src="images/ReferenceGeneration.png" alt=""/>
+</div>
+<p>These are a few suggestions for generating the reference image:</p>
+
+<ul class="pidoc_list">
+<li>Use a resolution (or focal length) not too different to the target image. A factor of 2 should be good enough. i.e. if the target image has an estimated resolution of 2 sec/pix, the reference image should have a resolution between 1 and 4.</li>
+<li>The reference image must contain the entire target image. It doesn't mind that the reference image is bigger than the target, but the reference must cover the entire target.</li>
+<li>Chose a suitable <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">projection</a> for the image. For most images the Gnomonic projection is the best one. For very short focal length images (i.e. all-sky cameras, fisheye lenses) Orthographic or Zenithal Equal Area could be better.</li>
+<li>For wide field images the best catalog in CatalogStarGenerator is &quot;BrightStars&quot;. This catalog contains most stars with magnitude up to 7.</li>
+<li>For higher resolution images the catalog PPMXL can be used, although it is necessary to filter the maximum magnitude to adapt it to the magnitude of the image. It is important to know that PPMXL shouldn't be used for wide field images because it doesn't contain some bright stars and the downloads are very slow for big areas.</li>
+<li>The script <a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a> can be used for drawing lines or labels that simplify the recognition of the stars in the synthetic image. For example, for wide field images is useful to draw the constellation lines on the reference image. This should be done so that the markings don't interfere with the star detection of <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>: you can not set a control point on a star if it is covered by a label or line.</li>
+</ul>
+
+
+<div style="text-align:center;">
+<img style="width:100%;height:auto;" src="images/ReferenceAnnotation.png" alt=""/>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Control_points__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Control points <a id="ControlPoints"></a></h4>
+<p>The control points are pairs of points in the reference and target images that correspond to the same coordinates, usually the same star. The control points can be defined using the process <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>. After opening the reference and target images in PixInsight you have to launch the process <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>. The reference image must be selected as &quot;Source&quot; (first) and the target image as the &quot;Target&quot; (second). The process of selecting the control points is this:</p>
+
+<ul class="pidoc_list">
+<li>Identify the same star in both images.</li>
+<li>Click in the position of the star in the reference image.</li>
+<li>Find the position of the new control point in the target image and move it to the position of the star.</li>
+</ul>
+
+<p>Identifying the same star in both images is perhaps the hardest part of the process. Fortunately, after two or three control points have been set <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> can predict the approximate position of the control points in the target image. Because of this, only the two first points are really difficult to match in both images. After them, the rest of points can be matched using the prediction of <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> and some common sense.</p>
+<p>After selecting enough control points you have to save the <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> process to a process icon. This is done dragging the triangle at the lower left corner of the interface window to the workspace.</p>
+
+<div style="text-align:center;">
+<img src="images/DynamicAlignment.png" alt=""/>
+</div>
+<p>These are a few suggestions for selecting the control points:</p>
+
+<ul class="pidoc_list">
+<li>You should select control points covering the entire image. There should be control points near the corners of the image.</li>
+<li>The quality of the solution depends on the number of control points and their quality. The necessary number of control points depends on the strength of the distortion of the image: An image with no distortion can be solved with only three control points although it is better to use more control points. An image with strong distortions can require 40 or more control points.</li>
+<li>If the image has much noise it is advisable to select more control points.</li>
+<li>After selecting the first two control points, <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> tries to predict the position of the control point in the target image. Sometimes this prediction fails and it selects a wrong position. You have to be aware of this, check every control point and move them to the correct position when necessary.</li>
+<li>The script can not detect if any of the control points has a wrong position (i.e. a star misidentified in one of the images). This case can be detected analyzing the residuals image that the script can optionally generate (see <a href="#residuals">Generate residuals image</a>). If a control point is wrong, its residuals (red line in the residuals image) will be much greater than the residuals of the rest of the points. After identifying the misplaced control point, you can fix (or delete) it and rerun the script.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Execution_of_ManualImageSolver__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Execution of ManualImageSolver <a id="RunScript"></a></h4>
+<p>As the final step you have to run the script ManualImageSolver. This script analyzes the control points and the reference image and calculates a solution for the coordinates of the target window.</p>
+
+<div style="text-align:center;">
+<img src="images/ConfigDialog.png" alt=""/>
+</div>
+<p>ManualImageSolver works on the active window in PixInsight. When you run the script it shows its configuration dialog:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Control points icon</p>
+</dt>
+<dd>
+<p>This parameter shows a list of the <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> icons available in the workspace. You have to select the icon that contains the control points that you want to use for solving the image. This icon can be created using the process explained in the section <a href="#ControlPoints">Control points</a>.</p>
+</dd>
+<dt>
+<p>Reference image</p>
+</dt>
+<dd>
+<p>This parameter shows a list of all the images open in PixInsight that have coordinates defined. You should select the image that was used for creating the control points icon or one with exactly the same geometry and coordinates.</p>
+</dd>
+<dt>
+<p>Generate residuals image <a id="residuals"></a></p>
+</dt>
+<dd>
+<p>When this option is selected the script generates an image which shows the residuals of the solution. The image shows as green crosses the predicted position of the control points using the calculated solution. Red lines from each control point join the predicted position to the actual position marked by the user.</p>
+<p>This image can be used to analyze the errors of the solution. In a good solution all the red lines should be very short (in a perfect solution the lines should have degenerated to points). When there is a control point with misplaced position its red arrow is much longer than the rest of control points.</p>
+</dd>
+<dt>
+<p>Distortion correction <a id="distortion"></a></p>
+</dt>
+<dd>
+<p>This parameter activates the distortion correction using surface splines. This option should be selected when the image deviates from an ideal projected image. This usually happens in images taken with focal lengths shorter than 400mm.</p>
+<p>When this option is active the script stores the solution in the properties of the image using a non-standard format. In order to be able to use the solution in other applications, the script also computes a lineal solution (without distortion correction) and stores it in the keywords of the image in the WCS format.</p>
+<p>The options <a href="#DistortionMap">Show distortion map</a> and <a href="#residuals">Generate residuals image</a> can help to evaluate the quality of the distortion correction.</p>
+</dd>
+<dt>
+<p>Show distortion map <a id="DistortionMap"></a></p>
+</dt>
+<dd>
+<p>When this option is activated the script creates a new window with a representation of the distortions in the image. The new image contains a grid with arrows at the center of each cell. The arrows point to the point where the center of the cells would be located if the image didn't have optical aberrations.</p>
+<p>This option is only enabled when the <a href="#distortion">distortion correction</a> is active.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img style="width:100%;height:auto;" src="images/DistortionMap.png" alt=""/>
+</div>
+</dd>
+<dt>
+<p>Generate distortion model <a id="DistortionModel"></a></p>
+</dt>
+<dd>
+<p>The script generates a CSV archive with a distortion model that consists in a list of points and their displacement relative to an ideal image with no geometrical optical aberrations. The points used in the model are the control points, so the control points should cover the whole image for best results. The distortion model is compatible with <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> and <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>.</p>
+<p>This option is only enabled when the <a href="#distortion">distortion correction</a> is active.</p>
+</dd>
+</dl>
+
+<p>When the script finishes successfully, stores the coordinates in the image and the console shows the values of this solution.</p>
+<p>The quality of the solution can be checked analyzing the value of the RMS error reported in the console, analyzing the residuals image and using AnnotationScript for drawing a grid and the position of the stars on the target image.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Advanced_tasks__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Advanced tasks</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Advanced_tasks', this );">[hide]</p>
+   <div id="Advanced_tasks">
+<div class="pidoc_subsection" id="__Advanced_tasks_:_Solution_optimization__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Solution optimization</h4>
+<img style="float:right;width:50%;height:auto;margin-left:5px;" src="images/ImageSolverOptimize.png" alt=""/>
+<p>Since the process of defining the control points for ManualImageSolver is quite slow and tedious, the user usually will not want to define more than 30-40 control points. Although this number is enough for calculating a good solution for most images, the quality of the solution is not comparable to the solutions calculated by <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> which can use several hundreds of samples.</p>
+<p>The solutions calculated by ManualImageSolver can be optimized using <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>. Although <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> can not solve some images starting from scratch, when these images are already solved, <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> can be used for further improving the solution.</p>
+<p>After solving the image using ManualImageSolver you can run <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> selecting the option &quot;Only apply optimization&quot; which is available at the &quot;Image parameters&quot; section. It is important to activate the distortion correction and set good values in the catalog filter in order to extract enough (but not too many) stars.</p>
+<p>The possibility of optimizing the solutions using <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> allows to use ManualImageSolver to get an approximate solution using only a few control points and then get a precise solution using <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Advanced_tasks_:_Manual_solving_of_many_images__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Manual solving of many images</h4>
+<p>The process of solving images using ManualImageSolver is quite tedious because the user has to define the control points one by one. When you want to solve many images, this get old fast. This section assumes that the images have geometric distortions since ManualImageSolver is usually not necessary for undistorted images.</p>
+<p>There are several strategies than can be used for accelerating this process. The next sections explain them, from the fastest/easiest to the slowest.</p>
+<div class="pidoc_subsection" id="__Advanced_tasks_:_Manual_solving_of_many_images_:_Method_1__Distortion_model__">
+   <h5 class="pidoc_subsectionTitle">3.2.1&emsp;Method 1 - Distortion model</h5>
+<p>Both <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> and <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> can generate distortion models for solved images. The distortion models can be used in ImageSolver for assisting in the process of matching the stars of the image against a catalog. This allows ImageSolver to solve images that it would not be able to solve without a distortion model.</p>
+<p>You can use in an image the distortion model generated from another when both have been taken with the same equipment and parameters: same camera, lenses/telescope, focal length and aperture.</p>
+<p>When you need to manually solve many images taken with the same optical system, you can use distortion models to speed up the process.</p>
+<p>First you have to create the distortion model. The documentation of <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> has a section describing how to generate a distortion model.</p>
+<p>When you have a good distortion model, the images can be solved using the following procedure:</p>
+
+<ul class="pidoc_list">
+<li>Launch the script <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>.</li>
+<li>Configure the <strong>Image parameters</strong> section the best you can. You can use the focal or resolution of the image that you solved for generating the distortion model. The center can be estimated using a star chart.</li>
+<li>Configure the catalog, magnitude, star sensitivity and distortion correction following the instructions of <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>.</li>
+<li>In the field <strong>Distortion model</strong> select the path of the distortion model.</li>
+<li>Press Ok for solving the image. If everything works, the script should solve the target image successfully.</li>
+</ul>
+
+<p>There are a few tests that can be done for checking if the solution is correct:</p>
+
+<ul class="pidoc_list">
+<li>You can analyze the <em>distortion map</em> that <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> generates. It should be nearly identical to the distortion map image that you got when you generated the distortion model.</li>
+<li>You can also analyze the <em>residuals image</em>. There should be detected stars (green crosses) across the entire image and the residuals must be small (very short red lines from the center of the green crosses). When the residuals are large (long red lines) or there are few detected stars the solution is probably wrong.</li>
+<li>The two previous tests are probably enough, although you can also use AnnotateImage to mark the position of known features on the image.</li>
+</ul>
+
+<p>If an image can not be solved using this method you can use the second method.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Advanced_tasks_:_Manual_solving_of_many_images_:_Method_2__Distortion_model_and_a_few_control_points__">
+   <h5 class="pidoc_subsectionTitle">3.2.2&emsp;Method 2 - Distortion model and a few control points</h5>
+<p>This method is very similar to the previous one but it needs more work. It requires to get a <a href="#DistortionModel">distortion model</a> the same way as explained in the previous section.</p>
+<p>For each image you have to do this:</p>
+
+<ul class="pidoc_list">
+<li>Using <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> and ManualImageSolver solve the image using 4-5 control points. This produces an approximate solution of very low precision. Although this requires some effort, this is much faster than generating the 30-40 control points necessary for a good solution.</li>
+<li>Launch <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>. Since the target image is already solved, the dialog fills its &quot;Image Parameters&quot; section using the values already stored in the image. This sets a very good starting point for the algorithm and it is much more probable that it can find a solution.</li>
+<li>Configure the rest of parameters (catalog magnitude, star sensitivity, distortion correction) and <u>select the <em>distortion model</em></u>.</li>
+<li>Press Ok for solving the image. If everything works, the script should solve the target image successfully.</li>
+</ul>
+
+<p>If the solver finishes without errors you can check the quality of the solution the same way as the previous method (distortion map, residuals image, annotation).</p>
+<p>If this method can not still solve any of the images you have to use the next method on them.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Advanced_tasks_:_Manual_solving_of_many_images_:_Method_3__Manual_solve_and_optimize__">
+   <h5 class="pidoc_subsectionTitle">3.2.3&emsp;Method 3 - Manual solve and optimize</h5>
+<p>This method consists in calculating a medium precision solution using ManualImageSolver and then optimizing the solution with <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>:</p>
+
+<ul class="pidoc_list">
+<li>Create a <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a> icon with enough control points to get fair approximation to the solution. Usually you would need (depending on the distortions of the image) about 15-30 points.</li>
+<li>Launch <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> and select the option &quot;Only apply optimization&quot;.</li>
+</ul>
+
+<p>Even if <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> still could not solve the image, the first step (ManualImageSolver) has already calculated a solution good enough for most purposes. In this extreme case you could add more control points to ManualImageSolver for improving the solution.</p>
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Algorithm__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Algorithm</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Algorithm', this );">[hide]</p>
+   <div id="Algorithm">
+<p>The algorithm of ManualImageSolver is this:</p>
+
+<ol class="pidoc_list">
+<li>The script reads the control points from the DynamicAlignment icon. For each point it gets the pixel coordinates of the same star in both images.</li>
+<li>Using the solution of the reference image it converts for each control point the pixel coordinates to AR/Dec coordinates.</li>
+<li>Now for each control point it has the celestial coordinates and the pixel coordinates in the target image.</li>
+<li>The script computes an approximation to the celestial coordinates of the center of the image and creates a projection with origin at the center of the image. The projection used is of the same class (<a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">Gnomonic, Orthographic, etc)</a> as the projection of the reference image.</li>
+<li>Then it projects the celestial coordinates of the control points using the projection to a flat space (we can call it G).</li>
+<li>If the distortion correction is active, it computes a pair of surface splines that transform the pixel coordinates of the control points to G. If the distortion correction is not active, it computes a linear transformation matrix using multiple linear regression.</li>
+<li>The projection and the splines (or transformation matrix) define a solution. Since it used an approximation of the celestial coordinates of the center of the image, the solution is not optimal yet.</li>
+<li>The solution is refined calculating a new approximation to the center of the image using the new solution. The steps 5-7 are repeated until it converges.</li>
+</ol>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Limitations__">
+   <h3 class="pidoc_sectionTitle">5&emsp;Limitations</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Limitations', this );">[hide]</p>
+   <div id="Limitations">
+<p>ManualImageSolver has the following limitations:</p>
+
+<ul class="pidoc_list">
+<li>ManualImageSolver can not solve with precision images that are the result of the stitching of a mosaic if this has not be done preserving the geometric characteristics of the original images. Mosaics can have <em>jumps</em> result of a sloppy join of two tiles and usually don't preserve the capability of be modelled by any supported projection.</li>
+<li>The result is as good as the quality of the control points used in the process. If the control points are misplaced or don't cover the entire image the result won't be correct.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> E. W. Greisen, M. R. Calabretta (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075</p>
+      <p id="__reference_2__"><strong>[2]</strong> M. R. Calabretta, E. W. Greisen (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>, <a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a>, <a href="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html" title="../../scripts/CatalogStarGenerator/CatalogStarGenerator.html">CatalogStarGenerator</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2013-15, Andrés del Pozo</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:33 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

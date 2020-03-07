@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | StarAlignment</title>
+   <meta name="keywords" content="image registration, mosaic generation, feature-based image registration, star detection, star matching, pattern matching, invariant descriptors, RANSAC, RANSAC star matching, homography, projective transformation, surface spline interpolation, frame adaptation" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Automatic image registration and mosaic generation using stars as alignment references." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>StarAlignment</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Automatic image registration and mosaic generation using stars as alignment references. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> ImageRegistration, Preprocessing</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> image registration, mosaic generation, feature-based image registration, star detection, star matching, pattern matching, invariant descriptors, RANSAC, RANSAC star matching, homography, projective transformation, surface spline interpolation, frame adaptation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Description__">2&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_The_StarAlignment_Process__">2.1&emsp;The StarAlignment Process</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Star_Detection__">2.2&emsp;Star Detection</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Star_Matching__">2.3&emsp;Star Matching</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Star_Matching_:_Initial_Star_Matching_Triangle_Similarity__">2.3.1&emsp;Initial Star Matching: Triangle Similarity</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Star_Matching_:_Robust_Star_Matching__Optimization_RANSAC__">2.3.2&emsp;Robust Star Matching + Optimization: RANSAC</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Star_Matching_:_Reducing_Uncertainty_for_Mosaics_Computing_Intersections__">2.3.3&emsp;Reducing Uncertainty for Mosaics: Computing Intersections</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Estimation_of_Transformation_Parameters__">2.4&emsp;Estimation of Transformation Parameters</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Estimation_of_Transformation_Parameters_:_Improving_Accuracy_2D_Surface_Splines__">2.4.1&emsp;Improving Accuracy: 2-D Surface Splines</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Seamless_Mosaics_Automatic_Frame_Adaptation__">2.5&emsp;Seamless Mosaics: Automatic Frame Adaptation</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Seamless_Mosaics_Automatic_Frame_Adaptation_:_Building_Seamless_Mosaics_in_Practice_GradientMergeMosaic__">2.5.1&emsp;Building Seamless Mosaics in Practice: GradientMergeMosaic</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Output_Image_Generation__">2.6&emsp;Output Image Generation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Known_Limitations_and_Future_Work__">2.7&emsp;Known Limitations and Future Work</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Reference_Image__">3.1&emsp;Reference Image</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Working_Mode__">3.2&emsp;Working Mode</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Target_Images__">3.3&emsp;Target Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Format_Hints__">3.4&emsp;Format Hints</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_Images__">3.5&emsp;Output Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Star_Detection__">3.6&emsp;Star Detection</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Star_Matching__">3.7&emsp;Star Matching</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Interpolation__">3.8&emsp;Interpolation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information__">3.9&emsp;Console Information</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information_:_Information_About_Input_Images__">3.9.1&emsp;Information About Input Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information_:_Information_from_the_Star_Detection_Routine__">3.9.2&emsp;Information from the Star Detection Routine</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information_:_Information_from_the_Initial_Star_Matching_Routine__">3.9.3&emsp;Information from the Initial Star Matching Routine</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information_:_Information_from_the_RANSAC_Star_Matching_Routine__">3.9.4&emsp;Information from the RANSAC Star Matching Routine</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information_:_Information_About_the_Registration_Model__">3.9.5&emsp;Information About the Registration Model</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Console_Information_:_Information_on_the_Output_Image__">3.9.6&emsp;Information on the Output Image</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Scripting_and_Automation__">3.10&emsp;Scripting and Automation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_A_Difficult_Mosaic_Example_Using_Previews_to_Restrict_Star_Matching__">3.11&emsp;A Difficult Mosaic Example: Using Previews to Restrict Star Matching</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedDocuments__">Related Documents</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>Image Registration is the process of matching two or more images of the same scene by superposition. This requires estimating optimal geometric transformations to align the images with respect to a common reference. Image registration is of crucial importance in all processing and analysis tasks based on the combination of data from sets of images. Some examples are <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">image integration</a>, <a href="../../tools/ChannelCombination/ChannelCombination.html" title="../../tools/ChannelCombination/ChannelCombination.html">multichannel image composition</a>, shared information retrieval, change detection and image mosaicing. These tasks have applications in astronomy, medical imaging, remote sensing, cartography, real-time target recognition and computer vision, just to name a few.</p>
+<p>Exhaustive surveys of existing image registration techniques can be found in the references. <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Lisa G. Brown (1992), <em>A Survey of Image Registration Techniques</em>, ACM Computing Surveys 24, pp. 326&ndash;376.">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+Barbara Zitová, Jan Flusser (2003), <em>Image Registration Methods: A Survey</em>, Image and Vision Computing 21, pp. 977&ndash;1000.">[2]</a></sup> Image registration algorithms can be loosely divided into two major categories: <em>feature-based</em> methods and <em>area-based</em> methods. Feature-based methods try to find relevant image features, known as <em>control points</em>, such as corners, point-like structures, line intersections, line ending points or high-curvature points, that can be matched between two or more images. Once a sufficiently large number of control points have been matched by correspondence on two images, a suitable geometric transformation can be computed and applied to align them.</p>
+<p>Area-based methods, also known as featureless, correlation-based or template matching methods, work by finding correspondences between regions of the images without considering any salient features. Most of these algorithms are based on <a href="http://en.wikipedia.org/wiki/Cross-correlation" title="http://en.wikipedia.org/wiki/Cross-correlation">cross correlation</a> in the spatial or frequency domain, or in maximization of mutual information. <sup><a href="#__reference_5__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 5]<br/>
+Paul Viola, William M. Wells III (1997), <em>Alignment by Maximization of Mutual Information</em>, International Journal of Computer Vision, 24(2), pp. 137&ndash;154">[5]</a></sup> Correlation can be estimated locally&mdash;for example, for rectangular regions distributed over a regular lattice&mdash;or globally for the whole image. If two images can be correlated, then the registration process continues as in feature-based methods: the parameters of a geometric transformation that maximizes cross correlation are estimated, and the images are aligned accordingly. A class of fast Fourier transform-based (FFT-based) <a href="http://en.wikipedia.org/wiki/Phase_correlation" title="http://en.wikipedia.org/wiki/Phase_correlation">phase correlation</a> algorithms <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+B. Srinivasa Reddy, B. N. Chatterji (1996), <em>An FFT-Based Technique for Translation, Rotation, and Scale-Invariant Image Registration</em>, IEEE Transactions on Image Processing, Vol. 5, No. 8, pp. 1266&ndash;1271.">[3]</a></sup> <sup><a href="#__reference_4__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 4]<br/>
+Roberto Araiza, Hongjei Xie et al. (2002), <em>Automatic Referencing of Multi-Spectral Images</em>, Proceedings of the IEEE Southwest Symposium on Image Analysis and Interpretation, Santa Fe, New Mexico, USA, April 7-9, 2002, pp. 21&ndash;25.">[4]</a></sup> is commonly used for alignment of planetary images.</p>
+<p>Another important criterion for classification of image registration algorithms considers the applied geometrical transformations. In order of complexity, these transformations can be <em>rigid,</em> <em>affine,</em> <em>piecewise affine</em> and non-rigid or <em>elastic.</em> Rigid registration models are linear and only allow for translations, rotations and uniform scale changes without any distortion. Affine models are also linear and support <em>overall distortions</em> represented as shears and stretches. Piecewise affine and elastic models are nonlinear and allow for arbitrary local and global distortions.</p>
+<p>The image registration task is one of the most complex and challenging problems of image analysis, where the extreme diversity of images and working scenarios make impossible for any image registration algorithm to be suitable for all applications. Area-based algorithms are necessary in those cases where registration control points cannot be determined without high uncertainty. Two good examples are registration of planetary images and most medical images. Feature-based registration algorithms are appropriate for images with high detail contents, where enough features can be easily and accurately detected. This includes most computer vision applications and also deep-sky astronomical images, which are the main target of the StarAlignment tool that we are going to document. In deep-sky images, stars serve as nearly ideal registration control points&mdash;this is in fact one of those extremely rare cases where the nature of astronomical images works in our favor.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/StarAlignment.png" alt=""/>
+<p>The StarAlignment tool has been specifically designed for alignment of deep-sky astronomical images. It implements feature-based, automatic image registration algorithms using stars as alignment references. As usual in PixInsight, StarAlignment is a robust and versatile tool with a large number of parameters and working modes to maximize user control, but at the same time, it generally can be used with default settings to achieve excellent results very easily. With the exception of a few difficult cases, we can affirm that StarAlignment is, despite its complexity, a remarkably easy-to-use tool.<br class="pidoc_clearfix"/></p>
+<p>StarAlignment implements a bunch of sophisticated algorithms to carry out the critical task of image registration in a completely automatic way. This is by no means an easy task; as we have said in the introduction, this is in our opinion one of the most complex and difficult problems of image processing, where offering a significant contribution is really challenging. The following list enumerates StarAlignment's main features:</p>
+
+<ul class="pidoc_list">
+<li><strong>Automatic image registration</strong> of deep-sky astronomical images.</li>
+<li class="pidoc_spaced_list_item"><strong>Single image registration</strong> when the process is applied to a view (open image).</li>
+<li class="pidoc_spaced_list_item"><strong>Batch image registration mode</strong> for unattended alignment of large sets of disk image files.</li>
+<li class="pidoc_spaced_list_item"><strong>Mosaic generation modes</strong> for creation of merged mosaics or separate mosaic components.</li>
+<li class="pidoc_spaced_list_item"><strong>Automatic frame adaptation</strong> for creation of seamless mosaics.</li>
+<li class="pidoc_spaced_list_item"><strong>Special control modes:</strong> structure detection, structure map, detected stars, matched stars and transformation matrix for tight control on the star detection and star matching phases of the algorithm.</li>
+<li class="pidoc_spaced_list_item"><strong>Optional generation of registration masks</strong> for evaluation of registration accuracy and implementation of special composition operations.</li>
+<li class="pidoc_spaced_list_item"><strong>Full control on output image generation</strong> with selectable output directory, file format, file name prefix and postfix, and pixel sample format.</li>
+<li class="pidoc_spaced_list_item"><strong>Multiscale star detection</strong> algorithm with programmable sensitivity, peak response and maximum star distortion.</li>
+<li class="pidoc_spaced_list_item"><strong>Automatic hot pixel removal</strong> implemented by morphological pre-filtering.</li>
+<li class="pidoc_spaced_list_item"><strong>Automatic noise reduction</strong> by suppression of small-scale wavelet layers.</li>
+<li class="pidoc_spaced_list_item"><strong>Robust RANSAC star matching algorithm</strong> with programmable optimization criteria.</li>
+<li class="pidoc_spaced_list_item"><strong>Automatic FFT-based intersection estimation</strong> for robust mosaic generation with minimal overlapping.</li>
+<li class="pidoc_spaced_list_item"><strong>Manual restriction of star matching</strong> to predefined previews, available as an option to solve extremely difficult cases.</li>
+<li class="pidoc_spaced_list_item"><strong>Projective and surface spline-based registration models</strong> for coordinate interpolation.</li>
+<li class="pidoc_spaced_list_item"><strong>Full set of <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">pixel interpolation algorithms</a></strong> available for output image generation.</li>
+</ul>
+
+<p><a id="star_detection"></a></p>
+<p><a id="star_matching"></a></p>
+<p><a id="estimation_of_transformation_parameters"></a></p>
+<p><a id="frame_adaptation"></a></p>
+<p><a id="output_image_generation"></a></p>
+<div class="pidoc_subsection" id="__Description_:_The_StarAlignment_Process__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;The StarAlignment Process</h4>
+<p>The StarAlignment process is composed of several functional blocks: star detection, initial star matching, RANSAC matching routine, registration model generation, and coordinate/pixel interpolation. In the following sections we'll describe each of these blocks with thorough bibliographic references.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div style="text-align:center;">
+<img src="images/StarAlignmentFlowChart.svg" alt=""/>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p><strong>A flowchart representation</strong> of the StarAlignment process. Three error conditions can abort the process: (a) the initial star detection phase doesn't find at least three stars on each image, (b) the initial star matching routine cannot find at least three putative star pair matches, and (c) the RANSAC routine (described below) doesn't find a valid registration model. Condition (a) aborts the process unconditionally. In the event of conditions (b) or (c), we have implemented an <em>automatic trial mode</em> where the process attempts to use several predefined sets of star matching parameters in sequence.</p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Star_Detection__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Star Detection</h4>
+<p>This initial step is a critical part of the image registration task. If stars are not detected accurately, the whole process will fail, or it will perform unreliably. Fortunately, stars are nearly ideal image registration references. Compared with corners, intersections, endpoints and other scale-invariant features, stars are relatively easy to be identified accurately as significant image structures: just look for a small-scale, bright structure whose intensity decreases similarly in all directions; if you find one of these, most likely what you've found is a star, or a star-like feature. In addition, describing a star as an alignment reference is also relatively simple: being essentially a point, a star is naturally invariant to translation, rotation and scale; we just need its position in pixel coordinates and its brightness (in some arbitrary scale) to fully characterize it.</p>
+<p>Actually, we are oversimplifying somewhat here: stars are not <em>that</em> easy to detect in a robust and reliable way. We need to detect as many stars as possible, but at the same time we want to be immune to false star-like structures (e.g., hot pixels and cosmic rays) and small nonstellar objects. On the other hand, not all of the stars in an image are valid registration references: saturated stars, too bright stars, too dim stars, multiple stars and stars crossing detection region boundaries do not qualify. Noise and local illumination variations can also be quite problematic here. The StarAlignment tool implements a multiscale (wavelet-based) star detection algorithm that is quite robust to all of these problems.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="float:left;margin-left:16px;margin-right:24px;" src="images/StarDetectorFlowChart.svg" alt=""/>
+
+<div class="pidoc_group">
+<img style="margin-bottom:8px;" src="images/StarDetectorOriginal.png" alt=""/>
+<img style="margin-bottom:8px;" src="images/StarDetectorStructures.png" alt=""/>
+<img style="margin-bottom:8px;" src="images/StarDetectorMap.png" alt=""/>
+<img src="images/StarDetectorStars.png" alt=""/>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p><strong>The star detector process</strong> in flowchart representation (left). Right column, from top to bottom: original image (a raw linear image shown here with a <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">screen stretch</a> applied), detected structures in wavelet space, structure map after thresholding and binarization, and detected stars. The star filter subtask rejects all detected structures that don't fulfill a set of prescribed <em>detection criteria</em>, such as non-saturation, minimum flux, minimum peakedness and maximum distortion, among others. This filters out saturated stars, too dim stars, multiple objects and most nonstellar objects. The purpose of this rejection procedure is to keep only image structures for which a position can be determined with minimal uncertainty. Detection criteria are controllable through process parameters, but their default settings are nearly optimal in most cases.</p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Star_Matching__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Star Matching</h4>
+<p><a id="initial_star_matching"></a></p>
+<p><a id="ransac_star_matching"></a></p>
+<p><a id="automatic_intersection_computation"></a></p>
+<div class="pidoc_subsection" id="__Description_:_Star_Matching_:_Initial_Star_Matching_Triangle_Similarity__">
+   <h5 class="pidoc_subsectionTitle">2.3.1&emsp;Initial Star Matching: Triangle Similarity</h5>
+<p>Once we have a list of stars for each image, we have to find matching pairs of stars. This is a classical and rather difficult computational problem: the <a href="http://en.wikipedia.org/wiki/Correspondence_problem" title="http://en.wikipedia.org/wiki/Correspondence_problem">correspondence problem</a>. We have implemented a variation of the basic algorithm described by F.G. Valdés et al. <sup><a href="#__reference_6__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 6]<br/>
+Francisco G. Valdés et al. (1995), <em>FOCAS Automatic Catalog Matching Algorithms</em>, Publications of the Astronomical Society of the Pacific, 107, pp. 1119&ndash;1128.">[6]</a></sup> and further refined by M. Marszalek and P. Rokita. <sup><a href="#__reference_7__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 7]<br/>
+M. Marszalek, P. Rokita (2004), <em>Pattern Matching with Differential Voting and Median Transformation Derivation</em>, Computer Vision and Graphics (Computational Imaging and Vision Series), 32, pp. 1002&ndash;1007.">[7]</a></sup> These elegant algorithms are based on triangle similarity. The basic idea is that the relationships between the sides of a triangle are invariant to several affine transformations of interest: translation, rotation and uniform scale change, plus mirroring. By identifying similar triangles in both images we can match pairs of stars between them if the images are subject to those transformations.</p>
+<p>The original algorithms haven't been designed for image registration purposes, but to match stars acquired on CCD images with star catalogs as part of automated sky survey systems. For this reason, these algorithms build and compare <em>all</em> existing triangles formed with a very reduced set of stars used as alignment references. There are <var>N</var>&times;(<var>N</var>&minus;1)&times;(<var>N</var>&minus;2)/6 distinct triangles definable with <var>N</var> stars, which implies that the whole star matching task is roughly an O(<var>N</var><sup>3</sup>) problem when all triangles are used. In practice this limits the number of stars used for registration to not much more than about 200 with reasonably modern hardware. With 200 stars we can build 1,313,400 triangles, but with 250 stars that number grows up to 2,573,000, or about twice more triangles just to increase the amount of stars by a 25%. 200 stars can be clearly insufficient for many practical image registration purposes. For example, when building mosaics, the reference and registered images usually share a very small fraction of the detected stars, so limiting the star matching process to the 200 brightest stars on each frame turns it into a useless task most times.</p>
+<p>To overcome these limitations our implementation differs from the original algorithms. We build all existing triangles for the brightest 200 detected stars, but for the rest of them (no specific limit), a relatively small number of triangles are built for each star. For any given star in the <em>faint subset</em>, <var>n</var> triangles are built with its 2<var>n</var> nearest neighbors, where <var>n</var> is a user-definable parameter that defaults to 40 triangles per star. This generates a very large but still manageable set of triangles. With the help of carefully designed data structures, the whole star matching task becomes an O(<var>N</var>) process asymptotically for large amounts of alignment stars. Besides reducing the complexity of the process, which allows us to use thousands of stars instead of a few tens, building a limited number of triangles based on star proximity has an additional advantage: since we are favoring comparisons among a large set of small-scale triangles, our version of the algorithm can deal much better with small amounts of global distortion. By using mostly large-scale triangles between a reduced number of bright stars, the original matching algorithm is much more intolerant of distortion.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+
+<div style="text-align:center;">
+<img src="images/TriangleSimilarity.svg" alt=""/>
+</div>
+<p><strong>Triangle similarity</strong> is invariant to translation, rotation, uniform scaling, and mirroring.</p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Star_Matching_:_Robust_Star_Matching__Optimization_RANSAC__">
+   <h5 class="pidoc_subsectionTitle">2.3.2&emsp;Robust Star Matching + Optimization: RANSAC</h5>
+<p>Along with a different triangle construction strategy, our implementation uses a completely different mechanism to enforce robustness of the star matching process. Robustness here means high resistance to false matches, or <em>outliers.</em> After the initial star matching routine based on triangle similarity, we have a list of putative star pair matches. However, in general a significant fraction of these matches are not true correspondences between the same stars in both images&mdash;hence the word <em>putative</em> here. It is crucial to the accuracy of the whole image registration system that all false matches be detected and removed, keeping only true star pair matches, which we call <em>inliers</em> in this context. Different strategies have been proposed to carry out this critical task. The authors of the original papers have used rejection methods based on a median transformation <sup><a href="#__reference_7__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 7]<br/>
+M. Marszalek, P. Rokita (2004), <em>Pattern Matching with Differential Voting and Median Transformation Derivation</em>, Computer Vision and Graphics (Computational Imaging and Vision Series), 32, pp. 1002&ndash;1007.">[7]</a></sup> and iterative sigma-clipping. <sup><a href="#__reference_6__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 6]<br/>
+Francisco G. Valdés et al. (1995), <em>FOCAS Automatic Catalog Matching Algorithms</em>, Publications of the Astronomical Society of the Pacific, 107, pp. 1119&ndash;1128.">[6]</a></sup> Faithful to our preference for robust methods, instead of those techniques we have implemented a custom adaptation of the <a href="http://en.wikipedia.org/wiki/RANSAC" title="http://en.wikipedia.org/wiki/RANSAC">RANSAC (RANdom SAmple Consensus)</a> algorithm. <sup><a href="#__reference_8__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 8]<br/>
+Martin A. Fischler, Robert C. Bolles (1981), <em>Random Sample Consensus: A Paradigm for Model Fitting with Applications to Image Analysis and Automated Cartography</em>, Communications of the ACM, Vol. 24 No. 6, pp. 381&ndash;395">[8]</a></sup> <sup><a href="#__reference_9__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 9]<br/>
+Ondrej Chum, Jirı Matas (2008), <em>Optimal Randomized RANSAC</em>, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 30, No. 8, August 2008">[9]</a></sup> Our RANSAC routine can tolerate a large fraction of outliers (more than a 70% of false star pair matches in our tests), and has been parallelized to use all available processors (running several instances of RANSAC concurrently for the same data increases linearly the probability of finding a valid registration model).</p>
+<p>At this stage of the image registration process, our RANSAC routine is used to achieve two key goals simultaneously: perform robust rejection of outliers (false star pair matches), and optimize the registration model according to four <em>programmable optimization criteria</em>:</p>
+
+<ul class="pidoc_list">
+<li><strong>Inliers maximization.</strong> This criterion tries to find a valid projective transformation using the largest possible fraction of putative star pair matches.</li>
+<li><strong>Overlapping maximization</strong> tries to find a valid registration model using a set of stars to cover the largest possible common area on both images.</li>
+<li><strong>Regularity maximization</strong> tries to find a valid registration model using a set of stars distributed as regularly as possible on the overlapping area between both images in both plane directions.</li>
+<li><strong>RMS error minimization</strong> tries to find a valid registration model where the root mean square error between the predicted and actual positions of all intervening stars is as small as possible.</li>
+</ul>
+
+<p>For normal image registration tasks all four optimization criteria are equally pursued by default. For small overlapping mosaics and other difficult problems, increasing the weights of overlapping and regularity maximization for RANSAC can be helpful to achieve more accurate results in some cases.</p>
+<p>The output of the RANSAC routine is the best set of confirmed star pair matches found, plus estimates of the root mean square error and peak errors in the computed transformed coordinates for both axes, and four <em>quality estimates</em> in the [0,1] range corresponding to the four optimization criteria. Customarily in PixInsight, we provide all of this information to the user for quantitative evaluation.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+
+<div style="text-align:center;">
+<img src="images/RANSACStarMatcherFlowChart.svg" alt=""/>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p><strong>A flowchart representation of the (simplified) RANSAC star matcher routine.</strong> At each iteration, the algorithm selects four putative matches at random, builds a registration model (homography <var>H),</var> and validates it against all target stars. In this flowchart we use the following symbols:</p>
+
+<ul class="pidoc_list">
+<li><var>H</var>: computed homography for the current set of four randomly selected reference stars.</li>
+<li><var>N</var>: number of reference stars.</li>
+<li><var>i</var>: iteration counter.</li>
+<li><var>L</var>: the number of validated star pair matches (inliers) with the current model.</li>
+<li><var>S<sub>i</sub></var>: the <var>i</var>th reference star.</li>
+<li><var>T<sub>i</sub></var>: the <var>i</var>th target star.</li>
+<li><var>P<sub>i</sub></var>: predicted target position for the <var>i</var>th reference star.</li>
+<li><var>&epsilon;</var>: RANSAC tolerance in pixels. When the distance between a predicted position <var>P<sub>i</sub></var> = <var>H</var>(<var>S<sub>i</sub></var>) and the corresponding matched target star <var>T<sub>i</sub></var> is less than this tolerance, the matched pair <var>S<sub>i</sub></var> &#x27f7; <var>T<sub>i</sub></var> is confirmed as an inlier with the current model.</li>
+</ul>
+
+<p>The output of the RANSAC routine is the best fitted model, along with a set of statistical properties and four <em>quality indexes</em>, according to the prescribed optimization criteria. The RANSAC process is aborted 'prematurely' when a fitted model validates more than a 98% of the putative star pair matches as inliers.</p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Star_Matching_:_Reducing_Uncertainty_for_Mosaics_Computing_Intersections__">
+   <h5 class="pidoc_subsectionTitle">2.3.3&emsp;Reducing Uncertainty for Mosaics: Computing Intersections</h5>
+<p>The probability of finding a valid model after <img style="vertical-align:middle;" src="images/eqn_0001.svg" alt=""/> iterations of the RANSAC algorithm is given by:</p>
+
+<div style="text-align:center;">
+<img src="images/RANSACProbabilityEquation.svg" alt=""/>
+</div>
+<p>where <img style="vertical-align:middle;" src="images/eqn_0002.svg" alt=""/> is the fraction of inliers in the input data set, and <img style="vertical-align:middle;" src="images/eqn_0003.svg" alt=""/> is the length of the sample required to build the model. Note that the probability of finding a valid model is independent on the length of the data set; only the sample size and the fraction of outliers (or inliers) are relevant. Solving for the number of iterations:</p>
+
+<div style="text-align:center;">
+<img src="images/RANSACNumberOfTrialsEquation.svg" alt=""/>
+</div>
+<p>For the StarAlignment task we have <img style="vertical-align:middle;" src="images/eqn_0004.svg" alt=""/> (four star pairs are required to define a projective coordinate transformation; see the <a href="#estimation_of_transformation_parameters">next section</a>) and a fixed probability <img style="vertical-align:middle;" src="images/eqn_0005.svg" alt=""/> by design. For normal image registration tasks, where the reference and target images almost completely overlap, we usually can expect a fraction of inliers <img style="vertical-align:middle;" src="images/eqn_0002.svg" alt=""/> in the range from 0.5 to 0.95, depending on effective overlapping, noise, resolution and scale differences, among other factors. Under these favorable circumstances the RANSAC routine is extremely efficient.</p>
+<p>A serious problem arises when the overlapping area between two images is very small. In these cases the uncertainty in the initial triangle matching process can grow exponentially to the point where RANSAC becomes impractical. This happens when the fraction of inliers descends below a 25% of the set of putative star pair matches. For example, with a 25% of inliers <img style="vertical-align:middle;" src="images/eqn_0001.svg" alt=""/> grows up to about 2400 iterations, which is quite large but still manageable. However, if the fraction of inliers descends to a 20% of the input set, more than 5700 RANSAC iterations are required. In these cases and without further help, the StarAlignment process can be unable to find a valid registration model.</p>
+<p>Fortunately we have found a good solution to this problem: precompute the intersection between the reference and target images, and constrain the whole star matching task to the overlapping area. In this way we can drastically reduce the fraction of outliers, so that the RANSAC algorithm can work under optimal conditions. The intersection can be estimated with a robust FFT-based image registration algorithm using phase correlation. The implemented FFT-based algorithm <sup><a href="#__reference_10__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 10]<br/>
+Prabhakara Rao G.V., Mahidhar A. (2006), <em>A Novel Still Image Mosaicing System Using Featureless Registration, Binary Check Stitching and Minimal Blending</em>, Proceedings of the 2006 International Conference on Image Processing, Computer Vision &amp; Pattern Recognition, Las Vegas, Nevada, USA, June 26-29, 2006, Volume 1, pp. 223&ndash;229">[10]</a></sup> is rather fast and allows us to compute a sufficiently approximate intersection, accurate to within one degree in rotation angle and a few pixels in the coordinates. With this feature the StarAlignment process can build mosaics in a completely automatic way, even very difficult mosaics with less than a 5% overlapping. For extremely difficult cases with less than a 2% overlapping and/or scarce star coverage on overlapping areas, we have implemented a simple manual method where the user can define the approximate overlapping areas with the help of previews. With all of these resources, our tool can build mosaics of any practical size and complexity.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<img style="float:left;margin-left:12px;margin-right:1.25em;" src="images/RANSACInliersVsIterationsGraph.svg" alt=""/>
+<p><strong>Number of RANSAC iterations vs. fraction of inliers</strong> in the StarAlignment process. The function plotted is the number of RANSAC iterations required to find a valid 2-D projective model (where the sample size is 4 star pair matches) with 99.99% probability.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+
+<div class="pidoc_figure">
+<a id="__figure_6__"></a>
+<p class="pidoc_figure_title">Figure 6</p>
+<img style="float:left;margin-right:1.25em;" src="images/MosaicM31.jpg" alt=""/>
+<p><strong>A difficult mosaic</strong> with 5% overlapping automatically generated by StarAlignment with FFT-based intersection estimation. The overlapped region between both images (about 120 pixels tall) has been highlighted in red. Image data courtesy of Jordi Gallego.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+
+<div class="pidoc_figure">
+<a id="__figure_7__"></a>
+<p class="pidoc_figure_title">Figure 7</p>
+<img style="display:block;" src="images/MosaicM31_MaximizeInliers.png" alt=""/>
+
+<div>
+<p>(a) Inliers maximization.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<img style="display:block;" src="images/MosaicM31_MaximizeOverlapping.png" alt=""/>
+
+<div>
+<p>(b) Overlapping maximization.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<img style="display:block;" src="images/MosaicM31_MinimizeRMSError.png" alt=""/>
+
+<div>
+<p>(c) RMS error minimization.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<img style="display:block;" src="images/MosaicM31_FullOptimization_Tolerance.png" alt=""/>
+
+<div>
+<p>(d) Full optimization: inliers + overlapping + regularity + minimize RMS error, with increased RANSAC tolerance.</p>
+</div>
+<p><strong>Matched stars with different RANSAC optimization criteria</strong> for the M31 mosaic shown on the figure above. These crops show the overlapped area between both mosaic frames, with red dots indicating matched stars. In these images the distortion inherent in the representation of a significant fraction of the sphere on the plane becomes problematic. This is particularly evident with overlapping maximization (b): forced to spread star matches over the largest possible region, RANSAC has chosen a set of stars on an arc segment. With inliers maximization (a) and RMS error minimization (c), no optimal solution can cover the whole overlapping region horizontally. Finally, the best result is obtained by favoring all optimization criteria and increasing RANSAC tolerance (d), which allows to find an optimal set of star pair matches covering the entire overlapping region.</p>
+</div>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Estimation_of_Transformation_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Estimation of Transformation Parameters</h4>
+<p>Our implementation uses a two-dimensional projective coordinate transformation, also known as 2-D homography, as an image registration model. <sup><a href="#__reference_11__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 11]<br/>
+P.H.S. Torr, D.W. Murray (1997), <em>The Development and Comparison of Robust Methods for Estimating the Fundamental Matrix</em>, International Journal of Computer Vision 24(3), pp. 271&ndash;300">[11]</a></sup> A 2-D homography is defined as a 3&times;3 homogeneous matrix <img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> such that for any point correspondence <img style="vertical-align:middle;" src="images/eqn_0007.svg" alt=""/>:</p>
+
+<div style="text-align:center;">
+<img src="images/HomographyEquation.svg" alt=""/>
+</div>
+<p>where the points are defined by their <a href="http://en.wikipedia.org/wiki/Homogeneous_coordinates" title="http://en.wikipedia.org/wiki/Homogeneous_coordinates">homogeneous coordinates</a>: <img style="vertical-align:middle;" src="images/eqn_0008.svg" alt=""/> and <img style="vertical-align:middle;" src="images/eqn_0009.svg" alt=""/> on the reference and target image, respectively. A 2-D projective model fully captures all affine transformations (translation, rotation, scaling and shearing), plus <em>chirping</em> (change in spatial frequency with position), <em>keystoning</em> (converging lines) and mirroring, while preserving straight lines. <sup><a href="#__reference_12__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 12]<br/>
+Steve Mann, Rosalind W. Picard (1997), <em>Video Orbits of the Projective Group: A Simple Approach to Featureless Estimation of Parameters</em>, IEEE Transactions on Image Processing,, Vol. 6, No. 9, September 1997, pp. 1281&ndash;1295">[12]</a></sup> A 2-D projective transformation has eight degrees of freedom, so we need strictly at least four star pair matches to compute it (the matrix <img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> has nine elements, but is defined only up to scale so the common scale factor <img style="vertical-align:middle;" src="images/eqn_0010.svg" alt=""/> is irrelevant). To ensure a valid transformation between two images with the implemented algorithms, a minimum of six matched star pairs are necessary to fit an affine transformation, and at least 8 pairs are required to fit a projective model.</p>
+<p>The final transformation matrix <img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> is obtained from the set of star pair matches provided by the RANSAC routine. We have implemented the <em>eight-point algorithm with isotropic scaling</em> <sup><a href="#__reference_13__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 13]<br/>
+H.C. Longuet-Higgins (1981), <em>A Computer Algorithm for Reconstructing a Scene from Two Projections</em>, Nature, Vol. 293, pp. 133&ndash;135">[13]</a></sup> <sup><a href="#__reference_14__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 14]<br/>
+Richard I. Hartley (1997), <em>In Defense of the Eight-Point Algorithm</em>, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 19, No. 6, June 1997, pp. 580&ndash;593">[14]</a></sup> and the <a href="http://en.wikipedia.org/wiki/Direct_linear_transformation" title="http://en.wikipedia.org/wiki/Direct_linear_transformation">direct linear transformation</a> (DLT) algorithm. <sup><a href="#__reference_15__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 15]<br/>
+A. Agarwal, C. V. Jawahar, P. J. Narayanan (2005), <em>A survey of planar homography estimation techniques</em>, Technical Report IIIT/TR/2005/12, International Institute of Information Technology, Hyderabad, 2005.">[15]</a></sup></p>
+<p><a id="2d_surface_splines"></a></p>
+<div class="pidoc_subsection" id="__Description_:_Estimation_of_Transformation_Parameters_:_Improving_Accuracy_2D_Surface_Splines__">
+   <h5 class="pidoc_subsectionTitle">2.4.1&emsp;Improving Accuracy: 2-D Surface Splines</h5>
+<p>Recall that our implementation builds all the existing triangles only for the 200 brightest detected stars. For the rest of stars, a relatively small number <var>n</var> of triangles are built with the 2<var>n</var> nearest neighbors of each star (<var>n</var>=40 by default). This process favors comparison of many small-scale triangles instead of a few large-scale ones during the initial star matching phase, which in turn allows for some degree of flexibility in the registration model. Nothing similar to an elastic model, of course, but we have some potential to represent distortions in a piecewise manner. We do exploit this potential, and with remarkably good results in some difficult problems, mainly in mosaics with small overlapping.</p>
+<p>To help with this <em>relaxation</em> of the registration model, the RANSAC routine has an additional parameter, which we call <em>tolerance.</em> It is the maximum allowed distance in pixels between a star's position and its predicted position using the projective transformation being evaluated by RANSAC. The robust nature of the RANSAC algorithm allows us to introduce <em>some</em> uncertainty in the solution design and still get an optimal model with very high probability. In our implementation the default RANSAC tolerance is two pixels, but it can be increased up to 8 pixels. With well designed optimization criteria and increased tolerance, RANSAC is able to find more valid star pair matches that deviate significantly from a model strictly based on triangle similarity. To capture these deviations, a flexible coordinate interpolation device is necessary. In our implementation we use 2-D surface splines, also known as <a href="http://en.wikipedia.org/wiki/Thin_plate_spline" title="http://en.wikipedia.org/wiki/Thin_plate_spline"><em>thin plates</em></a>. <sup><a href="#__reference_16__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 16]<br/>
+Gisela E. Müllges, Frank Uhlig (1997), <em>Numerical Algorithms with C</em>, Springer, 1996, &sect; 12.2, pp. 309&ndash;313">[16]</a></sup> <sup><a href="#__reference_17__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 17]<br/>
+Jean Meinguet (1979), <em>Multivariate Interpolation at Arbitrary Points Made Simple</em>, Journal of Applied Mathematics and Physics (ZAMP), Vol. 30, 1979, pp. 292&ndash;304">[17]</a></sup></p>
+
+<div class="pidoc_figure">
+<a id="__figure_8__"></a>
+<p class="pidoc_figure_title">Figure 8</p>
+<img src="images/MosaicM31_AccuracyLeft.png" alt=""/>
+
+<div>
+<p>Left side.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<img src="images/MosaicM31_AccuracyCenter.png" alt=""/>
+
+<div>
+<p>Center.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<img src="images/MosaicM31_AccuracyRight.png" alt=""/>
+
+<div>
+<p>Right side.</p>
+</div>
+<p><strong>The accuracy of 2-D surface spline interpolation</strong> for image registration is shown on these crops of the M31 mosaic used in preceding figures. The images show different regions of the joint between mosaic frames, enlarged 4:1. As before, the overlapped area has been highlighted in red. Note the stars 'sectioned' by the seam between mosaic frames.</p>
+</div>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Seamless_Mosaics_Automatic_Frame_Adaptation__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;Seamless Mosaics: Automatic Frame Adaptation</h4>
+<p>Visible seams between adjacent frames are a major problem in mosaic and panorama construction. The seams are mainly due to differences in texture and brightness. Visible texture differences can be problematic in deep-sky mosaics and are generally caused by differing noise levels and noise distributions. We have no remedy for these: if you are trying to create a mosaic from images with significantly different signal-to-noise ratios, then you're probably wasting your time. Better improve the defective frames by gathering more signal, or try a smaller mosaic if you can, or use wider field optics, but building a mosaic with incongruent data is one of the worst nightmares of astrophotography. Selective noise reduction can help to some extent&mdash;and even fix minor texture difference problems&mdash;but it is obviously far from an optimal solution.</p>
+<p>Visible brightness differences can be global, local, and a mixture of both. We certainly <em>can</em> help you with these. The StarAlignment tool has a built-in feature to fix global brightness differences automatically: <em>frame adaptation</em>. Our frame adaptation algorithm is based on a rather simple principle: each pixel is the sum of a background level&mdash;which should be a constant pedestal for the whole image&mdash;and a signal level that varies locally. This is an instance of those cases where a simplified view captures the essence of a problem to provide a powerful solution. The frame adaptation routine gathers all pixels in the overlapped region between each pair of adjacent frames and fits a simple linear model from their differences:</p>
+
+<div style="text-align:center;">
+<img src="images/FrameAdaptationFunctionEquation.svg" alt=""/>
+</div>
+<p>where <img style="vertical-align:middle;" src="images/eqn_0011.svg" alt=""/> is a pixel of the target image, <img style="vertical-align:middle;" src="images/eqn_0012.svg" alt=""/> is the corresponding pixel in the adapted image, and <img style="vertical-align:middle;" src="images/eqn_0013.svg" alt=""/> and <img style="vertical-align:middle;" src="images/eqn_0014.svg" alt=""/> are, respectively, the difference in background levels and the quotient of signal levels between the target and reference images. Applied to each pixel of the target image, this function removes any visible differences between both aligned frames. However, for this to work correctly the following conditions must hold:</p>
+
+<ul class="pidoc_list">
+<li>(a) Either both images are linear, or they are subject to identical nonlinear transformations. In other words, the <em>difference</em> between the images must be representable as a linear function.</li>
+<li>(b) Both images are correctly calibrated. In particular, accurate flat fielding is mandatory.</li>
+<li>(c) Either there are no additive gradients, or additive gradients are identical in both images.</li>
+</ul>
+
+<p>Condition (a) shouldn't be a problem if you work with calibrated raw CCD or CMOS data. Condition (b) will put your observational skills to the test: small flat fielding errors will <em>always</em> lead to visible differences, and this is one of the most challenging aspects where mosaic construction takes no prisoners. Condition (c) means that either you are one of those privileged persons that still can image under unpolluted skies, or you have to apply accurate gradient correction procedures <em>before</em> attempting to build a mosaic. So if you are one of those normal persons, then <a href="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html" title="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html">DynamicBackgroundExtraction</a> and <a href="../../tools/AutomaticBackgroundExtractor/AutomaticBackgroundExtractor.html" title="../../tools/AutomaticBackgroundExtractor/AutomaticBackgroundExtractor.html">AutomaticBackgroundExtractor</a> are your best friends.</p>
+<div class="pidoc_subsection" id="__Description_:_Seamless_Mosaics_Automatic_Frame_Adaptation_:_Building_Seamless_Mosaics_in_Practice_GradientMergeMosaic__">
+   <h5 class="pidoc_subsectionTitle">2.5.1&emsp;Building Seamless Mosaics in Practice: GradientMergeMosaic</h5>
+<p>To be realistic, condition (c) above is a tough one. Accurate flat fielding <em>is</em> indeed possible&mdash;in case you disagree, the figure below and the <a href="#mosaic_example_1">example at the end of this document</a> prove this&mdash;and you <em>should</em> be able to implement it consistently with your equipment, or otherwise you still have some very basic work to do for improvement. Actually, when failure to meet conditions (b) and (c) leads to visible mosaic seams, the problem is the same in both cases: irregular illumination. Assuming perfect flat fielding, additive sky gradients can be extremely difficult to fix completely, even with sophisticated algorithms such as those implemented in our background modelization tools. With the due respect to linear functions, when no matter what you do you still get some visible seams with StarAlignment's frame adaptation enabled, then you need something more powerful. <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a> (GMM) is an open source PixInsight tool written by German software developer Georg Viehoever. GMM implements gradient domain manipulation algorithms to generate absolutely seamless mosaics, even in very difficult cases. GMM must be applied to <a href="#register_union_separate">separate mosaic frames</a> generated by StarAlignment with the frame adaptation option enabled, that is, to mosaic frames where only local illumination differences persist.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_9__"></a>
+<p class="pidoc_figure_title">Figure 9</p>
+<div class="pidoc_mouseover">
+<img src="images/MosaicM31_NoFrameAdaptation.png" id="bdNLTP7ceHhLd00K" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="bdNLTP7ceHhLd00K_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('bdNLTP7ceHhLd00K', 'images/MosaicM31_NoFrameAdaptation.png'); pidoc_hideGroup('bdNLTP7ceHhLd00K', 2); pidoc_setOpacity('bdNLTP7ceHhLd00K_1', 1.0);">Mosaic generated with StarAlignment, frame adaptation disabled.</a></li>
+<li><span class="pidoc_indicator" id="bdNLTP7ceHhLd00K_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('bdNLTP7ceHhLd00K', 'images/MosaicM31_FrameAdaptation.png'); pidoc_hideGroup('bdNLTP7ceHhLd00K', 2); pidoc_setOpacity('bdNLTP7ceHhLd00K_2', 1.0);">Same mosaic, frame adaptation enabled.</a></li>
+</ul>
+</div>
+<p><strong>StarAlignment's automatic frame adaptation</strong> in action. This example shows the kind of results achievable with exquisitely calibrated images acquired under excellent rural skies. Image courtesy of Jordi Gallego. Raw CCD data have been calibrated by the author.</p>
+</div>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Output_Image_Generation__">
+   <h4 class="pidoc_subsectionTitle">2.6&emsp;Output Image Generation</h4>
+<p>The final step of the image registration process is to interpolate the target image to generate a registered version that matches the reference image. This involves the two very different tasks of coordinate interpolation and pixel interpolation. Coordinate interpolation works by <em>inverse mapping:</em> given a pixel of the output registered image, compute the coordinates of the corresponding pixel in the input target image. This is done by simply applying the registration model: either a projective transformation (homography) or 2-D surface splines. The other task is more subtle at this point. Different pixel interpolation algorithms may enhance rather different properties in the output image, and we often are forced to make a decision between two or more desirable properties: smoothness or sharpness, higher subpixel accuracy or better preservation of the original noise distribution, upsampling or downsampling performance, and so on. To be as versatile and widely applicable as possible, StarAlignment implements the whole set of <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">pixel interpolation algorithms</a> available on the PixInsight/PCL platform.</p>
+<p>As most interpolating geometric tools in PixInsight, StarAlignment has an <em>automatic interpolation mode</em> enabled by default. When this mode is selected, the <a href="http://en.wikipedia.org/wiki/Lanczos_resampling" title="http://en.wikipedia.org/wiki/Lanczos_resampling">Lanczos-4 pixel interpolation algorithm</a> is always used to register images with no scale differences, when the target image has to be scaled up (upsampled), and for slight scale down (downsampling) ratios. Lanczos interpolation has the best performance for these tasks in terms of subpixel accuracy, detail preservation and minimal aliasing artifacts. An alternative of lower quality but much faster in these cases is bicubic spline interpolation, <sup><a href="#__reference_18__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 18]<br/>
+Keys, R. G. (1981), <em>Cubic Convolution Interpolation for Digital Image Processing</em>, IEEE Transactions on Acoustics, Speech &amp; Signal Processing, Vol. 29, pp. 1153&ndash;1160.">[18]</a></sup> which has been the standard pixel interpolation in PixInsight until Lanczos algorithms were <a href="http://pixinsight.com/forum/index.php?topic=3875.0" title="http://pixinsight.com/forum/index.php?topic=3875.0">implemented in early 2012</a>. For larger scale down ratios Mitchell-Netravali cubic filters <sup><a href="#__reference_19__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 19]<br/>
+Don P. Mitchell, Arun N. Netravali (1988), <em>Reconstruction Filters in Computer Graphics</em>, Computer Graphics, Vol. 22, No. 4, pp. 221&ndash;228.">[19]</a></sup> are used. This automatic mode, along with all pixel interpolation algorithms available, are described with more detail in the above referred <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">document</a>. We think its performance is optimal for most image registration tasks.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Known_Limitations_and_Future_Work__">
+   <h4 class="pidoc_subsectionTitle">2.7&emsp;Known Limitations and Future Work</h4>
+<p>The following are the most important limitations of the current StarAlignment implementation:</p>
+
+<ol class="pidoc_list">
+<li>The <a href="#initial_star_matching">initial star matching routine</a> is based on triangle similarity. As a result, the whole image registration process is rather intolerant of global distortion. We overcome this limitation to some extent with a modified triangle generation strategy (favoring generation of many small-scale triangles) and an improved RANSAC implementation (programmable optimization criteria and increased RANSAC tolerance). However, a more flexible initial star matching algorithm would be desirable in situations where distortion currently prevents the tool from working properly, such as registration of wide field images acquired with different instruments and super-wide-field mosaics. As of this writing, we are working on a new star matching algorithm of our own design, based on <em>invariant local descriptors</em>, which doesn't have most of these limitations. Much more research and development work is necessary, but the first tests look promising.</li>
+<li class="pidoc_spaced_list_item">The implemented <a href="#automatic_intersection_computation">FFT-based intersection computation algorithm</a> fully supports arbitrary translation and rotation between mosaic frames, but not scale differences. Although this has little practical importance (usually mosaic frames are acquired with the same instrument, and we have a manual method based on definition of previews as a last resort), supporting scale differences would be desirable for automatic intersection computation. We have some ideas to modify the original algorithm with this purpose.</li>
+<li class="pidoc_spaced_list_item">The implemented <a href="#star_detection">star detector</a> has problems with large scale differences. This prevents registration of images acquired with very different focal lengths. The current star detector is a fast one-step process; perhaps a more efficient detection device could be implemented as a multistep process.</li>
+<li class="pidoc_spaced_list_item">The automatic frame adaptation routine should be extended to include a gradient domain algorithm, such as Georg Viehoever's <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic,</a> directly available as part of the StarAlignment process.</li>
+</ol>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p><a id="working_mode"></a></p>
+<p><a id="format_hints"></a></p>
+<p><a id="mosaic_example_1"></a></p>
+<div class="pidoc_subsection" id="__Usage_:_Reference_Image__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Reference Image</h4>
+<img src="images/ReferenceImage.png" alt=""/>
+<p>All registered images will be transformed geometrically (translated, scaled, rotated, etc.) as necessary to align them with respect to the reference image. The reference image will not be modified in any way during the registration process.</p>
+<p>The reference image can be either a disk file or a view. When you click the selection button (blue triangle), a file or view selection dialog opens where you can select the desired reference image.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Working_Mode__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Working Mode</h4>
+<img src="images/WorkingMode.png" alt=""/>
+<p>These controls allow you to select one of the eight working modes of the StarAlignment process, which we describe below. Along with normal alignment and mosaic generation modes, there are special <em>control modes</em> that are useful to diagnose problems and to evaluate the performance and suitability of image registration procedures.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Register/Match Images</p>
+</dt>
+<dd>
+<p>This is StarAlignment's 'normal' working mode. Each target image will be registered to match the reference image by superposition. The resulting registered image(s) will be generated as new image windows or disk files, as appropriate. This is the only working mode supported for registration of disk image files as batch tasks.</p>
+</dd>
+<dt>
+<p>Register/Union - Mosaic</p>
+</dt>
+<dd>
+<p>StarAlignment will create a new image including both the reference and target images. The target image will be registered to match the reference image by superposition, and the reference image will not be interpolated, but just copied in place. This forms a two-frame mosaic over a black canvas with the smallest possible dimensions to include the reference and registered target images completely. This mode can only be applied to view target images. However, the reference image can be a disk file.</p>
+</dd>
+<dt>
+<p><a id="register_union_separate"></a> Register/Union - Separate</p>
+</dt>
+<dd>
+<p>This mode is similar to the register/union mosaic mode, but each mosaic frame generates a separate image with the canvas size of the whole mosaic. Separate mosaic frames can then be composed into a single mosaic by means of a maximum combination (e.g., with <a href="../../tools/PixelMath/PixelMath.html" title="../../tools/PixelMath/PixelMath.html">PixelMath</a>'s max function). Separate mosaics are also required to post-process independent mosaic elements with tools such as <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic.</a></p>
+</dd>
+<dt>
+<p>Structure Detection</p>
+</dt>
+<dd>
+<p>In this control mode, StarAlignment generates a <em>structure detection map</em> for each target image. A structure detection map is an image where all pixels are black except for those regions where the <a href="#star_detection">star detection routine</a> looks for stars. In this way we can 'see' exactly what the star detector 'sees', which can be helpful to diagnose problematic cases where not enough stars are being detected for some reason. This mode can only be used with view target images.</p>
+</dd>
+<dt>
+<p>Structure Map</p>
+</dt>
+<dd>
+<p>This mode is similar to structure detection, but generates a <em>structure map</em> instead. A structure map is the result of thresholding and binarizing a structure detection map. A structure map is directly used by the <em>structure scanner</em> component of the <a href="#star_detection">star detection routine</a>.</p>
+</dd>
+<dt>
+<p>Detected Stars</p>
+</dt>
+<dd>
+<p>A new image is generated as a duplicate of the target image, then for each detected star a small cross is plotted centered at the star's pixel coordinates. If the target is an RGB color image, the star crosses will only be drawn on the red channel. This is very convenient because the red crosses are easily visible, especially on monochrome image. Hint: define a preview on the target image, convert it to the RGB color space (select <span class="pidoc_menu">Image &gt; Color Spaces &gt; Convert to RGB Color</span> from the main menu, or apply the <a href="../../tools/ConvertToRGBColor/ConvertToRGBColor.html" title="../../tools/ConvertToRGBColor/ConvertToRGBColor.html">ConvertToRGBColor</a> process), store the preview and apply StarAlignment in detected stars mode.</p>
+</dd>
+<dt>
+<p>Matched Stars</p>
+</dt>
+<dd>
+<p>This mode is identical to <em>detected stars</em>, but only the stars that have been matched between the reference and target images are plotted.</p>
+</dd>
+<dt>
+<p>Transformation Matrices</p>
+</dt>
+<dd>
+<p>In this mode StarAlignment calculates the transformation matrix for each registered image, but no actual image registration is carried out. A transformation matrix corresponds to a <a href="#estimation_of_transformation_parameters">homographic projection</a> (eight parameters) to register a target image on the reference image. The elements of each transformation matrix are written as plain text to the console at the end of each image registration task. This mode can be used with disk files as a batch task; as noted, however, the registered target images won't be generated and hence won't be written to disk.</p>
+</dd>
+<dt>
+<p>Generate Masks</p>
+</dt>
+<dd>
+<p>If this option is selected, StarAlignment will generate a <em>registration mask</em> for each registered target image. A registration mask is an 8-bit grayscale image whose pixels are white only where the registered image contains pixels from the corresponding target image; black anywhere else. These masks are very useful to apply selective corrections to registered pixels, especially in mosaic images. Registration masks <em>should</em> also be used to evaluate the accuracy of generated mosaics.</p>
+</dd>
+<dt>
+<p>Frame Adaptation</p>
+</dt>
+<dd>
+<p>When this option is selected, StarAlignment computes and applies a linear fitting function between each target image and the reference image. The linear fit is of the general form <var>y</var> = <var>a</var> + <var>bx</var>, where <var>a</var> and <var>b</var> are the two fitted parameters. The linear function is computed from all overlapped pixels between the target and reference images. The <var>a</var> parameter acts like a pedestal to compensate for the difference in background illumination, and the <var>b</var> parameter works like a scaling function to equalize signal levels between both images. Frame adaptation is extremely useful to create seamless mosaics. We already have given a complete <a href="#frame_adaptation">description of the frame adaptation feature</a> in this document, which we encourage you to read thoroughly.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Target_Images__">
+   <h4 class="pidoc_subsectionTitle">3.3&emsp;Target Images</h4>
+<img src="images/TargetImages.png" alt=""/>
+<p>Use these controls to define and manage a list of image views and/or image files to be registered as a <em>batch task</em>. Note that this is only possible in <a href="#working_mode"><em>register/match images</em> mode</a>. StarAlignment supports all installed file formats with image reading capabilities.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="target_images_list"></a> Target images list</p>
+</dt>
+<dd>
+<p>The largest control in this section is a list box with all the images currently selected for registration. For file items, the list will show full file paths or just file names, depending on the state of the <a href="#full_paths">Full Paths checkbox</a>. You can select an unlimited number of target image files or views. On this list you can:</p>
+
+<ul class="pidoc_list">
+<li>Double-click an item's file name, path or view identifier. If the item is a disk file, it will be loaded as a new image window. If the item is a view, the corresponding image window will be brought to front and the view will be activated.</li>
+<li>Double-click a green checkmark icon to disable an item (double-click the red crossmark icon to enable it). Disabled items will not be registered.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Add Files</p>
+</dt>
+<dd>
+<p>Click this button to open a file dialog where you can select existing image files, which will be appended to the current list of target images. Only files located in the local filesystem can be selected; the tool does not currently support remote files located on network devices. As noted at the beginning of this section, any installed file format with image reading capabilities can be selected.</p>
+</dd>
+<dt>
+<p>Add Views</p>
+</dt>
+<dd>
+<p>Click this button to open a view selection dialog where you can specify a list of views (main views and/or previews) that will be appended to the current list of target images. Defining a mixed set of disk files and views is supported, although rather unusual.</p>
+</dd>
+<dt>
+<p>Select All</p>
+</dt>
+<dd>
+<p>Click this button to select all the items in the current list of target images.</p>
+</dd>
+<dt>
+<p>Invert Selection</p>
+</dt>
+<dd>
+<p>Click this button to invert the current selection in the list of target images.</p>
+</dd>
+<dt>
+<p>Toggle Selected</p>
+</dt>
+<dd>
+<p>Click this button to enable/disable the items currently selected in the list of target images.</p>
+</dd>
+<dt>
+<p>Remove Selected</p>
+</dt>
+<dd>
+<p>This button removes the selected items from the list of target images. This action cannot be undone.</p>
+</dd>
+<dt>
+<p>Clear</p>
+</dt>
+<dd>
+<p>Click to empty the list of target images. This action cannot be undone.</p>
+</dd>
+<dt>
+<p><a id="full_paths"></a> Full Paths</p>
+</dt>
+<dd>
+<p>When this option is selected, the list of target images will show the full absolute file paths of all selected disk files. When this option is disabled (default state), only file names will be shown, which simplifies visual inspection, and full file paths are shown as tool tip messages. This option has no effect on view target items.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Format_Hints__">
+   <h4 class="pidoc_subsectionTitle">3.4&emsp;Format Hints</h4>
+<img src="images/FormatHints.png" alt=""/>
+<p>Format hints are small text strings that allow you to override global file format settings for specific processes. In the StarAlignment tool, <em>input hints</em> change the way input files of some particular file formats are loaded during the registration process. This includes both the reference and target image(s), when they have been specified as file items. In the same way, <em>output hints</em> change the way output registered images are written to disk files, when applicable.</p>
+<p>Most standard file format modules support hints; each format supports a number of input and/or output hints that you can use for different purposes with tools that give you access to format hints. As FITS is by far the most frequently used file format to store calibrated raw images, we'll only list the format hints supported by the standard FITS format support module in the following tables.</p>
+
+<table class="pidoc_table">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1<br/>
+FITS Input Hints</span></caption>
+<tr>
+<th><p>Hint</p>
+</th>
+<th><p>Purpose</p>
+</th>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">lower-range</span></span> <em>n</em></p>
+</td>
+<td><p>Specifies the lower bound of the floating point input range.<br/>
+ Example: <span class="pidoc_code">lower-range 0.001</span></p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">upper-range</span></span> <em>n</em></p>
+</td>
+<td><p>Specifies the upper bound of the floating point input range.<br/>
+ Example: <span class="pidoc_code">upper-range 65535</span></p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">rescale</span></span></p>
+</td>
+<td><p>Forces rescaling of out-of-range floating point images to the floating point input range.</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">rescale-out-of-range</span></span></p>
+</td>
+<td><p>A more explicit synonym to <span class="pidoc_code">rescale.</span></p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">truncate</span></span></p>
+</td>
+<td><p>Forces truncation of out-of-range floating point images to the floating point input range.</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">truncate-out-of-range</span></span></p>
+</td>
+<td><p>A more explicit synonym to <span class="pidoc_code">truncate.</span></p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">ignore-out-of-range</span></span></p>
+</td>
+<td><p>Ignores out-of-range floating point pixel values. <strong>Attention: platform stability is not guaranteed if out-of-range pixels propagate from processing tools.</strong></p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">bottom-up</span></span></p>
+</td>
+<td><p>Sets the coordinate origin at the bottom left corner of each pixel matrix. Horizontal coordinates grow from left to right. Vertical coordinates grow from bottom to top.</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">up-bottom</span></span></p>
+</td>
+<td><p>The inverse option to <span class="pidoc_code">bottom-up:</span> Sets the coordinate origin at the top left corner of each pixel matrix. Horizontal coordinates grow from left to right. Vertical coordinates grow from top to bottom.</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">signed-is-physical</span></span></p>
+</td>
+<td><p>Specifies that signed integer images store physical data in the positive range [0,2<sup>n-1</sup>&minus;1], where n is the number of bits per pixel sample. The negative part of the numeric range is not used, and the images are effectively represented with one bit less than the number of bits used to store each pixel in the image</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">signed-is-logical</span></span></p>
+</td>
+<td><p>Specifies that signed integer images store logical data in the full range [&minus;2<sup>n-1</sup>,+2<sup>n-1</sup>&minus;1].</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table">
+<caption><a id="__table_2__"></a>
+<span class="pidoc_table_title">Table 2<br/>
+FITS Output Hints</span></caption>
+<tr>
+<th><p>Hint</p>
+</th>
+<th><p>Purpose</p>
+</th>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">unsigned</span></span></p>
+</td>
+<td><p>Output integer images will store pixel samples as unsigned integers in the range [0,2<sup>n</sup>&minus;1], where n is the number of bits per pixel sample.</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">signed</span></span></p>
+</td>
+<td><p>Output integer images will store pixel samples as signed integers in the range [&minus;2<sup>n-1</sup>,+2<sup>n-1</sup>&minus;1].</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">bottom-up</span></span></p>
+</td>
+<td><p>Images will be written with the coordinate origin at the bottom left corner of each pixel matrix. Horizontal coordinates grow from left to right. Vertical coordinates grow from bottom to top.</p>
+</td>
+</tr>
+<tr>
+<td><p><span class="pidoc_code"><span class="pidoc_nowrap">up-bottom</span></span></p>
+</td>
+<td><p>The inverse option to <span class="pidoc_code">bottom-up:</span> Images will be written with the coordinate origin at the top left corner of each pixel matrix. Horizontal coordinates grow from left to right. Vertical coordinates grow from top to bottom.</p>
+</td>
+</tr>
+</table>
+
+<p>If multiple hints are specified, they must be separated by spaces.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_Images__">
+   <h4 class="pidoc_subsectionTitle">3.5&emsp;Output Images</h4>
+<img src="images/OutputImages.png" alt=""/>
+<p>This section allows you to define important parameters to control generation of registered images. Most of these parameters are only applicable to output image files.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Output directory</p>
+</dt>
+<dd>
+<p>This is the directory (or folder) where all output files will be written. If this field is left blank (the default value), each output file will be written to the same directory of its corresponding target image file. In such case, make sure that source directories are writable, or the registration process will fail upon trying to create the first output file.</p>
+</dd>
+<dt>
+<p>Output extension</p>
+</dt>
+<dd>
+<p>The output file extension determines the file format used to generate output image files. If this field is left blank, each output file will be written in the same format as its corresponding target image. Take into account that the selected output format must be <em>writable,</em> that is a format with file creation capabilities, or the registration process will fail upon trying to write the first registered image.</p>
+<p>The default value of this parameter is &quot;.fit&quot;, which corresponds to the FITS file format.</p>
+</dd>
+<dt>
+<p>Output prefix</p>
+</dt>
+<dd>
+<p>This is a short piece of text that will be prepended to the file names of all output registered images. For example, if a target image is &quot;myBestImage.fit&quot; and you specify &quot;reg_&quot; as a prefix, the corresponding output file will be &quot;reg_myBestImage.fit&quot;. Specifying file prefixes and/or postfixes, along with the use of a specific directory for each task, are good practices to keep your working data well organized. With large data sets these practices can become extremely important.</p>
+<p>The default value of this parameter is an empty string, so no output prefix is used by default.</p>
+</dd>
+<dt>
+<p>Output postfix</p>
+</dt>
+<dd>
+<p>This is a short piece of text that will be appended to the file names of all output registered images. For example, if a target image is &quot;myBestImage.fit&quot; and you specify &quot;_reg&quot; as a postfix, the corresponding output file will be &quot;myBestImage_reg.fit&quot;. Specifying file prefixes and/or postfixes, along with the use of a specific directory for each task, are good practices to keep your working data well organized. With large data sets these practices can become extremely important.</p>
+<p>The default value of this parameter is &quot;_r&quot;, so this is the postfix added to all output files by default. Other tools use different file postfixes; for example, the standard <a href="../../tools/ImageCalibration/ImageCalibration.html" title="../../tools/ImageCalibration/ImageCalibration.html">ImageCalibration</a> tool uses the &quot;_c&quot; postfix. This helps you identify the working data being generated at each stage of your preprocessing procedures.</p>
+</dd>
+<dt>
+<p>Mask postfix</p>
+</dt>
+<dd>
+<p>This is a file name postfix used for output registration masks. The default mask postfix is &quot;_m&quot;.</p>
+</dd>
+<dt>
+<p>Sample format</p>
+</dt>
+<dd>
+<p>This is the pixel sample format used to generate all output registered images (registration masks are always 8-bit unsigned integer images). With the exception of complex numeric types, all pixel sample formats supported on the PixInsight/PCL platform are available:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Same as target</p>
+</dt>
+<dd>
+<p>Writes all output registered images in the same format as their corresponding target images. This is the default option.</p>
+<p><strong>Warning:</strong> This option assumes that you are calibrating your raw data with PixInsight. In this case, all calibrated images will be in 32-bit floating point format unless you specifically select a different format, so this option is correct. However, if you use a different software for calibration (heaven forbid), chances are that the calibrated data be stored in 16-bit integer format. If this is the case, you should select the 32-bit floating point format explicitly for generation of registered output images.</p>
+</dd>
+<dt>
+<p>8-bit integer</p>
+</dt>
+<dd>
+<p>Writes all output registered images in 8-bit unsigned integer format (0 to 255 range). <strong>Warning:</strong> With the exception of some special control and diagnostics tasks, <em>this option should never be used for production work.</em></p>
+</dd>
+<dt>
+<p>16-bit integer</p>
+</dt>
+<dd>
+<p>Writes all output registered images in 16-bit unsigned integer format (0 to 65535 range). <strong>Warning:</strong> With the exception of some special control and diagnostics tasks, <em>this option should never be used for production work.</em></p>
+</dd>
+<dt>
+<p>32-bit integer</p>
+</dt>
+<dd>
+<p>Writes all output registered images in 32-bit unsigned integer format (0 to 2<sup>32</sup>-1 range).</p>
+</dd>
+<dt>
+<p>32-bit floating point</p>
+</dt>
+<dd>
+<p>Writes all output registered images in 32-bit <a href="http://grouper.ieee.org/groups/754/" title="http://grouper.ieee.org/groups/754/">IEEE 754</a> floating point format.</p>
+</dd>
+<dt>
+<p>64-bit floating point</p>
+</dt>
+<dd>
+<p>Writes all output registered images in 64-bit IEEE 754 floating point format.</p>
+</dd>
+</dl>
+
+</dd>
+<dt>
+<p>Overwrite existing files</p>
+</dt>
+<dd>
+<p>If this option is selected, StarAlignment will overwrite existing files with the same names as generated output files. This can be dangerous because the original contents of overwritten files will be lost and it will be impossible to recover it. <strong>Warning: Enable this option at your own risk.</strong></p>
+</dd>
+<dt>
+<p>On error policy</p>
+</dt>
+<dd>
+<p>With these options you can specify what to do if there are errors during a batch image registration process:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Continue</p>
+</dt>
+<dd>
+<p>The batch image registration task will continue with the next input target image, if there is one. This is the default option.</p>
+</dd>
+<dt>
+<p>Abort</p>
+</dt>
+<dd>
+<p>The task will be interrupted immediately after an error condition, including image registration failure, disk I/O errors, permission errors, etc.</p>
+</dd>
+<dt>
+<p>Ask user</p>
+</dt>
+<dd>
+<p>A dialog box will be shown where you'll have to specify whether to continue or to abort the task.</p>
+</dd>
+</dl>
+
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Star_Detection__">
+   <h4 class="pidoc_subsectionTitle">3.6&emsp;Star Detection</h4>
+<img src="images/StarDetection.png" alt=""/>
+<p>This section provides access to parameters that control the <a href="#star_detection">star detection</a> subtask of StarAlignment. Unless you find problems to register some particular images, in general you should not need to change the default values of these parameters.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Detection scales</p>
+</dt>
+<dd>
+<p>Number of wavelet layers (in a dyadic scaling sequence) used for structure detection:</p>
+
+<ul class="pidoc_list">
+<li>Increasing the number of wavelet layers favors detection of larger stars, and perhaps also some extended nonstellar objects.</li>
+<li class="pidoc_spaced_list_item">Decreasing the number of wavelet layers favors detection of smaller, and hence more, stars. Note that using more stars not necessarily leads to a better image registration; in most cases it just wastes more computation time and memory without any additional improvement, and in some cases too large of a set of stars may lead to a less robust star matching procedure.</li>
+</ul>
+
+<p>The default value is 5 layers. In general, this value works correctly for most images. In cases where more stars are needed you can try decreasing this parameter to 4 or 3 layers.</p>
+</dd>
+<dt>
+<p>Noise scales</p>
+</dt>
+<dd>
+<p>Number of small-scale wavelet layers removed before structure detection. The default value is one layer. This removes the smallest wavelet layer, which usually contains most of the small-scale (or high-frequency) noise. Noise reduction greatly improves the performance of the star detection routine and also leads to more accurate estimates of star positions. Unless you really need to use one-pixel 'stars' or very dim stars for some reason, in general don't change this parameter.</p>
+</dd>
+<dt>
+<p>Hot pixel removal</p>
+</dt>
+<dd>
+<p>This parameter defines the radius of a median filter applied before structure detection. The default value is one pixel. For radii larger than one pixel, circular structuring elements are used. Median filtering is extremely effective to remove hot pixels, which otherwise may fool the star matching routine if they are detected as stars. If you set this parameter to zero, no hot pixel removal will be applied.</p>
+</dd>
+<dt>
+<p>Log(sensitivity)</p>
+</dt>
+<dd>
+<p>Logarithm of the star detection sensitivity. The sensitivity of the star detection algorithm is measured with respect to the local background of each detected star. Given a star with estimated brightness <var>s</var> and local background <var>b,</var> sensitivity is the minimum value of (<var>s</var> &minus; <var>b</var>)/<var>b</var> necessary to trigger star detection.</p>
+<p>Decrease this parameter to favor detection of fainter stars. Increase it to restrict detection to brighter stars, which may accelerate the star matching process, but at the risk of increasing the probability of failure. In general, you shouldn't need to change the default value of this parameter.</p>
+</dd>
+<dt>
+<p>Peak response</p>
+</dt>
+<dd>
+<p>Peak response of the star detector. If you decrease this value, stars will need to have stronger (more prominent) peak values to be detected by the star detection algorithm. This is useful to prevent detection of saturated stars, as well as small nonstellar features. By increasing this parameter, the star detection algorithm will be more sensitive to <em>peakedness,</em> and hence more tolerant of relatively <em>flat</em> image features.</p>
+</dd>
+<dt>
+<p>Maximum distortion</p>
+</dt>
+<dd>
+<p>Maximum star distortion allowed by the star detector. Star distortion is measured with respect to a perfect square, whose distortion is 1.0. Lower values mean more distortion. The distortion of a perfectly circular star is about 0.75 (to be precise, it is &pi;/4). Increase this parameter, if necessary, to prevent inclusion of elongated stars, multiple stars and nonstellar image features, or decrease it if you want the star detection routine to be more permissive with these objects.</p>
+</dd>
+<dt>
+<p>Inverted image</p>
+</dt>
+<dd>
+<p>Invert the image prior to star detection. Select this option to register negative images (dark stars over a bright background).</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Star_Matching__">
+   <h4 class="pidoc_subsectionTitle">3.7&emsp;Star Matching</h4>
+<img src="images/StarMatching.png" alt=""/>
+<p>The parameters in this section control the <a href="#star_matching">star matching</a> stage of the StarAlignment algorithm. There are parameters to fully control both the <a href="#initial_star_matching">initial star matching routine</a> and the <a href="#ransac_star_matching">RANSAC robust star matching routine</a>. By default all RANSAC optimization criteria are favored equally: inliers, overlapping and regularity maximization, and RMS error minimization. As happens with star detection parameters, you normally should not need to change most of these.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>RANSAC tolerance</p>
+</dt>
+<dd>
+<p>Tolerance of the <a href="#ransac_star_matching">RANSAC star matching algorithm</a>. This is the maximum deviation in pixels allowed between a detected star's position and its corresponding predicted position. In other words, for a pair of stars to be considered as a matched pair, the registration model must predict the position of the star in the target image within a circle whose radius is equal to this parameter. If the actual star position lies outside the predicted circle, the star pair is considered an outlier and doesn't enter the registration model. This rejection process is carried out independently at each iteration of the RANSAC algorithm.</p>
+<p>This parameter can be increased to register images affected by relatively strong differential distortion. For example, differential distortion is often an issue with mosaics, even if all frames have been acquired with the same instrument, because the overlapping areas usually correspond to different sections of the focal plane, affected by varying geometrical aberrations. The distortion inherent in the projection of a large portion of the sphere on the plane has the same effect.</p>
+<p>The default value is 2 pixels. For normal image registration tasks, the default value of this parameter generally works very well. For registration of mosaics, however, increasing it up to 4 or 6 pixels may improve registration accuracy with a more flexible registration model. Bear in mind that increasing RANSAC tolerance also increases the chances to find a wrong registration model&mdash;that is, a mathematically correct model that does not correspond to the actual images being registered&mdash;, although this happens rarely even if RANSAC tolerance is increased to its maximum allowed value of 8 pixels.</p>
+</dd>
+<dt>
+<p>RANSAC iterations</p>
+</dt>
+<dd>
+<p>Maximum allowed RANSAC iterations. You normally should not need to change this parameter, since the number of necessary RANSAC iterations can be determined adaptively. In very difficult cases, allowing more RANSAC iterations may help to increase the probability of finding a valid registration model if the fraction of false putative star matches is very large.</p>
+</dd>
+<dt>
+<p>Inliers maximization</p>
+</dt>
+<dd>
+<p>Increase this parameter to maximize the number of star matches in the registration model. Under normal conditions, changing this parameter is not necessary for any image registration task.</p>
+</dd>
+<dt>
+<p>Overlapping maximization</p>
+</dt>
+<dd>
+<p>Increase this parameter to maximize the overlapping area defined by all matched stars in the registration model. Overlapping optimization can be useful to improve the accuracy of the registration model with minimal overlapping between registered images. This may be necessary only for extremely difficult mosaics.</p>
+</dd>
+<dt>
+<p>Regularity maximization</p>
+</dt>
+<dd>
+<p>Increase this parameter to maximize regularity in the two-dimensional distribution of star pair matches included in the registration model. Regularity optimization can be useful in the same cases as overlapping optimization: minimal overlapping in extremely difficult mosaics.</p>
+</dd>
+<dt>
+<p>RMS error minimization</p>
+</dt>
+<dd>
+<p>Increase this parameter to minimize the root mean square error residuals between actual and predicted star positions in the registration model. Under normal conditions, changing this parameter is not necessary for any image registration task.</p>
+</dd>
+<dt>
+<p><a id="maximum_stars"></a> Maximum stars</p>
+</dt>
+<dd>
+<p>Maximum number of stars allowed in the star matching routine. In the default <em>automatic mode</em>, StarAlignment will perform a series of tries using a predefined sequence of star counts if the initial attempt to register the images fails. This is the recommended setting. To select the automatic mode, specify zero as the value of this parameter.</p>
+<p>Increasing the amount of reference stars is in general not necessary, and it usually just slows down the image registration process with no improvement in registration accuracy. However, when registering images with little overlapping (mosaics, or images with large scale differences), it may be necessary to use a reduced or expanded set of reference stars, depending on a variety of working conditions. In these cases, the automatic probing sequence usually works very well, so you normally should not need to change the default value of this parameter.</p>
+</dd>
+<dt>
+<p>Triangles per star</p>
+</dt>
+<dd>
+<p>Minimum number of triangles per star used by the <a href="#initial_star_matching">star matching algorithm</a>. More triangles will always increase the probability of finding more putative star pair matches, but at the cost of more computing time. A value between 8 and 40 is appropriate in most cases. In very difficult cases a value up to 64 may be necessary for this parameter. Be aware that higher values will increase the required computing time dramatically.</p>
+</dd>
+<dt>
+<p><a id="compute_intersections"></a> Compute intersections</p>
+</dt>
+<dd>
+<p><a href="#automatic_intersection_computation">Compute the intersection region</a> between the reference and target images. When this option is selected and is applicable, StarAlignment uses a special FFT-based algorithm to precompute the intersection region between the reference and target images. Once the intersection has been found, the star matching process is restricted to the intersection area. This greatly improves the performance of the RANSAC algorithm by reducing the fraction of outliers (false putative matches) in the initial set of star pair matches. Note that this works in the same way, and has the same features and advantages, as the <a href="#restrict_to_previews">restrict to previews</a> option (see below). However, intersections are computed in a completely automatic and accurate way without user intervention.</p>
+<p>This parameter can have the following values:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Disabled</p>
+</dt>
+<dd>
+<p>This will prevent intersection computations. For generation of mosaics from images with no scale differences, intersections should <em>always</em> be calculated.</p>
+</dd>
+<dt>
+<p>Mosaic modes only</p>
+</dt>
+<dd>
+<p>Perform computation of intersection regions only when a mosaic construction mode has been selected (union/mosaic or separate mosaic). This is the default, recommended option.</p>
+</dd>
+<dt>
+<p>Always</p>
+</dt>
+<dd>
+<p>This will force calculation of intersections in all image registration tasks. In general, this is not necessary.</p>
+</dd>
+</dl>
+
+</dd>
+<dt>
+<p><a id="restrict_to_previews"></a> Restrict to previews</p>
+</dt>
+<dd>
+<p>Restrict star matching to preview areas. When this option is selected, StarAlignment will restrict the star matching process to the rectangular areas defined by all existing previews in reference and target images. If there are no previews defined in one of the images, the whole image will be used for star matching, ignoring this parameter. Obviously, this option only works for registration of views, not for disk image files.</p>
+<p>This option can be useful for mosaic construction in extremely difficult cases, when <a href="#compute_intersections">automatic intersection computation</a> (see above) fails. In general, this only happens for images with minimal overlapping. To use this option, you must define previews covering (roughly) the overlapping areas between the reference and target images, then execute StarAlignment on the target image with this option enabled. In this way StarAlignment will limit the star matching process to the areas covered by the previews, which greatly improves the performance of the RANSAC algorithm by reducing the fraction of outliers (false putative matches) in the initial set of star pair matches. With the help of this feature, one can build mosaics of any practical size and complexity with the StarAlignment tool. By default this option is enabled.</p>
+</dd>
+<dt>
+<p><a id="use_brightness_relations"></a> Use brightness relations</p>
+</dt>
+<dd>
+<p>Use brightness relations between alignment stars. Select this option to take into account brightness relations between stars for comparisons performed by the star matching algorithm. Note that actual brightness estimates are never used for star matching, but exclusively relational expressions such as &quot;star A is brighter than star B and dimmer than star C&quot;.</p>
+<p>This feature provides an additional level of characterization to triangle comparisons, which greatly improves the robustness of the initial star matching algorithm. In seldom cases however, trying to match brightness relations can cause problems to register images acquired through different filters, mainly narrowband filters. This normally never happens to register the individual channels of an LRGB image. This option is enabled by default.</p>
+</dd>
+<dt>
+<p><a id="use_scale_differences"></a> Use scale differences</p>
+</dt>
+<dd>
+<p>Use scale differences between triangles. Select this option to take into account differences in scale (or size) between the triangles used to match pairs of stars. You must also define a scale tolerance when this option is enabled&mdash;see the <a href="#scale_tolerance">scale tolerance</a> parameter below. When this option is enabled the star matching routine uses actual distances in pixels to build relational expressions such as &quot;triangles T and R are similar, but the perimeter of T is 10 pixels longer than R's perimeter&quot;.</p>
+<p>As happens with <a href="#use_brightness_relations">brightness relations</a>, scale differences improve triangle comparisons and hence the robustness of the initial star matching algorithm. However, take into account that enabling this option will prevent registration of images with scale differences larger than the value of the <a href="#scale_tolerance">scale tolerance</a> parameter.</p>
+</dd>
+<dt>
+<p><a id="scale_tolerance"></a> Scale tolerance</p>
+</dt>
+<dd>
+<p>This parameter is only used when the <a href="#use_scale_differences">use scale differences</a> option is enabled. The value of this parameter is the maximum allowed difference in scale between two similar triangles formed with putative star pair matches.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Interpolation__">
+   <h4 class="pidoc_subsectionTitle">3.8&emsp;Interpolation</h4>
+<img src="images/Interpolation.png" alt=""/>
+<p>Image registration involves two different <a href="#output_image_generation">interpolation</a> procedures: coordinate interpolation and pixel interpolation. Coordinate interpolation is used to apply the necessary geometric transformation to align the target image to the reference image. Pixel interpolation is used to generate the pixels of the output registered image.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Registration model</p>
+</dt>
+<dd>
+<p>Each pixel in a registered image is interpolated from a set of source image pixels mapped by inverse projection. This parameter defines the method used to compute source pixel coordinates:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a href="#estimation_of_transformation_parameters">Projective Transformation</a></p>
+</dt>
+<dd>
+<p>Uses a homography (an eight-parameter matrix transformation) to compute source pixel coordinates. This method is the best option for general image registration tasks with significant overlapping between registered images and no small-scale distortions. This is the default option.</p>
+</dd>
+<dt>
+<p><a href="#2d_surface_splines">2-D Surface Splines</a></p>
+</dt>
+<dd>
+<p>Uses second-order, two-dimensional surface splines (also known as <em>thin plates</em> to interpolate source pixel coordinates. Surface splines provide for extremely adaptable and accurate registration models, suitable for registration of images affected by differential small-scale distortions. This method can yield more accurate results in difficult cases with minimal overlapping between images, as happens frequently with mosaics.</p>
+</dd>
+</dl>
+
+</dd>
+<dt>
+<p><a id="pixel_interpolation"></a> Pixel interpolation</p>
+</dt>
+<dd>
+<p>The default automatic mode will select the following interpolation algorithms as a function of the rescaling involved in the registration geometric transformation:</p>
+
+<ul class="pidoc_list">
+<li><strong>Cubic B-spline filter interpolation</strong> when the scaling factor is less than 0.25 approximately.</li>
+<li><strong>Mitchell-Netravali filter interpolation</strong> for scaling factors between 0.6 and 0.25 approximately.</li>
+<li><strong>Lanczos-4 interpolation</strong> otherwise: from moderate size reductions to no rescaling or scale up.</li>
+</ul>
+
+<p>When no downscaling is required, Lanczos is in general the best pixel interpolation algorithm available for image registration on the PixInsight/PCL platform. This algorithm yields the best results in terms of preservation of original image features, accuracy of subpixel registration, and minimal generation of aliasing artifacts.</p>
+<p>Bicubic spline also yields good results, but generates more aliasing. The main advantage of bicubic spline over Lanczos is its speed&mdash;about 30 times faster than Lanczos-3 for 32-bit and 64-bit data, and about 10 times faster for 16-bit data thanks to a special LUT-based implementation of the Lanczos algorithm. This difference in execution speed can be decisive for very long batch image registration tasks, especially if working with large images.</p>
+<p>When the Lanczos and bicubic spline interpolations are selected (either explicitly or automatically), a <em>clamping</em> mechanism is used to prevent <em>undershoot</em> artifacts (aka ringing). Undershoot is caused by negative lobes of the interpolation functions falling over bright isolated pixels or high-contrast edges. See the <a href="#clamping_threshold">clamping threshold</a> parameter for a detailed description.</p>
+<p>Bilinear interpolation can be useful for auxiliary tasks and also to register low SNR linear images, in the rare cases where Lanczos and bicubic spline interpolation generate too strong undershoot artifacts between noisy pixels that can't be avoided completely with the clamping feature.</p>
+<p>Cubic filter interpolations, such as Mitchell-Netravali, Catmull-Rom spline and cubic B-spline, provide higher smoothness and subsampling accuracy that can be necessary when the registration transformation involves relatively strong size reductions.</p>
+<p>Nearest neighbor is the simplest possible pixel interpolation method. It always produces the worst results in terms of registration accuracy and discontinuities due to the simplistic interpolation scheme. Subpixel image registration is impossible with this algorithm. However, in absence of scale differences nearest neighbor preserves the original noise distribution in the registered images, a property that can be useful in some image analysis applications.</p>
+<p>For detailed information on all pixel interpolation algorithms available on the PixInsight/PCL platforms, including practical examples, refer to the <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms documentation</a>.</p>
+</dd>
+</dl>
+
+
+<div class="pidoc_figure">
+<a id="__figure_10__"></a>
+<p class="pidoc_figure_title">Figure 10</p>
+<div class="pidoc_mouseover">
+<img src="images/Lanczos3.png" id="zghWTmuvzHjBiqTP" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="zghWTmuvzHjBiqTP_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/Lanczos3.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_1', 1.0);">Lanczos-3</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/Lanczos4.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_2', 1.0);">Lanczos-4</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/BicubicSpline.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_3', 1.0);">Bicubic spline</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/Bilinear.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_4', 1.0);">Bilinear</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/NearestNeighbor.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_5', 1.0);">Nearest neighbor</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_6"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/BicubicBSpline.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_6', 1.0);">Bicubic B-spline (Bourke)</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_7"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/MitchellNetravali.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_7', 1.0);">Mitchell-Netravali cubic filter</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_8"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/CatmullRomSpline.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_8', 1.0);">Catmull Rom cubic spline filter</a></li>
+<li><span class="pidoc_indicator" id="zghWTmuvzHjBiqTP_9"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('zghWTmuvzHjBiqTP', 'images/CubicBSpline.png'); pidoc_hideGroup('zghWTmuvzHjBiqTP', 9); pidoc_setOpacity('zghWTmuvzHjBiqTP_9', 1.0);">Cubic B-spline filter</a></li>
+</ul>
+</div>
+<p><strong>Comparison of several interpolation algorithms for image registration (1)</strong> with rotation and no scaling. The images used in this example are synthetic star fields rendered by the StarGenerator tool. Two synthetic star fields of the same region of the sky were generated, one of them rotated 1.5 degrees around the center of the field. A mix of synthetic Gaussian and Poisson noise was added to both images with the <a href="../../tools/NoiseGenerator/NoiseGenerator.html" title="../../tools/NoiseGenerator/NoiseGenerator.html">NoiseGenerator</a> tool. With the non-rotated image selected as reference, the rotated image was registered with StarAlignment using different pixel interpolation algorithms.</p>
+<p>The default Lanczos interpolation provides the best results in terms of subpixel registration accuracy, detail preservation and minimal aliasig artifacts. Lanczos-3 and Lanczos-4 yield a virtually identical result in this case, and bicubic spline is a close second. Bilinear interpolation introduces strong aliasing. Bicubic B-spline (Bourke) and the cubic filter interpolation algorithms (Mitchell-Netravali, Catmull-Rom and and cubic B-spline) yield too smooth results. Nearest neighbor produces a useless registered image with obvious lack of subpixel accuracy and jagged stars.</p>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<div class="pidoc_mouseover">
+<img src="images/Lanczos3Crop.png" id="p6cY7FUkImkOtyBr" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="p6cY7FUkImkOtyBr_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('p6cY7FUkImkOtyBr', 'images/Lanczos3Crop.png'); pidoc_hideGroup('p6cY7FUkImkOtyBr', 4); pidoc_setOpacity('p6cY7FUkImkOtyBr_1', 1.0);">Lanczos-3</a></li>
+<li><span class="pidoc_indicator" id="p6cY7FUkImkOtyBr_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('p6cY7FUkImkOtyBr', 'images/BicubicSplineCrop.png'); pidoc_hideGroup('p6cY7FUkImkOtyBr', 4); pidoc_setOpacity('p6cY7FUkImkOtyBr_2', 1.0);">Bicubic spline</a></li>
+<li><span class="pidoc_indicator" id="p6cY7FUkImkOtyBr_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('p6cY7FUkImkOtyBr', 'images/BilinearCrop.png'); pidoc_hideGroup('p6cY7FUkImkOtyBr', 4); pidoc_setOpacity('p6cY7FUkImkOtyBr_3', 1.0);">Bilinear</a></li>
+<li><span class="pidoc_indicator" id="p6cY7FUkImkOtyBr_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('p6cY7FUkImkOtyBr', 'images/NearestNeighborCrop.png'); pidoc_hideGroup('p6cY7FUkImkOtyBr', 4); pidoc_setOpacity('p6cY7FUkImkOtyBr_4', 1.0);">Nearest neighbor</a></li>
+</ul>
+</div>
+<p><strong>Comparison of several interpolation algorithms for image registration (2).</strong> An enlarged crop of the previous figure for better comparison of the Lanczos, bicubic spline, bilinear and nearest neighbor interpolation algorithms.</p>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+
+<div class="pidoc_figure">
+<a id="__figure_11__"></a>
+<p class="pidoc_figure_title">Figure 11</p>
+
+<div style="text-align:center;">
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_3__"></a>
+<span class="pidoc_table_title">Table 3<br/>
+Average Moffat PSF Function Parameters</span></caption>
+<tr>
+<th>
+<div style="text-align:center;">
+<p>Interpolation</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>FWHMx (px)</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>FWHMy (px)</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>r</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>&theta; (&deg;)</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+&beta;</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>MAD</p>
+</div>
+</th>
+</tr>
+<tr>
+<td><p>Lanczos-3</p>
+</td>
+<td><p>3.22</p>
+</td>
+<td><p>2.91</p>
+</td>
+<td><p>0.902</p>
+</td>
+<td><p>-17.30</p>
+</td>
+<td><p>2.83</p>
+</td>
+<td><p>6.295e-03</p>
+</td>
+</tr>
+<tr>
+<td><p>Lanczos-4</p>
+</td>
+<td><p>3.23</p>
+</td>
+<td><p>2.92</p>
+</td>
+<td><p>0.902</p>
+</td>
+<td><p>-17.36</p>
+</td>
+<td><p>2.73</p>
+</td>
+<td><p>6.321e-03</p>
+</td>
+</tr>
+<tr>
+<td><p>Lanczos-5</p>
+</td>
+<td><p>3.23</p>
+</td>
+<td><p>2.91</p>
+</td>
+<td><p>0.903</p>
+</td>
+<td><p>-17.41</p>
+</td>
+<td><p>2.67</p>
+</td>
+<td><p>6.271e-03</p>
+</td>
+</tr>
+<tr>
+<td><p>Bicubic spline</p>
+</td>
+<td><p>3.29</p>
+</td>
+<td><p>2.97</p>
+</td>
+<td><p>0.905</p>
+</td>
+<td><p>-18.05</p>
+</td>
+<td><p>3.00</p>
+</td>
+<td><p>6.286e-03</p>
+</td>
+</tr>
+<tr>
+<td><p>Nearest neighbor</p>
+</td>
+<td><p>3.31</p>
+</td>
+<td><p>2.98</p>
+</td>
+<td><p>0.900</p>
+</td>
+<td><p>-15.94</p>
+</td>
+<td><p>2.86</p>
+</td>
+<td><p>6.923e-03</p>
+</td>
+</tr>
+<tr>
+<td><p>Bilinear</p>
+</td>
+<td><p>3.42</p>
+</td>
+<td><p>3.12</p>
+</td>
+<td><p>0.913</p>
+</td>
+<td><p>-18.10</p>
+</td>
+<td><p>3.06</p>
+</td>
+<td><p>6.302e-03</p>
+</td>
+</tr>
+</table>
+
+</div>
+<p><strong>Comparison of six pixel interpolation algorithms for a set of integrated images.</strong> In this example we have registered and integrated 27 raw CCD images of M51 acquired with the 1.23 meter Carl Zeiss telescope of Calar Alto Observatory, in Almeria, Southern Spain. The image scale is 0.5 arcseconds per pixel. The images were registered with StarAlignment using several pixel interpolation algorithms and then integrated with the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> tool. The integrated images are the weighted averages of each set of 27 registered images using multiscale noise evaluation weighting and linear fit clipping rejection, with the same parameters. The <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> tool was used to perform PSF fits for the same 30 stars on each image, and the average fitted function parameters have been listed in the table above. The 27 raw images used in this example are virtually unrotated (the maximum rotation angle during registration was 0.06 degrees), which has allowed us to include the nearest neighbor algorithm in the test. A screenshot of the PSF fitting process can be seen below. Original data courtesy of Vicent Peris (OAUV/CAHA).</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<img src="images/InterpolationPSFM51Example.jpg" alt=""/>
+<p>In this test, the differences in FWHM are not relevant, perhaps with the exception of the bilinear algorithm. The largest differences observed arise in the Moffat &beta; parameter, which defines the overall shape of the Moffat PSF fitting function. For detailed information on PSF fitting functions and their parameters, refer to the documentation for the <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> tool. A smaller &beta; value denotes a sharper, more peaked PSF, which is always a desirable result: a lower &beta; means that the light from each star has been concentrated in a smaller surface (in square pixels), denoting a higher spatial resolution. In the table above we can observe relevant differences in the PSF shapes achieved by the different interpolation algorithms. For example, although the Lanczos-3, Lanczos-4 and Lanczos-5 algorithms yield virtually identical FWHM values on both axes, the average &beta; parameter is significantly smaller for the integration of Lanczos-5 and Lanczos-4 interpolated images: 2.67 and 2.73 compared to 2.83, respectively.</p>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<div class="pidoc_mouseover">
+<img src="images/Moffat_L5_3dplot.png" id="pf6xuPb5wsoNZAqJ" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="pf6xuPb5wsoNZAqJ_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('pf6xuPb5wsoNZAqJ', 'images/Moffat_L5_3dplot.png'); pidoc_hideGroup('pf6xuPb5wsoNZAqJ', 6); pidoc_setOpacity('pf6xuPb5wsoNZAqJ_1', 1.0);">&beta;=2.67 &ndash; Lanczos-5</a></li>
+<li><span class="pidoc_indicator" id="pf6xuPb5wsoNZAqJ_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('pf6xuPb5wsoNZAqJ', 'images/Moffat_L4_3dplot.png'); pidoc_hideGroup('pf6xuPb5wsoNZAqJ', 6); pidoc_setOpacity('pf6xuPb5wsoNZAqJ_2', 1.0);">&beta;=2.73 &ndash; Lanczos-4</a></li>
+<li><span class="pidoc_indicator" id="pf6xuPb5wsoNZAqJ_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('pf6xuPb5wsoNZAqJ', 'images/Moffat_L3_3dplot.png'); pidoc_hideGroup('pf6xuPb5wsoNZAqJ', 6); pidoc_setOpacity('pf6xuPb5wsoNZAqJ_3', 1.0);">&beta;=2.83 &ndash; Lanczos-3</a></li>
+<li><span class="pidoc_indicator" id="pf6xuPb5wsoNZAqJ_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('pf6xuPb5wsoNZAqJ', 'images/Moffat_NN_3dplot.png'); pidoc_hideGroup('pf6xuPb5wsoNZAqJ', 6); pidoc_setOpacity('pf6xuPb5wsoNZAqJ_4', 1.0);">&beta;=2.86 &ndash; Nearest neighbor</a></li>
+<li><span class="pidoc_indicator" id="pf6xuPb5wsoNZAqJ_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('pf6xuPb5wsoNZAqJ', 'images/Moffat_BS_3dplot.png'); pidoc_hideGroup('pf6xuPb5wsoNZAqJ', 6); pidoc_setOpacity('pf6xuPb5wsoNZAqJ_5', 1.0);">&beta;=3.00 &ndash; Bicubic spline</a></li>
+<li><span class="pidoc_indicator" id="pf6xuPb5wsoNZAqJ_6"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('pf6xuPb5wsoNZAqJ', 'images/Moffat_BL_3dplot.png'); pidoc_hideGroup('pf6xuPb5wsoNZAqJ', 6); pidoc_setOpacity('pf6xuPb5wsoNZAqJ_6', 1.0);">&beta;=3.06 &ndash; Bilinear</a></li>
+</ul>
+</div>
+<p>In this comparison, the six average PSF functions of this example have been represented to scale as two-dimensional images by running the script below. The three-dimensional renditions have been generated with the standard 3DPlot script. In three dimensions, the significant differences among the results achieved with different interpolation algorithms become evident.</p>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+
+<pre class="code"><span class="pidoc_sh_preprocessor">#include &lt;pjsr/UndoFlag.jsh&gt;</span>
+
+<span class="pidoc_sh_preprocessor">#define IMAGE_SIZE   101</span>
+
+<span class="pidoc_sh_keyword">function</span> <span class="pidoc_sh_function">filterToImage</span>( filter, id )
+{
+   <span class="pidoc_sh_keyword">var</span> w = <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">ImageWindow</span>( IMAGE_SIZE, IMAGE_SIZE );
+   <span class="pidoc_sh_keyword">var</span> v = w.mainView;
+   v.<span class="pidoc_sh_function">beginProcess</span>( UndoFlag_NoSwapFile );
+   v.image.<span class="pidoc_sh_function">fill</span>( <span class="pidoc_sh_number">0.005</span> );
+   v.image.selectedPoint = <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">Point</span>( (IMAGE_SIZE - filter.cols) &gt;&gt; <span class="pidoc_sh_number">1</span>,
+                                      (IMAGE_SIZE - filter.rows) &gt;&gt; <span class="pidoc_sh_number">1</span> );
+   v.image.<span class="pidoc_sh_function">apply</span>( filter.<span class="pidoc_sh_function">toImage</span>() );
+   v.id = id;
+   v.<span class="pidoc_sh_function">endProcess</span>();
+   w.<span class="pidoc_sh_function">show</span>();
+   w.<span class="pidoc_sh_function">zoomToFit</span>();
+}
+
+<span class="pidoc_sh_preprocessor">#define SCALE 28</span>
+
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">round</span>( <span class="pidoc_sh_number">3.22</span>*SCALE )|<span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">2.83</span>, <span class="pidoc_sh_number">0.01</span>, <span class="pidoc_sh_number">0.902</span> ), <span class="pidoc_sh_quotation">"Moffat_L3"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">round</span>( <span class="pidoc_sh_number">3.23</span>*SCALE )|<span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">2.73</span>, <span class="pidoc_sh_number">0.01</span>, <span class="pidoc_sh_number">0.902</span> ), <span class="pidoc_sh_quotation">"Moffat_L4"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">round</span>( <span class="pidoc_sh_number">3.23</span>*SCALE )|<span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">2.67</span>, <span class="pidoc_sh_number">0.01</span>, <span class="pidoc_sh_number">0.903</span> ), <span class="pidoc_sh_quotation">"Moffat_L5"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">round</span>( <span class="pidoc_sh_number">3.31</span>*SCALE )|<span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">2.86</span>, <span class="pidoc_sh_number">0.01</span>, <span class="pidoc_sh_number">0.900</span> ), <span class="pidoc_sh_quotation">"Moffat_NN"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">round</span>( <span class="pidoc_sh_number">3.29</span>*SCALE )|<span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">3.00</span>, <span class="pidoc_sh_number">0.01</span>, <span class="pidoc_sh_number">0.905</span> ), <span class="pidoc_sh_quotation">"Moffat_BS"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">round</span>( <span class="pidoc_sh_number">3.42</span>*SCALE )|<span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">3.06</span>, <span class="pidoc_sh_number">0.01</span>, <span class="pidoc_sh_number">0.913</span> ), <span class="pidoc_sh_quotation">"Moffat_BL"</span> );</pre>
+
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="clamping_threshold"></a> Clamping threshold</p>
+</dt>
+<dd>
+<p>Clamping threshold for the Lanczos and bicubic spline interpolation algorithms. The PixInsight/PCL implementations of these algorithms include a clamping mechanism to prevent <a href="http://en.wikipedia.org/wiki/Overshoot_%28signal%29" title="http://en.wikipedia.org/wiki/Overshoot_%28signal%29">undershoot</a> artifacts (frequently referred to as <em>ringing</em>). Undershoot is caused by negative lobes of the interpolation functions falling over bright isolated pixels or high-contrast edges.</p>
+<p>On linear images, typical undershoot artifacts generated by image registration interpolations are composed of one or a few very dark pixels around bright structures such as stars, cosmic rays, and hot pixels. On nonlinear stretched images, including diurnal images, the undershoot and overshoot effects are in general desirable since they increase <em>accutance,</em> or the visual perception of sharpness. In interpolated deep-sky linear images, undershoot can be seen as a price to pay for the superior performance of the Lanczos and bicubic spline algorithms. The counterpart to undershoot is <em>aliasing,</em> especially when geometric transformations involve small rotations, as frequently happens in image registration tasks. Aliasing is problematic in these cases because it acts like a low-pass filter causing a loss of detail on areas distributed regularly over the image.</p>
+<p>The clamping threshold parameter can be varied in the [0,1] range. The default value of 0.3 prevents visible undershoot artifacts in most cases, but sometimes a smaller value can be necessary. By decreasing this parameter a more aggressive deringing effect is applied; however, take into account that the clamping feature tends to degrade interpolation performance, especially by increasing generation of aliasing artifacts. If you detect undershoot artifacts in your registered frames, consider that these artifacts are isolated pixels that will be easily identified as outliers and hence rejected during image integration&mdash;see the documentation for the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> tool and the information related to pixel rejection. If your registered images are not intended to be further integrated (as mosaics for example) and you get undershoot artifacts, you'll have to decrease the clamping threshold parameter as necessary.</p>
+</dd>
+</dl>
+
+
+<div class="pidoc_figure">
+<a id="__figure_12__"></a>
+<p class="pidoc_figure_title">Figure 12</p>
+<div class="pidoc_mouseover">
+<img src="images/ClampingThreshold100.png" id="A2zfnBUhnrKBDlM2" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="A2zfnBUhnrKBDlM2_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('A2zfnBUhnrKBDlM2', 'images/ClampingThreshold100.png'); pidoc_hideGroup('A2zfnBUhnrKBDlM2', 5); pidoc_setOpacity('A2zfnBUhnrKBDlM2_1', 1.0);">Clamping threshold = 1.00</a></li>
+<li><span class="pidoc_indicator" id="A2zfnBUhnrKBDlM2_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('A2zfnBUhnrKBDlM2', 'images/ClampingThreshold075.png'); pidoc_hideGroup('A2zfnBUhnrKBDlM2', 5); pidoc_setOpacity('A2zfnBUhnrKBDlM2_2', 1.0);">Clamping threshold = 0.75</a></li>
+<li><span class="pidoc_indicator" id="A2zfnBUhnrKBDlM2_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('A2zfnBUhnrKBDlM2', 'images/ClampingThreshold050.png'); pidoc_hideGroup('A2zfnBUhnrKBDlM2', 5); pidoc_setOpacity('A2zfnBUhnrKBDlM2_3', 1.0);">Clamping threshold = 0.50</a></li>
+<li><span class="pidoc_indicator" id="A2zfnBUhnrKBDlM2_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('A2zfnBUhnrKBDlM2', 'images/ClampingThreshold030.png'); pidoc_hideGroup('A2zfnBUhnrKBDlM2', 5); pidoc_setOpacity('A2zfnBUhnrKBDlM2_4', 1.0);">Clamping threshold = 0.30 (default value)</a></li>
+<li><span class="pidoc_indicator" id="A2zfnBUhnrKBDlM2_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('A2zfnBUhnrKBDlM2', 'images/ClampingThreshold020.png'); pidoc_hideGroup('A2zfnBUhnrKBDlM2', 5); pidoc_setOpacity('A2zfnBUhnrKBDlM2_5', 1.0);">Clamping threshold = 0.20</a></li>
+</ul>
+</div>
+<p><strong>Interpolation clamping example.</strong> This crop of a registered image shows typical undershoot artifacts around stars and the effect of the interpolation clamping feature, in this case with the Lanczos-3 interpolation algorithm. The default clamping threshold value of 0.3 fixes all undershoot pixels in most cases.</p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Console_Information__">
+   <h4 class="pidoc_subsectionTitle">3.9&emsp;Console Information</h4>
+<p>Exhaustive information on working data, images and applied processes is provided on a customary basis in PixInsight, and the StarAlignment tool is no exception to this rule. In this section we describe the information items provided for registration of image files. The information provided for registration of views is identical for all the items that don't depend on disk files.</p>
+<div class="pidoc_subsection" id="__Usage_:_Console_Information_:_Information_About_Input_Images__">
+   <h5 class="pidoc_subsectionTitle">3.9.1&emsp;Information About Input Images</h5>
+<p>Information on reference and target image files is provided by the installed file formats that StarAlignment invokes using intermodule communication techniques (the way modules communicate and share data in the modular architecture of PixInsight). This usually includes full file paths, image dimensions and sample data formats, as well as additional information and warning messages when image data are being loaded with restrictions or under special conditions. An example is shown below.</p>
+
+<div class="pidoc_box">
+
+<pre>Registering target image 1 of 6
+Loading target file:
+/media/Pleiades001/test-images/m81m82L/m81n-002L_c.fit
+Reading FITS: 32-bit floating point, 1 channel(s), 2048x2048 pixels: 100%
+Normalizing sample values: 100%</pre>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Console_Information_:_Information_from_the_Star_Detection_Routine__">
+   <h5 class="pidoc_subsectionTitle">3.9.2&emsp;Information from the Star Detection Routine</h5>
+<p>The star detection routine informs about the number of detected stars.</p>
+
+<div class="pidoc_box">
+
+<pre>Structure map: 100%
+Detecting stars: 100%
+3008 stars found.</pre>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Console_Information_:_Information_from_the_Initial_Star_Matching_Routine__">
+   <h5 class="pidoc_subsectionTitle">3.9.3&emsp;Information from the Initial Star Matching Routine</h5>
+<p>The initial star matching routine informs about the number of putative star pair matches. As in the example shown below, additional informative messages are written when the set of putative matches is being conditioned or restricted for some reason. In this example, a restriction to the 2000 brightest stars is being imposed by the <a href="#maximum_stars">maximum stars</a> parameter in its default automatic mode.</p>
+
+<div class="pidoc_box">
+
+<pre>Matching stars ...
+* Reference image: Limiting to 2000 brightest stars.
+* Target image: Limiting to 2000 brightest stars.
+1389 putative star pair matches.</pre>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Console_Information_:_Information_from_the_RANSAC_Star_Matching_Routine__">
+   <h5 class="pidoc_subsectionTitle">3.9.4&emsp;Information from the RANSAC Star Matching Routine</h5>
+<p>The RANSAC routine provides detailed information about the set of confirmed star pair matches and the fitted model. The information items are the following:</p>
+
+<ul class="pidoc_list">
+<li>Number of validated star pair matches (inliers).</li>
+<li class="pidoc_spaced_list_item">A set of four <em>quality indexes</em> in the [0,1] range. The first three indexes correspond to the inliers, overlapping and regularity maximization criteria. The last index is the overall quality of the fitted projective model, calculated as the average of the three maximization indexes.</li>
+<li class="pidoc_spaced_list_item">The root mean square (RMS) error of the fitted projective model. This is the square root of the average of the squared distances in pixels between the target stars and their predicted positions with the fitted model.</li>
+<li class="pidoc_spaced_list_item">The average absolute deviation from the median in the set of fitting errors. This value is a robust estimate of dispersion that can be used as a confidence estimator for the RMS error. If the dispersion is small, this means that the RMS error is representative of the actual registration error in the fitted registration model. If the dispersion is very high&mdash;for example, comparable to the RMS error itself&mdash;then the RMS error shouldn't be used as an estimate of registration accuracy.</li>
+<li class="pidoc_spaced_list_item">Peak errors in the X and Y axes. These values are the maximum distances in pixels between the predicted and actual star positions for the target image.</li>
+</ul>
+
+
+<div class="pidoc_box">
+
+<pre>Performing RANSAC ...
+1169 star pair matches in 71 RANSAC iterations.
+Summary of model properties:
+Inliers     : 0.842
+Overlapping : 1.000
+Regularity  : 0.994
+Quality     : 0.921
+Root mean square error:
+ΔRMS  :  0.300 px
+Average RMS error deviation:
+σRMS  :  0.156 px
+Peak errors:
+Δxmax :  0.972 px
+Δymax :  1.041 px</pre>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Console_Information_:_Information_About_the_Registration_Model__">
+   <h5 class="pidoc_subsectionTitle">3.9.5&emsp;Information About the Registration Model</h5>
+<p>The coefficients of the fitted homography matrix are written in tabulated form. In addition, the computed scaling factor and rotation angle&mdash;which are difficult to be estimated from the matrix coefficients&mdash;are also written, along with the components of the translation vector.</p>
+
+<div class="pidoc_box">
+
+<pre>Transformation matrix:
+     +1.0000     -0.0016    +10.4137
+     +0.0016     +1.0002     +2.2024
+     +0.0000     +0.0000     +1.0000
+scale    : 1.000
+rotation :     +0.10°
+dx       :    +10.41 px
+dy       :     +2.20 px</pre>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Console_Information_:_Information_on_the_Output_Image__">
+   <h5 class="pidoc_subsectionTitle">3.9.6&emsp;Information on the Output Image</h5>
+<p>During the output image generation phase, StarAlignment writes the names of the coordinate and pixel interpolation algorithms used. For the bicubic spline pixel interpolation algorithm, the applied linear clamping parameter is also written (see the &quot;c=0.10&quot; string in the example below). As happens for input files, an installed file format is invoked by StarAlignment to write the output registered image, which usually informs about the full file path, image dimensions and sample format of the newly created image.</p>
+
+<div class="pidoc_box">
+
+<pre>Generating registered image
+Homographic Projection / Bicubic Spline Interpolation, c=0.10: 100%
+Registration successful.
+Writing output file: /media/Pleiades001/test-images/m81m82L/registered/1/m81n-002L_c_r.fit
+Writing FITS image: 32-bit floating point, 1 channel(s), 2048x2048 pixels: 100%</pre>
+
+</div>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Scripting_and_Automation__">
+   <h4 class="pidoc_subsectionTitle">3.10&emsp;Scripting and Automation</h4>
+<p>The StarAlignment process can be easily automated via scripting with the PixInsight JavaScript Runtime (PJSR). This allows you to use StarAlignment in the context of more complex systems, such as preprocessing pipelines.</p>
+<p>To automate StarAlignment execution, a script must invoke one of the <span class="pidoc_code">executeOn</span> or <span class="pidoc_code">executeGlobal</span> methods of a StarAlignment instance. <span class="pidoc_code">executeOn()</span> should be called to align a single image specified as a view, while <span class="pidoc_code">executeGlobal()</span> allows running StarAlignment as a batch image registration process. By setting appropriate process parameters before these calls, the script can specify reference and target images, along with all the required operating parameters. After successful execution, the StarAlignment instance will provide a number of read-only properties with complete information about the registration process performed. The following tables describe all StarAlignment parameters and properties available for scripting:</p>
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_4__"></a>
+<span class="pidoc_table_title">Table 4<br/>
+StarAlignment Parameters</span></caption>
+<tr>
+<th><p>Parameter</p>
+</th>
+<th><p>Description</p>
+</th>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">referenceImage</span></strong> (String)</p>
+</td>
+<td><p>Full path or view identifier of the reference image.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">referenceIsFile</span></strong> (Boolean)</p>
+</td>
+<td><p>Whether the referenceImage parameter is a file path or a view identifier.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">targets</span></strong> (Table)</p>
+</td>
+<td><p>Input target images. This table has the following column parameters:</p>
+
+<table class="pidoc_table" style="margin-top:1em;width:100%;">
+<caption><a id="__table_5__"></a>
+<span class="pidoc_table_title">Table 5</span></caption>
+<tr>
+<td><p><strong><span class="pidoc_code">enabled</span></strong> (Boolean)</p>
+</td>
+<td><p>Enabled state. Disabled target images are not registered.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">isFile</span></strong> (Boolean)</p>
+</td>
+<td><p>Whether this target image is a file or a view.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">image</span></strong> (String)</p>
+</td>
+<td><p>Full path or view identifier of this target image.</p>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">inputHints</span></strong> (String)</p>
+</td>
+<td><p>Format input hints. Multiple input hints must be separated by space characters.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputHints</span></strong> (String)</p>
+</td>
+<td><p>Format output hints. Multiple output hints must be separated by space characters.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">mode</span></strong> (Enumeration)</p>
+</td>
+<td><p>Working mode. One of:</p>
+<p>StarAlignment.prototype.RegisterMatch<br/>
+ StarAlignment.prototype.RegisterUnion<br/>
+ StarAlignment.prototype.RegisterUnionSeparate<br/>
+ StarAlignment.prototype.Structures<br/>
+ StarAlignment.prototype.StructureMap<br/>
+ StarAlignment.prototype.DrawStars<br/>
+ StarAlignment.prototype.DrawMatchedStars<br/>
+ StarAlignment.prototype.OutputMatrix</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">generateMasks</span></strong> (Boolean)</p>
+</td>
+<td><p>Generate registration masks.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptation</span></strong> (Boolean)</p>
+</td>
+<td><p>Enable the automatic frame adaptation routine.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputDirectory</span></strong> (String)</p>
+</td>
+<td><p>Full path of the output directory. Can be an empty string, in which case output files will be written on the same directories as their corresponding target images.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputExtension</span></strong> (String)</p>
+</td>
+<td><p>Output file extension, including a leading dot character. Can be an empty string, in which case output files will be written with the same format as their corresponding target images.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputPrefix</span></strong> (String)</p>
+</td>
+<td><p>Output file name prefix.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputPostfix</span></strong> (String)</p>
+</td>
+<td><p>Output file name postfix.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">maskPostfix</span></strong> (String)</p>
+</td>
+<td><p>File name postfix for output registration mask files.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputSampleFormat</span></strong> (Enumeration)</p>
+</td>
+<td><p>Output pixel sample format. One of:</p>
+<p>StarAlignment.prototype.SameAsTarget<br/>
+ StarAlignment.prototype.i8<br/>
+ StarAlignment.prototype.i16<br/>
+ StarAlignment.prototype.i32<br/>
+ StarAlignment.prototype.f32<br/>
+ StarAlignment.prototype.f64</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">overwriteExistingFiles</span></strong> (Boolean)</p>
+</td>
+<td><p>Overwrite existing files. <strong>Warning: if this property is set to true, existing image file data will be permanently lost.</strong></p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">onError</span></strong> (Enumeration)</p>
+</td>
+<td><p>On error policy. One of:</p>
+<p>StarAlignment.prototype.Continue<br/>
+ StarAlignment.prototype.Abort<br/>
+ StarAlignment.prototype.AskUser</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">structureLayers</span></strong> (Int32)</p>
+</td>
+<td><p>Number of wavelet layers for structure detection.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">noiseLayers</span></strong> (Int32)</p>
+</td>
+<td><p>Number of small-scale wavelet layers removed for noise reduction.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">hotPixelFilterRadius</span></strong> (Int32)</p>
+</td>
+<td><p>Radius in pixels of a median filter applied for hot pixel removal. If set to zero, no median filtering will be applied.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">sensitivity</span></strong> (Float)</p>
+</td>
+<td><p>Sensitivity of the star detection algorithm.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">peakResponse</span></strong> (Float)</p>
+</td>
+<td><p>Peak response of the star detection algorithm.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">maxStarDistortion</span></strong> (Float)</p>
+</td>
+<td><p>Maximum allowed distortion in the star detection algorithm.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">invert</span></strong> (Boolean)</p>
+</td>
+<td><p>True if the image is inverted (black stars over a white background); false for normal deep-sky images (white stars, black background).</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">matcherTolerance</span></strong> (Float)</p>
+</td>
+<td><p>Tolerance of the initial star matching algorithm, in units of triangle similarity.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">ransacTolerance</span></strong> (Float)</p>
+</td>
+<td><p>Tolerance of the RANSAC star matching algorithm.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">ransacMaxIterations</span></strong> (Float)</p>
+</td>
+<td><p>Maximum allowed RANSAC iterations.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">ransacMaximizeInliers</span></strong> (Float)</p>
+</td>
+<td><p>Weight of RANSAC's 'inliers maximization' optimization criterion.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">ransacMaximizeOverlapping</span></strong> (Float)</p>
+</td>
+<td><p>Weight of RANSAC's 'overlapping maximization' optimization criterion.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">ransacMaximizeRegularity</span></strong> (Float)</p>
+</td>
+<td><p>Weight of RANSAC's 'regularity maximization' optimization criterion.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">ransacMinimizeError</span></strong> (Float)</p>
+</td>
+<td><p>Weight of RANSAC's 'RMS error minimization' optimization criterion.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">maxStars</span></strong> (Int32)</p>
+</td>
+<td><p>Maximum number of stars allowed for the star matching process.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">trianglesPerStar</span></strong> (Int32)</p>
+</td>
+<td><p>Number of generated triangles per star, for the 'faint subset' beyond the 200 brightest stars.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">restrictToPreviews</span></strong> (Boolean)</p>
+</td>
+<td><p>Restrict the star matching process to the areas covered by the previews defined in the reference and target images.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">intersection</span></strong> (Enumeration)</p>
+</td>
+<td><p>Automatic intersection estimation. One of:</p>
+<p>StarAlignment.prototype.NoIntersection<br/>
+ StarAlignment.prototype.MosaicOnly<br/>
+ StarAlignment.prototype.Always</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">useBrightnessRelations</span></strong> (Boolean)</p>
+</td>
+<td><p>Use brightness relations between stars to improve star matching.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">useScaleDifferences</span></strong> (Boolean)</p>
+</td>
+<td><p>use scale differences between triangles to improve star matching.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">scaleTolerance</span></strong> (Float)</p>
+</td>
+<td><p>Maximum allowed difference in scale for triangle similarity.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">useSurfaceSplines</span></strong> (Boolean)</p>
+</td>
+<td><p>Enable 2-D surface spline coordinate interpolation. If set to false, use a projective transformation (homography).</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">pixelInterpolation</span></strong> (Enumeration)</p>
+</td>
+<td><p>Pixel interpolation algorithm for generation of output pixels. One of:</p>
+<p>StarAlignment.prototype.NearestNeighbor<br/>
+ StarAlignment.prototype.Bilinear<br/>
+ StarAlignment.prototype.BicubicSpline<br/>
+ StarAlignment.prototype.BicubicBSpline<br/>
+ StarAlignment.prototype.Lanczos3<br/>
+ StarAlignment.prototype.Lanczos4<br/>
+ StarAlignment.prototype.Lanczos5<br/>
+ StarAlignment.prototype.MitchellNetravaliFilter<br/>
+ StarAlignment.prototype.CatmullRomSplineFilter<br/>
+ StarAlignment.prototype.CubicBSplineFilter<br/>
+ StarAlignment.prototype.Auto</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">clampingThreshold</span></strong> (Float)</p>
+</td>
+<td><p>Clamping threshold for the bicubic spline and Lanczos interpolation algorithms.</p>
+</td>
+</tr>
+</table>
+
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_6__"></a>
+<span class="pidoc_table_title">Table 6<br/>
+StarAlignment Output Properties</span></caption>
+<tr>
+<th><p>Property</p>
+</th>
+<th><p>Description</p>
+</th>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputData</span></strong> (Table)</p>
+</td>
+<td><p>This table is the only output property of the StarAlignment process, where each row corresponds to a target image. This table has the following columns:</p>
+
+<table class="pidoc_table" style="margin-top:1em;width:100%;">
+<caption><a id="__table_7__"></a>
+<span class="pidoc_table_title">Table 7</span></caption>
+<tr>
+<td><p><strong><span class="pidoc_code">outputImage</span></strong> (String)</p>
+</td>
+<td><p>Full path or view identifier (depending on the type of target image) of this output image.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">outputMask</span></strong> (String)</p>
+</td>
+<td><p>Full path or view identifier (depending on the type of target image) of the registration mask generated for this output image.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">pairMatches</span></strong> (Int32)</p>
+</td>
+<td><p>Number of star pair matches confirmed by the RANSAC star matching routine.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">inliers</span></strong> (Float)</p>
+</td>
+<td><p>Fraction of inliers, or fraction of confirmed putative star pair matches.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">overlapping</span></strong> (Float)</p>
+</td>
+<td><p>Overlapping model quality.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">regularity</span></strong> (Float)</p>
+</td>
+<td><p>Regularity model quality.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">quality</span></strong> (Float)</p>
+</td>
+<td><p>Overall model quality.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">rmsError</span></strong> (Float)</p>
+</td>
+<td><p>RMS error in pixels.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">rmsErrorAvgDev</span></strong> (Float)</p>
+</td>
+<td><p>Average absolute deviation from the median in the set of registration errors, in pixels.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">peakErrorX</span></strong> (Float)</p>
+</td>
+<td><p>Peak registration error on the horizontal axis, in pixels.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">peakErrorY</span></strong> (Float)</p>
+</td>
+<td><p>Peak registration error on the vertical axis, in pixels.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H11</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, first row, first column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H12</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, first row, second column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H13</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, first row, third column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H21</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, second row, first column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H22</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, second row, second column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H23</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, second row, third column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H31</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, third row, first column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H32</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, third row, second column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">H33</span></strong> (Float)</p>
+</td>
+<td><p>2-D homography matrix, third row, third column.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationBiasRK</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, red/gray channel, zero crossing term.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationBiasG</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, green channel, zero crossing term.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationBiasB</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, blue channel, zero crossing term.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationSlopeRK</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, red/gray channel, line slope term.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationSlopeG</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, green channel, line slope term.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationSlopeB</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, blue channel, line slope term.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationAvgDevRK</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, red/gray channel, average absolute deviation from the median.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationAvgDevG</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, green channel, average absolute deviation from the median.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">frameAdaptationAvgDevB</span></strong> (Float)</p>
+</td>
+<td><p>Frame adaptation function, blue channel, average absolute deviation from the median.</p>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_A_Difficult_Mosaic_Example_Using_Previews_to_Restrict_Star_Matching__">
+   <h4 class="pidoc_subsectionTitle">3.11&emsp;A Difficult Mosaic Example: Using Previews to Restrict Star Matching</h4>
+<p>In this example we are going to build a two-frame mosaic with calibrated raw CCD images of the North America nebula region, acquired with the <a href="http://www.caha.es/CAHA/Telescopes/3.5m.html" title="http://www.caha.es/CAHA/Telescopes/3.5m.html">3.5 meter telescope</a> and the <a href="http://www.caha.es/CAHA/Instruments/LAICA/laica.jpeg" title="http://www.caha.es/CAHA/Instruments/LAICA/laica.jpeg">LAICA camera</a> at <a href="http://www.caha.es/" title="http://www.caha.es/">Calar Alto Observatory</a>, in Southern Spain. These data are part of a larger 16-frame mosaic of the same region. The images are courtesy of Vicent Peris.</p>
+<p>This is a difficult mosaic for two reasons: the overlapping area between frames is just 82 pixels wide, or a 2% of the image area, and only 30 stars are detected on the overlapping region (with default star detection parameters). This mosaic cannot be generated with automatic FFT-based intersection estimation. Below you can see the two mosaic frames. Of course the images are linear; they can be seen with the help of <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">automatic screen stretch functions</a>. On each image we have defined a preview roughly covering the overlapping area. This will help StarAlignment by restricting the star matching process to the regions covered by the previews.</p>
+<img src="images/DifficultMosaicExample1.jpg" alt=""/>
+<p>The next screenshot shows the generated mosaic. The applied StarAlignment instance has all default parameters except the following:</p>
+
+<ul class="pidoc_list">
+<li>Frame adaptation enabled.</li>
+<li>Mask generation enabled. For mosaics, the registration mask is <em>always</em> necessary to verify registration accuracy.</li>
+<li>RANSAC tolerance increased to 6 pixels.</li>
+<li>2-D surface splines selected as the registration model.</li>
+</ul>
+
+<img src="images/DifficultMosaicExample2.jpg" alt=""/>
+<p>In the screenshot below you can see the mosaic's red channel with the overlapped region highlighted. To highlight the overlapped area, we first modify the registration mask by applying the following <a href="../../tools/PixelMath/PixelMath.html" title="../../tools/PixelMath/PixelMath.html">PixelMath</a> expression:</p>
+
+<div style="text-align:center;">
+<span class="pidoc_code">iif( x() &gt; width( CCD2_SE_line_long ), 0, 0.2*$T )</span></div>
+<p>where <span class="pidoc_code">CCD2_SE_line_long</span> is the reference registration image. This expression sets to zero (black) all pixels of the registration mask that don't belong to the intersection between both images. It also multiplies the intersection by 0.2 to make the mask translucent on this region. When the mask is activated for the mosaic image, the result can be seen in the next screenshot.</p>
+<img src="images/DifficultMosaicExample3.jpg" alt=""/>
+<p>Finally, we can verify the achieved registration accuracy by inspecting the overlapping edges, again with the help of the modified registration mask.</p>
+<img src="images/DifficultMosaicExample4.png" alt=""/>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Lisa G. Brown (1992), <em>A Survey of Image Registration Techniques</em>, ACM Computing Surveys 24, pp. 326&ndash;376.</p>
+      <p id="__reference_2__"><strong>[2]</strong> Barbara Zitová, Jan Flusser (2003), <em>Image Registration Methods: A Survey</em>, Image and Vision Computing 21, pp. 977&ndash;1000.</p>
+      <p id="__reference_3__"><strong>[3]</strong> B. Srinivasa Reddy, B. N. Chatterji (1996), <em>An FFT-Based Technique for Translation, Rotation, and Scale-Invariant Image Registration</em>, IEEE Transactions on Image Processing, Vol. 5, No. 8, pp. 1266&ndash;1271.</p>
+      <p id="__reference_4__"><strong>[4]</strong> Roberto Araiza, Hongjei Xie et al. (2002), <em>Automatic Referencing of Multi-Spectral Images</em>, Proceedings of the IEEE Southwest Symposium on Image Analysis and Interpretation, Santa Fe, New Mexico, USA, April 7-9, 2002, pp. 21&ndash;25.</p>
+      <p id="__reference_5__"><strong>[5]</strong> Paul Viola, William M. Wells III (1997), <em>Alignment by Maximization of Mutual Information</em>, International Journal of Computer Vision, 24(2), pp. 137&ndash;154</p>
+      <p id="__reference_6__"><strong>[6]</strong> Francisco G. Valdés et al. (1995), <em>FOCAS Automatic Catalog Matching Algorithms</em>, Publications of the Astronomical Society of the Pacific, 107, pp. 1119&ndash;1128.</p>
+      <p id="__reference_7__"><strong>[7]</strong> M. Marszalek, P. Rokita (2004), <em>Pattern Matching with Differential Voting and Median Transformation Derivation</em>, Computer Vision and Graphics (Computational Imaging and Vision Series), 32, pp. 1002&ndash;1007.</p>
+      <p id="__reference_8__"><strong>[8]</strong> Martin A. Fischler, Robert C. Bolles (1981), <em>Random Sample Consensus: A Paradigm for Model Fitting with Applications to Image Analysis and Automated Cartography</em>, Communications of the ACM, Vol. 24 No. 6, pp. 381&ndash;395</p>
+      <p id="__reference_9__"><strong>[9]</strong> Ondrej Chum, Jirı Matas (2008), <em>Optimal Randomized RANSAC</em>, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 30, No. 8, August 2008</p>
+      <p id="__reference_10__"><strong>[10]</strong> Prabhakara Rao G.V., Mahidhar A. (2006), <em>A Novel Still Image Mosaicing System Using Featureless Registration, Binary Check Stitching and Minimal Blending</em>, Proceedings of the 2006 International Conference on Image Processing, Computer Vision &amp; Pattern Recognition, Las Vegas, Nevada, USA, June 26-29, 2006, Volume 1, pp. 223&ndash;229</p>
+      <p id="__reference_11__"><strong>[11]</strong> P.H.S. Torr, D.W. Murray (1997), <em>The Development and Comparison of Robust Methods for Estimating the Fundamental Matrix</em>, International Journal of Computer Vision 24(3), pp. 271&ndash;300</p>
+      <p id="__reference_12__"><strong>[12]</strong> Steve Mann, Rosalind W. Picard (1997), <em>Video Orbits of the Projective Group: A Simple Approach to Featureless Estimation of Parameters</em>, IEEE Transactions on Image Processing,, Vol. 6, No. 9, September 1997, pp. 1281&ndash;1295</p>
+      <p id="__reference_13__"><strong>[13]</strong> H.C. Longuet-Higgins (1981), <em>A Computer Algorithm for Reconstructing a Scene from Two Projections</em>, Nature, Vol. 293, pp. 133&ndash;135</p>
+      <p id="__reference_14__"><strong>[14]</strong> Richard I. Hartley (1997), <em>In Defense of the Eight-Point Algorithm</em>, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol. 19, No. 6, June 1997, pp. 580&ndash;593</p>
+      <p id="__reference_15__"><strong>[15]</strong> A. Agarwal, C. V. Jawahar, P. J. Narayanan (2005), <em>A survey of planar homography estimation techniques</em>, Technical Report IIIT/TR/2005/12, International Institute of Information Technology, Hyderabad, 2005.</p>
+      <p id="__reference_16__"><strong>[16]</strong> Gisela E. Müllges, Frank Uhlig (1997), <em>Numerical Algorithms with C</em>, Springer, 1996, &sect; 12.2, pp. 309&ndash;313</p>
+      <p id="__reference_17__"><strong>[17]</strong> Jean Meinguet (1979), <em>Multivariate Interpolation at Arbitrary Points Made Simple</em>, Journal of Applied Mathematics and Physics (ZAMP), Vol. 30, 1979, pp. 292&ndash;304</p>
+      <p id="__reference_18__"><strong>[18]</strong> Keys, R. G. (1981), <em>Cubic Convolution Interpolation for Digital Image Processing</em>, IEEE Transactions on Acoustics, Speech &amp; Signal Processing, Vol. 29, pp. 1153&ndash;1160.</p>
+      <p id="__reference_19__"><strong>[19]</strong> Don P. Mitchell, Arun N. Netravali (1988), <em>Reconstruction Filters in Computer Graphics</em>, Computer Graphics, Vol. 22, No. 4, pp. 221&ndash;228.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>, <a href="../../tools/ImageCalibration/ImageCalibration.html" title="../../tools/ImageCalibration/ImageCalibration.html">ImageCalibration</a>, <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a>, <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_documents__">
+   <h3 class="pidoc_sectionTitle">Related Documents</h3>
+   <div id="related_documents">
+<p><a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms in PixInsight</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto S.L.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:17 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

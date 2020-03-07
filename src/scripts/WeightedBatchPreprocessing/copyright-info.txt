@@ -1,0 +1,4 @@
+Copyright (c) 2012 Kai Wiechen. All Rights Reserved.
+Copyright (c) 2019-2020 Roberto Sartori. All Rights Reserved.
+Copyright (c) 2019-2020 Tommaso Rubechi. All Rights Reserved.
+Copyright (c) 2012-2020 Pleiades Astrophoto S.L. All Rights Reserved.

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | BackgroundNeutralization</title>
+   <meta name="keywords" content="background neutralization, color calibration" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Neutralizes the sky background of a color deep-sky image." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>BackgroundNeutralization</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Neutralizes the sky background of a color deep-sky image. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> ColorCalibration</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> background neutralization, color calibration</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;Reference image</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;Lower limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;Upper limit</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;Working mode</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter005__">2.5&emsp;Target background</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter006__">2.6&emsp;Region of Interest</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/BackgroundNeutralization.png" alt=""/>
+<p>The background neutralization task equalizes the average red, green and blue components of a color deep sky image to yield a <em>neutral gray</em> rendition of the sky background. Neutralization is carried out by applying per-channel linear transformations computed from a set of pixels sampled on a <em>background reference image</em>.<br class="pidoc_clearfix"/></p>
+<p>A neutral background is a necessary precondition to perform a correct color calibration. The BackgroundNeutralization tool can be applied prior to <a href="../../tools/ColorCalibration/ColorCalibration.html" title="../../tools/ColorCalibration/ColorCalibration.html">ColorCalibration</a> or other color calibration tools and procedures.</p>
+<p>BackgroundNeutralization requires a good background reference. A good background reference includes mainly data that actually represents the sky background in the target image.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;<a id="reference_image"></a> Reference image</h4>
+<p>BackgroundNeutralization will use pixels read from this image to compute an initial mean background level for each color channel. If you leave this field blank &mdash;or with its default <em>&lt;target image&gt;</em> value&mdash;, the target image will be also the background reference image during the neutralization process.</p>
+<p>You should specify a view that represents the true background of the image. In most cases this means that you must select a view whose histograms are strongly dominated by the sky background, as it is being represented on the target image. A typical example involves defining a small preview over a free sky area of the target image, and selecting it here as the background reference image. Even better than selecting a background preview as a reference image is using a <a href="#region_of_interest">region of interest</a> (ROI), as we describe later in this document.</p>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;Lower limit</h4>
+<p>Lower bound of the set of background pixels. Background reference pixels with values less than or equal to this value will be rejected for calculation of mean background levels. Note that since the minimum allowed value for this parameter is zero, black pixels are never taken into account.</p>
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;Upper limit</h4>
+<p>Upper bound of the set of background pixels. Background reference pixels above this value will be rejected for calculation of mean background levels.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;Working mode</h4>
+<p>Use this parameter to select a background neutralization mode:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="target_background_mode"></a> Target background</p>
+</dt>
+<dd>
+<p>In this mode BackgroundNeutralization will force the target image to have the specified mean background value (see the <a href="#target_background_param"><em>Target background</em> parameter</a> below) for the three RGB channels. In this mode, any resulting out-of-range values after neutralization will be truncated. There can be some (usually negligible) data clipping, but only additive transformations are applied to the data.</p>
+</dd>
+<dt>
+<p>Rescale</p>
+</dt>
+<dd>
+<p>The target image will always be rescaled after neutralization. 'Rescaled' here means that all pixel values are recalculated so they all stay within the native numeric range of the image, that is, no clipping can occur. In this mode, besides no data clipping, the neutralized image maximizes dynamic range usage. However, in this mode you have no control over the resulting mean background value, and the rescaling operation is a multiplicative transformation that redistributes all pixel values throughout the native numeric range of the image.</p>
+</dd>
+<dt>
+<p>Rescale as needed</p>
+</dt>
+<dd>
+<p>Similar to <em>rescale,</em> but the target image is only rescaled if there are out-of-range values after neutralization. This is the default working mode.</p>
+</dd>
+<dt>
+<p>Truncate</p>
+</dt>
+<dd>
+<p>All resulting out-of-range pixels after neutralization will be truncated, which usually results in severely clipped data. This mode is useful to perform a background subtraction to a working image used for an intermediate analysis or processing step.</p>
+</dd>
+</dl>
+
+</div>
+
+      </div>
+      <div id="__parameter005__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.5&emsp;<a id="target_background_param"></a> Target background</h4>
+<p>In the <a href="#target_background_mode">target background working mode</a>, this is the final mean background level that will be imposed to the three RGB channels of the target image. In the other working modes (<em>rescale,</em> <em>rescale as needed</em> and <em>truncate)</em> this parameter is not used.</p>
+</div>
+
+      </div>
+      <div id="__parameter006__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.6&emsp;<a id="region_of_interest"></a> Region of Interest</h4>
+<p>When the whole image cannot be used to sample the background appropriately, a usual way to restrict sampling to background pixels is defining a preview and selecting it as the <a href="#reference_image">reference image</a>. In these cases a much better solution is using a <em>region of interest</em> (ROI). In BackgroundNeutralization, the ROI defines a rectangular area of the reference image that will be sampled to acquire mean background levels. The ROI is specified by four values expressed in pixels: the coordinates of its top left corner and its width and height. More convenient than entering these values directly is acquiring them from an existing preview by clicking the <em>From Preview</em> button.</p>
+<p>To enable the ROI section, you have to check the <em>Region of Interest</em> group title checkbox. When using a ROI, you usually will leave the reference image with its default blank value (indicated as <em>&lt;target image&gt;</em> on the BackgroundNeutralization interface). This has the advantage that the process instance so defined is <em>reusable:</em> it can be applied to any image without requiring existence of specific previews. This is especially important to integrate BackgroundNeutralization instances with <a href="ProcessContainer" title="ProcessContainer">ProcessContainer.</a> The <a href="ColorCalibration" title="ColorCalibration">ColorCalibration</a> tool also has a similar ROI functionality.</p>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/ColorCalibration/ColorCalibration.html" title="../../tools/ColorCalibration/ColorCalibration.html">ColorCalibration</a>, <a href="../../tools/LinearFit/LinearFit.html" title="../../tools/LinearFit/LinearFit.html">LinearFit</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:11 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

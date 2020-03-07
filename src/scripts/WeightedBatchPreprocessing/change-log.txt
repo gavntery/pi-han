@@ -1,0 +1,102 @@
+===============================================================================
+Weighted Batch Preprocessing Script Changelog
+===============================================================================
+
+2020/01/23 - v1.4.4
+
+- The "Calibrate master darks" checkbox is now only enabled, and can only be
+  unchecked, if the "Use master dark" option is enabled. This update removes
+  potential problems and confusion regarding the meaning of disabling master
+  dark calibration when single darks are provided.
+
+-------------------------------------------------------------------------------
+2020/01/20 - v1.4.3
+
+- New StackEngine.masterDarkIncludesBias property. Contributed by Armando
+  Beneduce. This new parameter allows using pre-calibrated master dark frames,
+  i.e. bias-subtracted master darks. This adds flexibility to the WBPP script,
+  but deviates from our recommended best practices. Appropriate diagnostics and
+  warning messages are shown when this property is set to false.
+
+- Bugfix: Fixed broken acquisition of exposure times from FITS ketywords.
+  Contributed by Armando Beneduce.
+
+- Bugfix: Don't generate diagnostics errors for light file lists smaller than
+  three frames when StackEngine.calibrateOnly is true and/or
+  StackEngine.integrate is false.
+
+- Bugfix: Non-function-call use of StackEngine.exposuresToString in
+  StackEngine.doLight().
+
+- Improved numeric error checks in image weights computation routines.
+
+-------------------------------------------------------------------------------
+2019/11/24 - v1.4.2
+
+- Corrected some typos.
+
+- Bugfix: Fixed broken StackEngine.exportParameters() method.
+
+- Bugfix: masterFlat items are now assigned correctly to each group.
+
+- Code refactoring: Extensions to core objects isolated into a Utility object.
+
+- Code refactoring: Replaced all global scope variable declarations ('var')
+  with local scope ('let') when adequate.
+
+- Improvement: The StackEngine global variable is garbage-collected at the end
+  of script execution.
+
+- "Generate Weights" flat is now decoupled from "Use best frame as reference
+  for registration" flag.
+
+-------------------------------------------------------------------------------
+2019/11/19 - v1.4.1
+
+- First official release.
+
+- Removed the (now useless) exportCalibrationFiles script parameter.
+
+- Bugfix: Fixed StackEngine frame group export/import routines.
+
+-------------------------------------------------------------------------------
+2019/11/19 - v1.4.0
+
+- Light exposure tolerance flag replaces the "Group lights with different
+  exposure".
+
+- Reference frame selected amog the files with the lowest binning.
+
+- Bugfix: Drizzle files not update by Image Integration process.
+
+-------------------------------------------------------------------------------
+v1.3.5
+
+- Automatic light frame weights computation.
+
+- Automatic selection of the best reference frame for registration.
+
+- Multiple duration/filter/binning light frame groups processed.
+
+- "Group lights with different exposures" flag added to optionally group all
+  light frames despite their duration.
+
+- Light frames are grouped by duration during calibration process to match the
+  correct dark frame (useful when light frames with different exposure are
+  grouped together).
+
+- "auto" rejection option to select the best rejection strategy during
+  integration.
+
+- Smart naming: BINNING, FILTER and EXPTIME can be added to file names or
+  including folder to provide these values when no proper keywords are stored
+  into frame files.
+
+- Flat frames are always calibrated with master bias if a matching master bias
+  is provided.
+
+- Smart reporting: summary of operations shown at the end of the process.
+
+- Advanced diagnostic.
+
+- "Save frame groups on exit" flag added.

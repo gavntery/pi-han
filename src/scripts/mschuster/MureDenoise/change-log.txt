@@ -1,0 +1,207 @@
+===============================================================================
+MureDenoise Script Changelog
+===============================================================================
+
+-------------------------------------------------------------------------------
+2020.01.21 - Version 1.27
+
+- Improve flatfield compensation accuracy and ease of use. Restrict flatfield
+view selection to a main view. The sizes of the main view of the image selected
+for denoising and the main view of the flatfield must be equal.
+
+- Enable by default the option "Include gradient classifier".
+
+- Improve documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2019.12.16 - Version 1.26
+
+- Improved undo/redo/reset support when the denoising process is aborted.
+
+- Added support for interpolation method Lanczos-5.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2019.11.24 - Version 1.25
+
+- Fixed Use image metadata bug.
+
+- Added none keyword to indicate unavailable or unsupported image metadata.
+
+- Increased Cycle-spin count maximum to 48.
+
+- Added Cycle-spin count UI numeric clipping.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2019.11.20 - Version 1.24
+
+- Added the use image metadata option.
+
+- Removed the load variance scale button.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2019.11.10 - Version 1.23
+
+- Addressed a PixInsight 1.8.8 metadata compatibility issue involving load
+variance scale.
+
+- Removed support for load variance scale from a process log file.
+
+- Improved the handling of ill-conditioned linear systems that may arise when
+optimizing the denoising process.
+
+- Included an optional gradient classifier to provide a increase in the
+adaptivity and accuracy of the denoising process, but also increases processing
+time by about 50%.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2019.02.16 - Version 1.22
+
+- Fixed preview reset bug.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2017.02.16 - Version 1.21
+
+- Removed use gradient/noise thresholds option.
+
+- Fixed non-zero detector offset bug.
+
+- Improved cycle-spin sampling uniformity.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2017.01.31 - Version 1.20
+
+- Enabling the use gradient/noise thresholds parameter increases the adaptivity
+of the denoising process by incorporating interscale gradient to local noise
+ratio relationships into the thresholding functions. Increasing the adaptivity
+of the denoising process improves output quality, but also increases processing
+time by about 40%.
+
+- Optimized the filtering, thresholding, and wavelet transform implementations
+for a 10% performance gain.
+
+- Account for detector offset in the 10th percentile exposure component noise
+variance estimates.
+
+- Use DataType_Real64 for floating point settings.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2016.12.31 - Version 1.19
+
+- "Load variance scale..." loads variance scale directly from the image selected
+for denoising using metadata produced by the recent ImageIntegration update. No
+need now for a process log .txt file, except for a legacy integration that lacks
+the metadata.
+
+- The script now works with image containers. Create a script instance on the
+workspace and drag it to an image container instance or vice versa. You may also
+drag the script instance on the workspace to a view. Be sure to check the
+process log for errors, as no GUI error messages will appear. Abort processing
+by clicking "Pause/Abort" in the console.
+
+- If "Generate method noise image" is enabled, the log will contain an estimate
+of component Poisson and Gaussian noise variance in the sky background, defined
+by the 10th percentile exposure. If the Gaussian noise variance contribution is
+less than 10%, the image can be considered "sky background noise limited".
+
+- Improved messaging, documentation, and tooltips.
+
+-------------------------------------------------------------------------------
+2016.12.19 - Version 1.18
+
+- Added a Haar-wavelet correlation structure exploit that provides a small
+denoising quality improvement by partially addressing the correlation introduced
+by frame registration.
+
+- Added support for ImageIntegration Weights option custom FITS keyword in the
+load variance scale import.
+
+- Added Flatfield parameter view name save and restore.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2016.02.24 - Version 1.15
+
+- Modified Load variance scale button to load Combination count in addition to
+  Variance scale.
+
+- Improved documentation and tooltips.
+
+- Updated copyright.
+
+-------------------------------------------------------------------------------
+2015.12.04 - Version 1.14
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2015.11.26 - Version 1.12
+
+- Improved covariance hypothesis.
+
+- Disabled process console pause/abort button.
+
+- Improved tooltips.
+
+- Removed support for Lanczos-5 interpolation method.
+
+-------------------------------------------------------------------------------
+2015.11.23 - Version 1.11
+
+- Fixed dialog group box style sheet problem.
+
+- Improved covariance hypothesis.
+
+- Documented nonsupport of one shot color (OSC) detectors.
+
+-------------------------------------------------------------------------------
+2015.11.20 - Version 1.10
+
+- Improved covariance hypothesis.
+
+- Improved quality of cycle-spin shift generator.
+
+- Improved documentation.
+
+-------------------------------------------------------------------------------
+2015.11.14 - Version 1.9
+
+- Added large spatial scale flatfield compensation.
+
+- Improved documentation and tooltips.
+
+-------------------------------------------------------------------------------
+2015.11.10 - Version 1.8
+
+- Added denoise variance scale parameter.
+
+- Added loading of variance scale from an ImageIntegration process log file.
+
+- Removed unsupported image interpolation methods.
+
+- Remove denoise amount parameter.
+
+- Improved documentation.
+
+- Added change-log.txt, copyright-info.txt, and product-info.txt.
+
+-------------------------------------------------------------------------------
+2015.11.03 - Version 1.7
+
+- Initial release.
+
+-------------------------------------------------------------------------------

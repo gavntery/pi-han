@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | MureDenoise</title>
+   <meta name="keywords" content="image denoising, mixed Poisson-Gaussian noise" />
+   <meta name="author" content="Mike Schuster" />
+   <meta name="description" content="Script for denoising linear monochannel images corrupted by mixed Poisson-Gaussian noise." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.4" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>MureDenoise</h1>
+
+<div id="authors">
+<p>By Mike Schuster</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for denoising linear monochannel images corrupted by mixed Poisson-Gaussian noise. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> image denoising, mixed Poisson-Gaussian noise</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Mixed_PoissonGaussian_noise_hypothesis__">1.1&emsp;Mixed Poisson-Gaussian noise hypothesis</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Correlation_hypothesis__">1.2&emsp;Correlation hypothesis</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Denoising_method__">1.3&emsp;Denoising method</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Single_frame_image_denoising__">1.4&emsp;Single frame image denoising</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Average_combination_image_denoising__">1.5&emsp;Average combination image denoising</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Method_noise__">1.6&emsp;Method noise</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoise__">2.1&emsp;MureDenoise</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoise_:_Image__">2.1.1&emsp;Image</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoise_:_Flatfield__">2.1.2&emsp;Flatfield</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoise_:_Detector__">2.1.3&emsp;Detector</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoise_:_Denoise__">2.1.4&emsp;Denoise</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Button_pane__">2.2&emsp;Button pane</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Limitations_and_known_issues__">3&emsp;Limitations and known issues</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<p>MureDenoise denoises linear monochannel images corrupted by mixed Poisson-Gaussian noise. MureDenoise is applicable to single frame images and average combinations of equally exposed and registered frames.</p>
+<p>The script supports an astronomical image processing workflow in which the denoising step occurs immediately after the calibration and optional average combination steps and prior to other linear or nonlinear processing steps.</p>
+<p>The script applies a Haar-wavelet mixed noise unbiased risk estimator (MURE) to find a denoised output image that minimizes an estimate of the oracle mean-squared error (MSE) between the denoised output image and the unknown noise-free image.<sup><a href="#__reference_4__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 4]<br/>
+C. Stein, &quot;Estimation of the Mean of a Multivariate Normal Distribution&quot;, <em>The Annals of Statistics</em>, 9(6):1135-1151, November 1981.">[4]</a></sup><sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+F. Luisier, &quot;The SURE-LET Approach to Image Denoising&quot;, École polytechnique fédérale de Lausanne, Thèse N° 4566, January 2010.">[3]</a></sup></p>
+<p><strong>Note</strong>: For linear multichannel images from monocolor detectors, run the monochannel denoiser on each channel separately. The script does not work properly for images from one shot color (OSC) detectors.</p>
+<p><strong>Warning</strong>: The script is adapted to denoise linear monochannel images mainly corrupted by shot noise, read noise, and dark current noise which is typically the case for astronomical data. The script does not work properly for other noise distributions, for saturated images, for debayered images, for upsampled or downsampled images, for linearly or nonlinearly processed images, for median combinations, or for drizzle combinations.</p>
+<p><strong>Warning</strong>: Do not combine denoised images. Signal-to-noise ratio (SNR) will be enhanced by combining noisy images and denoising the result. Combined images must be equally exposed, have the same pixel resolution, and be registered by projective transformation with no distortion correction.</p>
+<p>This document describes MureDenoise Version 1.27.</p>
+<div class="pidoc_subsection" id="__Description_:_Mixed_PoissonGaussian_noise_hypothesis__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;Mixed Poisson-Gaussian noise hypothesis</h4>
+<p>The mixed Poisson-Gaussian noise hypothesis used by MureDenoise is defined as y ~ &nu;&Rho;(&alpha;&eta;x/&nu;)/(&alpha;&eta;) + &Nu;(&delta;, &nu;&sigma;<sup>2</sup>/&eta;), where</p>
+
+<ul class="pidoc_list">
+<li>y: noisy input image (DN),</li>
+<li>x: unknown noise-free image (DN),</li>
+<li>&alpha;: detector gain (e-/DN),</li>
+<li>&delta;: detector offset (DN),</li>
+<li>&sigma;: standard deviation of detector additive white Gaussian noise (DN),</li>
+<li>&eta;: combination count, and</li>
+<li>&nu;: variance scale.</li>
+</ul>
+
+<p>&nu;&Rho;(&alpha;&eta;x/&nu;)/(&alpha;&eta;) is a Poisson distribution with expectation x, variance &nu;x/(&alpha;&eta;), and identity covariance.</p>
+<p>&Nu;(&delta;, &nu;&sigma;<sup>2</sup>/&eta;) is a Gaussian distribution with expectation &delta;, variance &nu;&sigma;<sup>2</sup>/&eta;, and identity covariance.</p>
+<p>&eta; equals the combination count of the image or 1 for single frame images.</p>
+<p>Variance scale &nu; equals the product of a user specified <a href="#variance_scale">variance scale</a> parameter and the combination variance scaling function discussed in the <a href="#correlation_hypothesis">Correlation hypothesis</a> section.</p>
+<p>The expectation &xi;{y} and variance &upsilon;{y} of the noisy input image y as a function of the unknown noise-free image x are given by</p>
+
+<ul class="pidoc_list">
+<li>&xi;{y} = x + &delta; and</li>
+<li>&upsilon;{y} = (&nu;/&eta;)(x/&alpha; + &sigma;<sup>2</sup>).</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Correlation_hypothesis__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;<a id="correlation_hypothesis"></a>Correlation hypothesis</h4>
+<p>The denoising method employs a correlation hypothesis to partially compensate for the correlation introduced by image registration. Registration results in correlation between pixels within the interpolation filter's region of support which reduces the variance of a registered image. The correlation hypothesis models the Haar-wavelet correlation structure to improve output quality.</p>
+<p>The first component of the correlation hypothesis is the variance scaling function S(&kappa;, &iota;) that defines the average scaling of variance at wavelet scale &kappa; that results from an application of interpolation method &iota;. Figures 1 shows an estimate of S(&kappa;, &iota;) for the supported interpolation methods. Variance scaling values approach 1 at increasing scales due to the locality of the correlation. The variance scaling function was estimated by numerical integration over the unit pixel domain on a set of pseudorandom variates from the Gaussian distribution.</p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_1__"></a>
+<p><span class="pidoc_figure_title">Figure 1 &mdash;</span>  Variance scaling function S(&kappa;, &iota;)</p>
+<img style="margin-top:6pt;" src="images/VarianceScalingFunction.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+<p>The second component of the correlation hypothesis is the combination variance scaling function C(&kappa;, &iota;, &eta;) that estimates the ratio of the normalized variance of the average combination of &eta; images registered with interpolation method &iota; to the normalized variance of an average combination of &eta; unregistered images at scale &kappa;. C(&kappa;, &iota;, &eta;) is defined as (1 + (&eta; - 1) S(&kappa;, &iota;)) / &eta;. The numerator represents the variance sum of one unregistered reference image with unit variance and &eta; - 1 registered images each with S(&kappa;, &iota;) variance. The denominator represents the variance sum of &eta; unregistered images each with unit variance.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Denoising_method__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;Denoising method</h4>
+<p>The denoising method is based on a statistical estimate of the oracle mean square error (MSE) between the unknown noise-free image and the denoised output image. Given a mixed Poisson-Gaussian noise hypothesis, the denoising method minimizes the MSE estimate over a set of denoising processes to find the optimal one, in the sense of peak-signal-to-noise ratio (PSNR).<sup><a href="#__reference_4__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 4]<br/>
+C. Stein, &quot;Estimation of the Mean of a Multivariate Normal Distribution&quot;, <em>The Annals of Statistics</em>, 9(6):1135-1151, November 1981.">[4]</a></sup><sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+F. Luisier, &quot;The SURE-LET Approach to Image Denoising&quot;, École polytechnique fédérale de Lausanne, Thèse N° 4566, January 2010.">[3]</a></sup></p>
+<p>The denoising processes are expressed as a linear combination of thresholding functions, from which only the weights are unknown. These weights are computed by a solution to a linear system of equations. This implies that all parameters of the method are determined automatically, without requiring user input.</p>
+<p>The denoising method applies MSE minimization independently at each scale of an unnormalized Haar-wavelet decomposition that preserves hypothesis noise statistics across scales. This independent MSE minimization at each wavelet scale is equivalent to a global image-domain MSE minimization, thanks to the orthogonality of Haar wavelets. The thresholding functions involve several parameters, which provides more adaptability than the standard single-parameter thresholding functions. In particular, the thresholds are adapted to local estimates of the signal-dependent noise variance, which are derived from the corresponding coarse coefficients at the same scale. The coarse coefficients are also used to incorporate interscale relationships into the thresholding functions.</p>
+<p>The denoising method uses cycle-spinning to suppress visual artifacts due to the lack of translation invariance of the decimated wavelet decomposition.<sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+R. Coifman and D. Donoho, “Translation invariant de-noising”, in <em>Lecture Notes in Statistics: Wavelets and Statistics</em>, 103:125–150, Springer Verlag, New York, 1995.">[1]</a></sup><sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+U.S. Kamilov, E. Bostan, and M. Unser, &quot;Variational Justification of Cycle Spinning for Wavelet-Based Solutions of Inverse Problems&quot;, <em>IEEE Signal Processing Letters</em>, 21(11):1326-1330, November 2014.">[2]</a></sup> For a range of translations or shifts, cycle-spinning shifts the noisy image, denoises the shifted image, and then unshifts the denoised image. The result so produced are averaged together to form the output denoised image, which is nearly translation invariant.</p>
+<p>The denoising method provides an option to compensate for large scale noise variance scaling due to flatfielding. Large scale noise scaling variations, resulting from the flatfield correction of optical vignettes and detector sensitivity variations, are estimating by smoothing the flatfield. The denoising method compensates for these variations by multiplying the noisy image by the smoothed flatfield, denoising the product, and then dividing the result by the smoothed flatfield to form the output denoised image.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Single_frame_image_denoising__">
+   <h4 class="pidoc_subsectionTitle">1.4&emsp;Single frame image denoising</h4>
+<p>Figure 2 shows parameters for denoising a 40 minute single frame exposure of the ionized hydrogen region Sharpless Sh2-202 obtained with a Takahashi FSQ-106EDX 106 mm f/5 refractor, a monochrome Kodak KAF-8300 detector binned 2x2, and an Astrodon 3 nm H-alpha filter.</p>
+<p>The combination count parameter is set to 1 to specify that the image is a single frame exposure.</p>
+<p>The flatfield view is set to the image used for flatfield calibration to enable large scale flatfield compensation.</p>
+<p>Flatfield compensation is useful for telescopes with more than ~10% optical vignetting. For telescopes with less vignetting, flatfield compensation results in negligible output quality improvement.</p>
+<p>The detector gain parameter is set to a value obtained from camera manufacture data provide by the EGAIN FITS file keyword. If detector gain is unknown, the <a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a> script can provide an estimate.</p>
+<p>The standard deviation of detector additive white Gaussian noise parameter is set to an estimate of the quadrature sum of read noise and dark current noise in a 40 minute dark provided by the <a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a> script. Detector offset is set to 0 because the image is dark-subtracted.</p>
+<p>The variance scale parameter is set to one to indicate that the nominal amount of denoising be performed. A value less than one will reduce the amount of denoising. A value greater than one will increase the amount of denoising.</p>
+<p><strong>Warning</strong>: Excessively large variance scale values risk the generation of denoising artifacts and the loss of signal-to-noise ratio (SNR). Denoising artifacts typically take on a “checkerboard” pattern, visible with high stretch in the background areas of the denoised image.</p>
+<p>The cycle-spin count parameter provides an adjustable tradeoff between output quality and processing time. The default cycle-spin count of 8 typically provides very good quality results in reasonable time. With this default, denoising a 4K x 4K pixel image requires several minutes of time on a late 2015 processor and a single-threaded PixInsight PJSR platform.</p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_2__"></a>
+<p><span class="pidoc_figure_title">Figure 2 &mdash;</span>  Single frame image parameters</p>
+<img style="margin-top:6pt;" src="images/2013_11_light_12_c_dialog.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+<p>Figure 3 shows a crop of the noisy and denoised single frame images with nonlinear stretch in a stack from which only one is visible at a time for efficient image comparison.</p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_3__"></a>
+<p><span class="pidoc_figure_title">Figure 3 &mdash;</span>  Single frame noisy and denoised images</p>
+<div class="pidoc_mouseover" style="margin-top:6pt;">
+<img src="images/2013_11_light_12_c_crop1.png" id="gBtsJ8gwXnoerI1x" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="gBtsJ8gwXnoerI1x_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gBtsJ8gwXnoerI1x', 'images/2013_11_light_12_c_crop1.png'); pidoc_hideGroup('gBtsJ8gwXnoerI1x', 2); pidoc_setOpacity('gBtsJ8gwXnoerI1x_1', 1.0);">Noisy image</a></li>
+<li><span class="pidoc_indicator" id="gBtsJ8gwXnoerI1x_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gBtsJ8gwXnoerI1x', 'images/2013_11_light_12_c_denoised_crop1.png'); pidoc_hideGroup('gBtsJ8gwXnoerI1x', 2); pidoc_setOpacity('gBtsJ8gwXnoerI1x_2', 1.0);">Denoised image</a></li>
+</ul>
+</div>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Average_combination_image_denoising__">
+   <h4 class="pidoc_subsectionTitle">1.5&emsp;Average combination image denoising</h4>
+<p>Figure 4 shows parameters for denoising an average combination of 8 registered frames of Sharpless Sh2-202, each a 40 minute exposure obtained in similar observing conditions with the same equipment.</p>
+<p>The combination count parameter is set to 8 to specify that the image is an 8 frame average combination.</p>
+<p>The interpolation method parameter is set to the Nearest Neighbor method that was used by the <em>StarAlignment</em> process to register the frames. Interpolation method must be set equal to the <em>StarAlignment</em> process parameter <em>Interpolation</em> &gt; <em>Pixel interpolation</em>.</p>
+<p>The remaining parameters are identical to those shown in Figure 2.</p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_4__"></a>
+<p><span class="pidoc_figure_title">Figure 4 &mdash;</span>  Average combination image parameters</p>
+<img style="margin-top:6pt;" src="images/2013_11_light_integration_8_dialog.png" alt=""/>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+<p>Figures 5 and 6 show a crop of the noisy and denoised average combination images with nonlinear stretch in a stack for efficient image comparison. The differences are hard to see in Figure 5 at actual size. Figure 6 shows a crop of the same images at a 2x zoom where the differences are more apparent.</p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_5__"></a>
+<p><span class="pidoc_figure_title">Figure 5 &mdash;</span>  Average combination noisy and denoised images</p>
+<div class="pidoc_mouseover" style="margin-top:6pt;">
+<img src="images/2013_11_light_integration_8_crop1.png" id="RGdt5jdzIsnOtYWx" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="RGdt5jdzIsnOtYWx_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RGdt5jdzIsnOtYWx', 'images/2013_11_light_integration_8_crop1.png'); pidoc_hideGroup('RGdt5jdzIsnOtYWx', 2); pidoc_setOpacity('RGdt5jdzIsnOtYWx_1', 1.0);">Noisy image</a></li>
+<li><span class="pidoc_indicator" id="RGdt5jdzIsnOtYWx_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RGdt5jdzIsnOtYWx', 'images/2013_11_light_integration_8_denoised_crop1.png'); pidoc_hideGroup('RGdt5jdzIsnOtYWx', 2); pidoc_setOpacity('RGdt5jdzIsnOtYWx_2', 1.0);">Denoised image</a></li>
+</ul>
+</div>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_6__"></a>
+<p><span class="pidoc_figure_title">Figure 6 &mdash;</span>  Average combination noisy and denoised images, 2x zoom</p>
+<div class="pidoc_mouseover" style="margin-top:6pt;">
+<img src="images/2013_11_light_integration_8_crop2.png" id="oVlgX8wTPxlgCkTZ" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="oVlgX8wTPxlgCkTZ_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('oVlgX8wTPxlgCkTZ', 'images/2013_11_light_integration_8_crop2.png'); pidoc_hideGroup('oVlgX8wTPxlgCkTZ', 2); pidoc_setOpacity('oVlgX8wTPxlgCkTZ_1', 1.0);">Noisy image</a></li>
+<li><span class="pidoc_indicator" id="oVlgX8wTPxlgCkTZ_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('oVlgX8wTPxlgCkTZ', 'images/2013_11_light_integration_8_denoised_crop2.png'); pidoc_hideGroup('oVlgX8wTPxlgCkTZ', 2); pidoc_setOpacity('oVlgX8wTPxlgCkTZ_2', 1.0);">Denoised image</a></li>
+</ul>
+</div>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Method_noise__">
+   <h4 class="pidoc_subsectionTitle">1.6&emsp;Method noise</h4>
+<p>MureDenoise provides an option to generate the method noise image. Method noise is the noise guessed by the denoising method, defined as the difference between the noisy input and the denoised output. Method noise should track hypothesis noise statistics, and is strongly signal dependent due to the presence of Poisson noise.</p>
+<p>Figure 7 shows crops of a denoised combination and the corresponding method noise image in a stack for efficient image comparison, the latter shown with linear stretch. Signal dependent method noise variations are clearly visible, however image structures unrelated to noise are small.</p>
+
+<div class="pidoc_figure" style="float:left;margin-left:36pt;">
+<a id="__figure_7__"></a>
+<p><span class="pidoc_figure_title">Figure 7 &mdash;</span>  Denoised image and method noise image</p>
+<div class="pidoc_mouseover" style="margin-top:6pt;">
+<img src="images/2013_11_light_integration_8_denoised_crop1.png" id="FS7a6v7LBggGrSrD" alt="" />
+<ul>
+<li><span class="pidoc_indicator_default" id="FS7a6v7LBggGrSrD_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('FS7a6v7LBggGrSrD', 'images/2013_11_light_integration_8_denoised_crop1.png'); pidoc_hideGroup('FS7a6v7LBggGrSrD', 2); pidoc_setOpacity('FS7a6v7LBggGrSrD_1', 1.0);">Denoised image</a></li>
+<li><span class="pidoc_indicator" id="FS7a6v7LBggGrSrD_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('FS7a6v7LBggGrSrD', 'images/2013_11_light_integration_8_method_noise_crop1.png'); pidoc_hideGroup('FS7a6v7LBggGrSrD', 2); pidoc_setOpacity('FS7a6v7LBggGrSrD_2', 1.0);">Method noise image</a></li>
+</ul>
+</div>
+</div>
+<p><br class="pidoc_clearfix"/></p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_MureDenoise__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;MureDenoise</h4>
+<img style="margin-left:36pt;" src="images/2013_11_light_integration_8_dialog.png" alt=""/>
+<div class="pidoc_subsection" id="__Usage_:_MureDenoise_:_Image__">
+   <h5 class="pidoc_subsectionTitle">2.1.1&emsp;Image</h5>
+<img style="margin-left:36pt;" src="images/image_group.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>View</p>
+</dt>
+<dd>
+<p>The view of the linear monochannel image selected for denoising. The image must be a single frame image or an average combination of similarly exposed and registered frames. The size of the image must be at least 256 pixels in width and height.</p>
+<p><strong>Note</strong>: For linear multichannel images from monocolor detectors, run the monochannel denoiser on each channel separately. The script does not work properly for images from one shot color (OSC) detectors.</p>
+<p><strong>Warning</strong>: The script is adapted to denoise linear monochannel images mainly corrupted by shot noise, read noise, and dark current noise which is typically the case for astronomical data. The script does not work properly for other noise distributions, for saturated images, for debayered images, for upsampled or downsampled images, for linearly or nonlinearly processed images, for median combinations, or for drizzle combinations.</p>
+<p><strong>Warning</strong>: Do not combine denoised images. Signal-to-noise ratio (SNR) will be enhanced by combining noisy images and denoising the result. Combined images must be equally exposed, have the same pixel resolution, and be registered by projective transformation with no distortion correction.</p>
+</dd>
+<dt>
+<p>Combination count</p>
+</dt>
+<dd>
+<p>The combination count of the image.</p>
+<p><em>Combination count</em> must be set to 1 for single frame images.</p>
+<p><em>Combination count</em> must be set to &eta; for average combinations of &eta; equally exposed and registered frames.</p>
+</dd>
+<dt>
+<p>Interpolation method</p>
+</dt>
+<dd>
+<p>The interpolation method used to register images for combination, as defined by the <em>StarAlignment</em> process.</p>
+<p><em>Interpolation method</em> must be set equal to the <em>StarAlignment</em> process parameter <em>Interpolation</em> &gt; <em>Pixel interpolation</em>. When <em>Auto</em> was selected as the <em>StarAlignment</em> pixel interpolation parameter, interpolation method must be set equal to the value recorded in the <em>StarAlignment</em> process log.</p>
+<p>The script supports the following interpolation methods:</p>
+
+<ul class="pidoc_list">
+<li>Nearest Neighbor</li>
+<li>Bilinear</li>
+<li>Bicubic Spline</li>
+<li>Lanczos-3</li>
+<li>Lanczos-4</li>
+<li>Lanczos-5</li>
+</ul>
+
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_MureDenoise_:_Flatfield__">
+   <h5 class="pidoc_subsectionTitle">2.1.2&emsp;Flatfield</h5>
+<img style="margin-left:36pt;" src="images/flatfield_group.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>View</p>
+</dt>
+<dd>
+<p>To enable large scale flatfield compensation, the main view of the monochannel image used for flatfield calibration. The flatfield must be bias or dark-subtracted. Pedestal must be zero. To disable flatfield compensation, do not select a view.</p>
+<p>The sizes of the main view of the image selected for denoising and the main view of the flatfield must be equal.</p>
+<p>The standard deviation of the smoothed flatfield is written to the process console as the <em>Flatfield scale</em> value. The value is normalized as a percentage of the mean of the smoothed flatfield.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_MureDenoise_:_Detector__">
+   <h5 class="pidoc_subsectionTitle">2.1.3&emsp;Detector</h5>
+<img style="margin-left:36pt;" src="images/detector_group.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>Gain</p>
+</dt>
+<dd>
+<p>The gain of the detector in e-/DN.</p>
+<p>If detector gain is unknown, the <a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a> script can provide an estimate.</p>
+<p>Manufacture detector specifications may provide a gain value in e-/DN. This value may be used, with the risk that it may not correspond well to the actual detector configuration and performance. In general, the <a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a> script estimate is more reliable.</p>
+</dd>
+<dt>
+<p>Gaussian noise</p>
+</dt>
+<dd>
+<p>The standard deviation of Gaussian noise of the detector in DN.</p>
+<p>If detector Gaussian noise is unknown, the <a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a> script can provide an estimate.</p>
+<p>Manufacture detector specifications may provide a read noise value in e-. This value, when divided by detector gain to obtain a value in DN, may be used, with the risk that it may not correspond well to the actual detector configuration and performance. In general, the <a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a> script estimate is more reliable.</p>
+</dd>
+<dt>
+<p>Offset</p>
+</dt>
+<dd>
+<p>The offset of the detector in DN.</p>
+<p>Detector offset must be set to 0 for a bias or dark-subtracted image, unless the image has a non-zero pedestal, in which case offset must be set equal to the pedestal.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_MureDenoise_:_Denoise__">
+   <h5 class="pidoc_subsectionTitle">2.1.4&emsp;Denoise</h5>
+<img style="margin-left:36pt;" src="images/denoise_group.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="variance_scale"></a> Variance scale</p>
+</dt>
+<dd>
+<p>This parameter scales hypothesis noise variance. A value of one corresponds to nominal hypothesis noise variance and a corresponding nominal amount of denoising. A value less than one will reduce the amount of denoising. A value greater than one will increase the amount of denoising.</p>
+<p><strong>Warning</strong>: Excessively large variance scale values risk the generation of denoising artifacts and the loss of signal-to-noise ratio (SNR). Denoising artifacts typically take on a “checkerboard” pattern, visible with high stretch in the background areas of the denoised image.</p>
+</dd>
+<dt>
+<p>Cycle-spin count</p>
+</dt>
+<dd>
+<p><em>Cycle-spin count</em> provides an adjustable trade-off between output quality and processing time. Increasing the number of cycle-spins improves denoising quality, but also increases (nearly linearly) processing time.</p>
+<p>The script works at multiple resolutions. To create the coarser resolutions, the script combines pixels from finer resolutions. There are multiple ways to choose which pixels to combine. Each cycle-spin chooses different pixels to combine, and performs a complete denoising operation. The results from all of the cycle-spins are averaged together to produced the final result. The net effect is to average out the variations in noise estimation due to pixel choice, and so gives a better result.</p>
+<p>The default cycle-spin count of 8 typically provides very good quality results in reasonable time.</p>
+</dd>
+<dt>
+<p>Use image metadata</p>
+</dt>
+<dd>
+<p>Use <em>ImageIntegration</em> generated image metadata to estimate a linear image transformation that accounts for the process's integration normalization, weighting, and output rescaling operations. Also loads <em>Combination count</em>.</p>
+<p>The following <em>ImageIntegration</em> settings are supported: <em>Image integration</em> &gt; <em>Combination</em>: <em>Average</em>. <em>Image integration</em> &gt; <em>Normalization</em>: <em>No normalization</em>, <em>Additive</em>, or <em>Additive with scaling</em>. <em>Image integration</em> &gt; <em>Weights</em>: all values.</p>
+<p>The parameters of the linear image transformation used are logged in the process console during the denoising process.</p>
+<p>The keyword <em>none</em> indicates either unavailable image metadata or unsupported <em>ImageIntegration</em> settings.</p>
+</dd>
+<dt>
+<p>Include gradient classifier</p>
+</dt>
+<dd>
+<p>Include a gradient classifier that exploits local gradient squared magnitude to local noise variance ratio relationships to provide an increase in the adaptivity and accuracy of the denoising process, but also increases processing time by about 50%.</p>
+</dd>
+<dt>
+<p>Generate method noise image</p>
+</dt>
+<dd>
+<p>Generate the method noise of the denoising process as a new image window. Method noise is the noise guessed by the denoising method, defined as the difference between the noisy input and the denoised output. Method noise should track hypothesis noise statistics, and is strongly signal dependent due to the presence of Poisson noise.</p>
+<p>The standard deviation of the method noise image is written to the process console as the <em>Method noise</em> value in DN units. The process log will also contain an estimate of the relative contributions of Poisson noise variance and Gaussian noise variance in the 10th percentile exposure. If the Gaussian noise variance contribution is less than 10%, the image can be considered &quot;sky background noise limited&quot;.</p>
+</dd>
+</dl>
+
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Button_pane__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Button pane</h4>
+<img style="margin-left:36pt;" src="images/button_pane.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<img src="images/new_instance.png" alt=""/>
+</dt>
+<dd>
+<p>Create a new instance.</p>
+</dd>
+<dt>
+<img src="images/browse_documentation.png" alt=""/>
+</dt>
+<dd>
+<p>Open a browser to view documentation.</p>
+</dd>
+<dt>
+<img src="images/reset.png" alt=""/>
+</dt>
+<dd>
+<p>Reset all parameters.</p>
+</dd>
+<dt>
+<p>Denoise</p>
+</dt>
+<dd>
+<p>Denoise the image.</p>
+</dd>
+<dt>
+<p>Dismiss</p>
+</dt>
+<dd>
+<p>Dismiss the dialog or abort the denoising.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Limitations_and_known_issues__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Limitations and known issues</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Limitations_and_known_issues', this );">[hide]</p>
+   <div id="Limitations_and_known_issues">
+<p><strong>Warning</strong>: The script is adapted to denoise linear monochannel images mainly corrupted by shot noise, read noise, and dark current noise which is typically the case for astronomical data. The script does not work properly for other noise distributions, for saturated images, for debayered images, for upsampled or downsampled images, for linearly or nonlinearly processed images, for median combinations, or for drizzle combinations.</p>
+<p><strong>Warning</strong>: Do not combine denoised images. Signal-to-noise ratio (SNR) will be enhanced by combining noisy images and denoising the result. Combined images must be equally exposed, have the same pixel resolution, and be registered by projective transformation with no distortion correction.</p>
+<p><strong>Warning</strong>: Excessively large Denoise Variance scale values risk the generation of denoising artifacts and the loss of signal-to-noise ratio (SNR). Underestimates of detector gain, overestimates of detector Gaussian noise, and underestimates of detector offset risk similar problems. Denoising artifacts typically take on a “checkerboard” pattern, visible with high stretch in the background areas of the denoised image.</p>
+<p><strong>Warning</strong>: Even if no denoising artifacts are visible, incorrect parameters or excessively large Denoise Variance scale values can result is loss of signal. In general, avoid the temptation to get “more” denoising by increasing the Denoise Variance scale parameter. If more denoising is needed, use a different method later during image processing.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> R. Coifman and D. Donoho, “Translation invariant de-noising”, in <em>Lecture Notes in Statistics: Wavelets and Statistics</em>, 103:125–150, Springer Verlag, New York, 1995.</p>
+      <p id="__reference_2__"><strong>[2]</strong> U.S. Kamilov, E. Bostan, and M. Unser, &quot;Variational Justification of Cycle Spinning for Wavelet-Based Solutions of Inverse Problems&quot;, <em>IEEE Signal Processing Letters</em>, 21(11):1326-1330, November 2014.</p>
+      <p id="__reference_3__"><strong>[3]</strong> F. Luisier, &quot;The SURE-LET Approach to Image Denoising&quot;, École polytechnique fédérale de Lausanne, Thèse N° 4566, January 2010.</p>
+      <p id="__reference_4__"><strong>[4]</strong> C. Stein, &quot;Estimation of the Mean of a Multivariate Normal Distribution&quot;, <em>The Annals of Statistics</em>, 9(6):1135-1151, November 1981.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html" title="../../scripts/MureDenoiseDetectorSettings/MureDenoiseDetectorSettings.html">MureDenoiseDetectorSettings</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012-2020 Mike Schuster. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.4 on 2020-01-23 10:15:42 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | BayerDrizzlePrep</title>
+   <meta name="keywords" content="bayer drizzle, bayer, drizzle, BayerDrizzlePrep, DrizzleIntegration, debayer, BatchDebayer" />
+   <meta name="author" content="Documentation authored by Juan Conejero (Pleiades Astrophoto S.L), Ian Lauwerys (www.blackwaterskies.co.uk)" />
+   <meta name="description" content="A script to convert a set of monochrome CFA images to RGB Bayer images and create a corresponding drizzle data file for use as part of a Bayer Drizzle workflow." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>BayerDrizzlePrep</h1>
+
+<div id="authors">
+<p>By Documentation authored by Juan Conejero (Pleiades Astrophoto S.L), Ian Lauwerys (www.blackwaterskies.co.uk)</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>A script to convert a set of monochrome CFA images to RGB Bayer images and create a corresponding drizzle data file for use as part of a Bayer Drizzle workflow. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> bayer drizzle, bayer, drizzle, BayerDrizzlePrep, DrizzleIntegration, debayer, BatchDebayer</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Background__">1.1&emsp;Bayer Drizzle Background</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow__">1.2&emsp;Bayer Drizzle Workflow</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow_:_Step_1_Calibration__">1.2.1&emsp;Step 1. Calibration</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow_:_Step_2_Debayering__">1.2.2&emsp;Step 2. Debayering</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow_:_Step_3_Registration__">1.2.3&emsp;Step 3. Registration</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow_:_Step_4_Integration__">1.2.4&emsp;Step 4. Integration</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow_:_Step_5_Drizzle_Integration_OPTIONAL__">1.2.5&emsp;Step 5. Drizzle Integration (OPTIONAL)</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Bayer_Drizzle_Workflow_:_Step_6_Bayer_Drizzle__">1.2.6&emsp;Step 6. Bayer Drizzle</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Using_the_BayerDrizzlePrep_Script__">1.3&emsp;Using the BayerDrizzlePrep Script</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Using_the_BayerDrizzlePrep_Script_:_Images_to_Convert__">1.3.1&emsp;Images to Convert</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Using_the_BayerDrizzlePrep_Script_:_Drizzle_Files_to_Convert__">1.3.2&emsp;Drizzle Files to Convert</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Using_the_BayerDrizzlePrep_Script_:_Conversion_Options__">1.3.3&emsp;Conversion Options</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Using_the_BayerDrizzlePrep_Script_:_Control_Buttons__">1.3.4&emsp;Control Buttons</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<p>The BayerDrizzlePrep script is used as part of a Bayer Drizzle workflow by converting source images and drizzle data files in to a format suitable for use with the <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> process. Note the BatchPreprocessing script can also perform Bayer drizzle but this script enables you to use the separate calibration, registration and integration processes instead of the more limited options available in BPP.</p>
+<p>BayerDrizzlePrep supports single-image file formats only, with one mono CFA pattern channel per image.</p>
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Background__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;<a id="bayer_drizzle_background"></a>Bayer Drizzle Background</h4>
+<p>When working with CFA images generated by a One Shot Colour (OSC) or DSLR camera, each pixel contains data obtained through one (typically Red, Green or Blue) colour filter, as shown at the left of the illustration below.</p>
+<img src="images/Debayer.png" alt=""/>
+<p>In order to obtain the missing colour data, the <a href="../../tools/Debayer/Debayer.html" title="../../tools/Debayer/Debayer.html">Debayer</a> process interpolates it from adjacent pixels which have the other filters, as shown to the right of the illustration above. There are a number of debayering algorithms such as VNG, AHD, etc., but in all cases interpolation (estimating) is used to create the missing data. This leads to a loss of colour resolution and can create noticeable artefacts such as colour fringing around stars or close to edges of features.</p>
+<p>Bayer drizzling refers to the use of the <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> process to generate full colour images from CFA source images. Bayer drizzling avoids the need for interpolation as the missing colour data is obtained from other images of the same part of the sky which were covered by different sensor pixels and therefore different filters.</p>
+<p>The drizzle algorithm is a superresolution algorithm that uses multiple source images of a subject to create an image at a higher spatial resolution that that of source images. In general use, drizzle recovers spatial resolution that was available in the optical system but not fully sampled by the sensor. In the special case of Bayer drizzle, the same process is used to recover spatial resolution that was lost in each colour channel due to each being sampled only by sensor pixels with the relevant filter.</p>
+<p>In order for the drizzle algorithm to be successful, three requirements must be met:</p>
+
+<ul class="pidoc_list">
+<li>The source images must be undersampled. The number of arc seconds per pixel achieved by the optical system and camera must be lower than the resolving power of the optical system. This is often the case with short focal length refractors and camera lenses. Conversely long focal length scopes may be oversampled by the camera, in which case the image already contains all of the information produced by the optical system. It is not possible to beat the laws of physics using drizzle! 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: Bayer drizzle is a special case. If a combined <strong>block of four pixels</strong> in the CFA array is oversampled or optimally sampled, there is no need to use Bayer drizzle at all. It is enough to use normal debayering with the <strong>superpixel</strong> algorithm and subsequent registration/integration to extract all of the available information. Otherwise Bayer drizzling should be used to increase th colour resolution. This is the case even if individual pixels are oversampled or optimally sampled, since the objective is not to increase the spatial resolution of the individual pixels, but that of each four pixel block of CFA elements. This means that Bayer drizzling will work with longer focal length imaging systems and/or smaller camera pixels than standard drizzle.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The source images must be dithered, so the sensor pixels in different images do not cover the exactly same part of the sky. In the general case, it is important that the dithering is not an exact number of pixels, because if the 'footprint' of each pixel on the sky exactly overlaps the footprints of pixels in the other images the drizzle algorithm cannot extract the extra resolution information. Therefore the dithering process needs to re-point the imaging scope by a random amount of pixels plus a random fraction of a pixel between each image. Dithering in most guiding/imaging applications will try to do this by default. In practice mount drive flaws and field rotation due to imperfect polar alignment will usually do a good enough job of creating the necessary random fractions of a pixel between images even if the guiding application cannot. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: Again Bayer drizzle is a special case. The requirement is for each part of the sky to be imaged by pixels with all of the different colour filters. Thus precisely overlapping sensor pixel footprints are not a concern, but as noted above this isn't usually achievable in practice anyway.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>There must be sufficient source images to fully 'wet' the final image. Drizzling doesn't create additional data, rather it takes the total signal in the source images and spreads it across more pixels. This causes the final image to be noisier than an image created from the same data using a normal registration and integration process. Therefore drizzling requires more source images to create an acceptable signal to noise ratio in the final image. This is especially the case for Bayer drizzling, since two (Green) or three (Red, Blue) out of every four source pixels will be black and thus contribute no signal to that colour channel in the final image. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: There are no hard and fast rules as to the number or source images required, as this will depend on the target, sky background, etc. As a rule of thumb, tens to hundreds of source images are needed for a successful Bayer drizzle. Bear in mind that for a typical RGGB CFA, the Green channel contributes double the signal of the Red and Blue channels by virtue of there being twice as many Green filtered sensor pixels. Therefore sufficient source signal is required to achieve the desired SNR in the Red and Blue channels.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+</ul>
+
+<img src="images/drizzle.png" alt=""/>
+<p>In general use, the <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> tool is used to create an output image with a higher spatial resolution than the source images, by setting the <strong>scale</strong> parameter to a value greater than one. In the illustration above, the original sensor pixels are represented by the grey boxes at the left. If <strong>scale</strong> of 2 is used, a new grid of pixels half the size of the originals is created, represented by the black boxes in the centre. The <strong>drop shrink</strong> parameter is set to a value less than one, which effectively makes the original pixels smaller as respresnted by the orange boxes.</p>
+<p>As multiple dithered and registered images are combined on the right of the illustration, different sensor pixels contribute different amounts of signal to the new, smaller pixels. This is analagous to using a larger buckets of water to fill an array of smaller ones, hence the name 'drizzle'.</p>
+<img src="images/bayer-drizzle.png" alt=""/>
+<p>In the case of Bayer drizzle, the <strong>scale</strong> and <strong>drop shrink</strong> parameters are usually set to one to produce an output image with the same spatial resolution as the source images. This is necessary because of the lack of data in the unused pixels of each source colour channel. Producing a higher resolution image through Bayer drizzling requires a really huge amount of data. As can be seen from the illustration above, pixels created with filters contribute to the individual colour channels of each output channel, avoiding the need for the interpolation of missing data that occurs when debayering.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;<a id="bayer_drizzle_workflow"></a>Bayer Drizzle Workflow</h4>
+<p>In order to undertake a Bayer Drizzle, it is first necessary to prepare the drizzle data files (<strong>.drz</strong>) for the source images by following the standard <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> workflow. This process involves calibration, registration and pre-integration of the source images.</p>
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow_:_Step_1_Calibration__">
+   <h5 class="pidoc_subsectionTitle">1.2.1&emsp;<a id="step_1"></a>Step 1. Calibration</h5>
+<p>The first step of the process is to calibrate the source images in the usual manner. This is acheived by use of the <a href="../../tools/ImageCalibration/ImageCalibration.html" title="../../tools/ImageCalibration/ImageCalibration.html">ImageCalibration</a> and <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> tools to create master bias, master dark and master flat files and then calibrate the source images with them. Optionally the <a href="../../tools/CosmeticCorrection/CosmeticCorrection.html" title="../../tools/CosmeticCorrection/CosmeticCorrection.html">CosmeticCorrection</a> tool may also be used following source image calibration.</p>
+<p>These are standard PixInsight workflow tasks and there are no special considerations in respect of Bayer drizzle.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow_:_Step_2_Debayering__">
+   <h5 class="pidoc_subsectionTitle">1.2.2&emsp;<a id="step_2"></a>Step 2. Debayering</h5>
+<p>The next step is to debayer the calibrated source images using the <a href="../../tools/Debayer/Debayer.html" title="../../tools/Debayer/Debayer.html">Debayer</a> tool or the <strong>BatchDebayer</strong> script. Debayering necessary to enable subsquent tools to generate the drizzle data files required for <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a>. Use an appropriate debayering algorithm such as VNG or AHD (but not superpixel).</p>
+<p>At the end of the whole process, the calibrated images generated at the end of <a href="#step_1">Step 1</a> above. will be reused, but for now the workflow proceeds with the debayered images.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow_:_Step_3_Registration__">
+   <h5 class="pidoc_subsectionTitle">1.2.3&emsp;<a id="step_3"></a>Step 3. Registration</h5>
+<p>The drizzle algorithm works by projecting input image pixels on a finer grid of output pixels. This applies the same geometrical transformations used to register images in a normal preprocessing task, but instead of being an isolated step, image registration is performed during the drizzle integration process directly from calibrated data without interpolation.</p>
+<p>Thus it is necessary to pre-compute and store the image registration transformations. To that end, the <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> tool has an option to generate drizzle data, as shown below:</p>
+<img src="images/drizzle-sa.png" alt=""/>
+<p>When this option is enabled, <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> generates a drizzle data file for each registered image. Drizzle data files carry the .drz suffix and store all the information required by the <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> tool, including image registration data, statistical data, and pixel rejection maps. <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> supports the same image registration devices implemented by <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>, including projective transformations (homographies) and two-dimensional surface splines (thin plates).</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p><em><strong>Note</strong>: <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> will always create new drizzle data files with fresh registration data, so existing .drz files will always be replaced to start a new drizzle integration procedure.</em></p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow_:_Step_4_Integration__">
+   <h5 class="pidoc_subsectionTitle">1.2.4&emsp;<a id="step_4"></a>Step 4. Integration</h5>
+<p>The registered images generated above must be integrated with <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a>, and the corresponding .drz files must also be selected. As shown below, a set of registered images is being pre-integrated as part of a drizzle procedure:</p>
+<img src="images/drizzle-ii1.png" alt=""/>
+<p>Firstly select the registered images to integrate as usual. Next select the drizzle data files generated by <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> by clicking the <strong>Add Drizzle Files</strong> button.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p><em><strong>Note</strong>: When a .drz file has been associated with an input image, a special &quot;&lt;d&gt;&quot; indicator is shown on the Input Images file list for the corresponding item. For a drizzle data file to be associated with its corresponding registered image, both files must have the same file name (only different suffixes).</em></p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p>Secondly, activate the <strong>Generate Drizzle Data</strong> option on <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a>. Now proceed to integrate the images as usual: Find optimal pixel rejection parameters and maximize SNR in the result, just as for normal image integration tasks. Each time the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> tool is run, the selected .drz files are updated with statistical and rejection data automatically. Ensure that the final integration is performed <strong>without</strong> a selected region of interest so that all rejection data is generated.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow_:_Step_5_Drizzle_Integration_OPTIONAL__">
+   <h5 class="pidoc_subsectionTitle">1.2.5&emsp;<a id="step_5"></a>Step 5. Drizzle Integration (OPTIONAL)</h5>
+<p>In order to proceed directly to a Bayer drizzle skip to <a href="#step_6">Step 6</a> below. To test a standard drizzle integration first, complete this Step 5.</p>
+<p>After <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> and <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a>, the drizzle data files (*.drz) are now ready for the <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> tool. Select the .drz files generated above, execute the tool globally and a drizzle integrated image will be generated.</p>
+<img src="images/drizzle-di.png" alt=""/>
+<p>The drizzle algorithm can be controlled with two main parameters and some subsidiary options:</p>
+
+<ul class="pidoc_list">
+<li><strong>Output Scale</strong>, or subsampling ratio. This is the factor that multiplies source image dimensions (width, height) to compute the dimensions in pixels of the output integrated image. For example, to perform a 'drizzle x2' integration, the corresponding drizzle scale is 2 and the output image will have four times the area of the input reference image in square pixels.</li>
+<li><strong>Drop Shrink Factor</strong>. This is a reduction factor applied to input image pixels. Smaller input pixels or drops tend to yield sharper results because the integrated image is formed by convolution with a smaller PSF. However, smaller input pixels are more prone to 'dry' output pixels, visible patterns caused by partial sampling, and overall decreased SNR. Low shrink factors require more and better dithered input images. The default drop shrink factor is 0.9, and typical values range from 0.7 to 1.0.</li>
+<li>Along with these important parameters, <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> permits the enabling/disabling of pixel rejection and image weighting, plus the use of surface splines (when available) for image registration.</li>
+<li>Finally, it is possible to define a region of interest (ROI) to accelerate repeated tests. This is useful because the task's execution time (and also its memory space consumption) grows quadratically with the dimensions of the output integrated image. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: The coordinates and dimensions of the ROI are expressed in input reference pixels, not in output pixels. It is possible to define ROI coordinates on an integrated image generated by the <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> tool, or on a registered image created by <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>, by defining a preview and clicking the From Preview button.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+</ul>
+
+<p><a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> always generates two images: the result of the drizzle reconstruction and a drizzle weights image. The value of each pixel on the weights image represents the (normalized) amount of data gathered by the corresponding pixel on the integrated result. Note that the integrated image has already been divided by the weights image when both of them are made available as new image windows.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Bayer_Drizzle_Workflow_:_Step_6_Bayer_Drizzle__">
+   <h5 class="pidoc_subsectionTitle">1.2.6&emsp;<a id="step_6"></a>Step 6. Bayer Drizzle</h5>
+<p>The drizzle data file generated at the end of Step 4. above stores all the data required to perform a drizzle integration process:</p>
+<p>a. The full file path of the source drizzle image (calibrated, debayered, but not registered). This is the image that will be integrated with <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a>.</p>
+<p>b. The full file path of the registration target image (calibrated, debayered and registered). This was the image that was integrated in Step 4. above to compute normalization parameters, image weights, and pixel rejection data. This image will <strong>not</strong> be used in the final drizzle integration process.</p>
+<p>c. The geometry of the reference registration image. This defines the geometry of the final drizzle-integrated image (multiplied by the drizzle output scale).</p>
+<p>d. The geometrical transformations necessary to register the image. This may include a projective transformation matrix and/or surface spline control points and parameters, if local distortion correction is being used. These transformations are applied by <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> to compute the geometry of each 'drop' that 'rains' over the drizzle-integrated image.</p>
+<p>e. The coordinates of each rejected pixel.</p>
+<p>f. Image normalization parameters, including estimates of statistical location and scale.</p>
+<p>g. Image weighting parameters. These are normally based on noise estimates computed during <a href="#step_1">Step 1</a> above (and stored as XISF properties and FITS keywords in the image), but can also be generated from statistical parameters or image properties/keywords by <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> during <a href="#step_4">Step 4</a> above if necessary.</p>
+<p>Drizzle data files are created by the <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> tool with items a, b, c and d. The <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a> tool updates drizzle files with items e, f and g.</p>
+<p>In order to conduct a Bayer drizzle, it is necessary to replace item a. with the path to the calibrated mono CFA image, that is, the final images generated at the end of <a href="#step_1">Step 1</a> above <strong>after</strong> calibration (and optionally cosmeticisation) but <strong>before</strong> applying the debayering process. However, the <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> process cannot use the monochrome CFA data directly because the RGB color channels would become intermixed in the integrated image.</p>
+<img src="images/MonoToRGB.png" alt=""/>
+<p>Thus the mono CFA must be split into three separate R, G and B channels as shown above, with black pixels replacing the missing data in each channel, and saved as a three channel RGB image. This is known as a RGB Bayer image. The <a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> process can then be applied to this RGB Bayer as if it was working with a normal RGB image.</p>
+<p>The BatchPreprocessing script does this automatically, including generation of separate RGB Bayer images and corresponding drizzle data files. The downside of BPP is that the user has less control over some of the individual processes involved in calibrating, registering and integrating the source images.</p>
+<p>The same task can also be implemented manually, with the help of Nikolay's SplitCFA tool to convert the mono CFA images to Bayer RGB ones. The advantage over BPP is that there is full control over each step of the workflow. The downside is that user is then responsible for renaming and moving the RGB Bayer images so that they replace the images in a. above. This process is tedious and prone to error for more than a handful of source images.</p>
+<p><strong>The BayerDrizzlePrep script also allows full control over the workflow, but removes most of the tedium by automatically creating both the RGB Bayer images needed along with new copies of the drizzle data files linked to them.</strong></p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p><em><strong>Note</strong>: The Bayer drizzle workflow can only be implemented as a fully automatic process using the BatchPreprocessing script. Using any other method, including the <strong>BayerDrizzlePrep</strong> script, there is no foolproof automatic means by which the source monochrome CFA images can be associated with the corresponding drizzle data file. This is because the drizzle data files are first created by the <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> process from the debayered source images. Thus there is no reliable rule to impute the names and locations of the mono CFA images that preceded the debayer step.</em></p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p>Therefore the user is responsible for ensuring that each mono CFA images in the <strong>Images to Convert</strong> list has a corresponding drizzle data file in the <strong>Drizzle Files to Convert</strong> list, and that <strong>both lists are in the same order</strong>.</p>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Using_the_BayerDrizzlePrep_Script__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;<a id="using_bayerdrizzleprep"></a>Using the BayerDrizzlePrep Script</h4>
+<img src="images/BayerDrizzlePrep.png" alt=""/>
+<p>Using the BayerDrizzlePrep script requires the user to select source image files and their corresponding drizzle data files, specify the Bayer pattern of the source image files and the output directory where the converted image and drizzle data files will be written.</p>
+<div class="pidoc_subsection" id="__Description_:_Using_the_BayerDrizzlePrep_Script_:_Images_to_Convert__">
+   <h5 class="pidoc_subsectionTitle">1.3.1&emsp;<a id="images_to_convert"></a>Images to Convert</h5>
+<p>The <strong>Images to Convert</strong> list contains the source images to be converted. These should be calibrated and (optionally) cosmeticised, but not yet debayered images, as created at the end of <a href="#step_1">Step 1</a> of the Bayer drizzle workflow.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p><em><strong>Note</strong>: There must be an equal number of image files and drizzle data files in the lists and they must be in the same order. The  BayerDrizzlePrep script cannot automatically match the image file with its corresponding drizzle data file. Selecting an image file in the <strong>Images to Convert</strong> list will select the corresponding drizzle data file in the <strong>Drizzle Files to Convert</strong> list.</em></p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+
+<ul class="pidoc_list">
+<li>Click the <strong>Add</strong> button to choose image files to convert. Any image file format supported by PixInsight should be suitable provided it contains a single image per file, with a single mono CFA pattern channel. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: The dialog can be resized vertically to show more list entries and horizontally to show long file names by dragging its edges as required.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ BayerDrizzlePrep does not currently support working with open image views, previews, etc.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Move Up</strong> and <strong>Move Down</strong> buttons will move the selected image(s) up or down the list if you need to re-order them. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> If the first selected image is already at the top of the list, none of the selected images will move up when <strong>Move Up</strong> is clicked, and similarly at the bottom of the list for the <strong>Move Down</strong> button.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Clear</strong>, <strong>Invert Selection</strong> and <strong>Remove Selected</strong> buttons function in the same manner as other PixInsight scripts and processes should you need to amend the list.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Using_the_BayerDrizzlePrep_Script_:_Drizzle_Files_to_Convert__">
+   <h5 class="pidoc_subsectionTitle">1.3.2&emsp;<a id="drizzle_files_to_convert"></a>Drizzle Files to Convert</h5>
+<p>The <strong>Drizzle Files to Convert</strong> list contains the completed drizzle data files (.drz) to be converted. These should be the complete drizzle files as created at the end of <a href="#step_4">Step 4</a> of the Bayer drizzle workflow.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p><em><strong>Note</strong>: There must be an equal number of image files and drizzle data files in the lists and they must be in the same order. The  BayerDrizzlePrep script cannot automatically match the image file with its corresponding drizzle data file. Selecting a drizzle data file in the <strong>Drizzle Files to Convert</strong> list will select the corresponding image file in the <strong>Images to Convert</strong> list.</em></p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+
+<ul class="pidoc_list">
+<li>Click the <strong>Add</strong> button to choose drizzle files to convert. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: The dialog can be resized vertically to show more list entries and horizontally to show long file names by dragging its edges as required.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Move Up</strong> and <strong>Move Down</strong> buttons will move the selected file(s) up or down the list if you need to re-order them. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> If the first selected file is already at the top of the list, none of the selected files will move up when <strong>Move Up</strong> is clicked, and similarly at the bottom of the list for the <strong>Move Down</strong> button.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Clear</strong>, <strong>Invert Selection</strong> and <strong>Remove Selected</strong> buttons function in the same manner as other PixInsight scripts and processes should you need to amend the list.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Using_the_BayerDrizzlePrep_Script_:_Conversion_Options__">
+   <h5 class="pidoc_subsectionTitle">1.3.3&emsp;<a id="conversion_options"></a>Conversion Options</h5>
+
+<ul class="pidoc_list">
+<li>The <strong>Bayer Pattern</strong> combo box allows you to select the Bayer pattern applicable to the images to be converted, from RGGB, BGGR, GRBG, GBRG. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> If you are working with different Bayer patterns, they must be converted in separate batches as only one pattern can be used per run.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Output Directory...</strong> button allows you to select an Output Directory where the converted RGB Bayer images and the new drizzle files will be written. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> It is advisable to use an empty directory to avoid accidentally overwriting images or drizzle files from the standard workflow. If there are name clashes between files in different source directories, they should be converted in batches to different <strong>Output Directories</strong>. (<a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a> supports integration of files from different source folders, thus splitting in to batches will not cause any issues later.)</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Using_the_BayerDrizzlePrep_Script_:_Control_Buttons__">
+   <h5 class="pidoc_subsectionTitle">1.3.4&emsp;<a id="control_buttons"></a>Control Buttons</h5>
+
+<ul class="pidoc_list">
+<li>The <strong>Convert</strong> button converts all images and drizzle files in the file lists and outputs new RGB Bayer images and corresponding drizzle files in the specified Output Directory. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> The new files will have the same names as the source images and drizzle files, with <strong>_brgb</strong> appended to them.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> Any existing images or drizzle files in the Output Directory with the same names will be overwritten. If you are using sets of source files from different directories that have name clashes, convert them in separate batches to different Output Directories.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Exit</strong> button exits the BayerDrizzlePrep script. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: No warning is given upon exit so please take care to create a process icon if required.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The blue <strong>Process</strong> triangle can be dragged to the PixInsight workspace to create a process icon. All file entries in the lists and the options are saved as part of the process icon. The process may be re-instantiated by right clicking the script icon, choosing <strong>Launch Script Instance</strong> and then clicking the round <strong>Apply Global</strong> icon at the bottom of the <strong>Script</strong> dialog. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> Dragging the &quot;Process&quot; triangle on to an image window has no effect.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Help</strong> button displays this help documentation, or hover over it for a brief summary in the tooltip.</li>
+</ul>
+
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/DrizzleIntegration/DrizzleIntegration.html" title="../../tools/DrizzleIntegration/DrizzleIntegration.html">DrizzleIntegration</a>, <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a>, <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/BatchPreprocessing/BatchPreprocessing.html" title="../../scripts/BatchPreprocessing/BatchPreprocessing.html">BatchPreprocessing</a>, <a href="../../scripts/BatchDebayer/BatchDebayer.html" title="../../scripts/BatchDebayer/BatchDebayer.html">BatchDebayer</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Documentation Copyright © 2014-2015 Pleiades Astrophoto S.L., Copyright © 2014-2015 Ian Lauwerys. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:26 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

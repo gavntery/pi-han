@@ -1,0 +1,14 @@
+===============================================================================
+Ephemerides Script Changelog
+===============================================================================
+
+-------------------------------------------------------------------------------
+2019.04.29 - v1.01
+
+- Minor fix: The initial time is now initialized to the current day at 0h UTC
+  by default (previously it was January 1.0 of the next year).
+
+-------------------------------------------------------------------------------
+2018.11.28 - v1.0
+
+- First public version. Released with PixInsight core 1.8.6.

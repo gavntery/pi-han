@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!---
+*******************************************************************************
+PixInsight Photometric White Reference Database
+Version 1.0 - Compiled May 2017
+Copyright (C) 2017 Vicent Peris
+Copyright (C) 2017 Pleiades Astrophoto S.L.
+===============================================================================
+Attribute  Photometric
+Name       Filter
+=========  ===========
+JB         Johnson B
+JV         Johnson V
+Sg         Sloan g'
+Sr         Sloan r'
+Si         Sloan i'
+*******************************************************************************
+-->
+<xwrf version="1.0" xmlns="http://www.pixinsight.com/xwrf" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.pixinsight.com/xwrf http://pixinsight.com/xwrf/xwrf-1.0.xsd">
+   <ZeroPoint id="Z" JB_JV="-0.42292" Sr_JV="-0.12403" Sr_Sg="-0.34735" name="Zero Point"/>
+   <WhiteRef id="S" JB_JV="+0.28594" Sr_JV="-0.35230" Sr_Sg="-0.28358" name="Average Spiral Galaxy" default="1"/>
+   <WhiteRef id="S0" JB_JV="+0.49570" Sr_JV="-0.41625" Sr_Sg="-0.48705" name="S0 Galaxy"/>
+   <WhiteRef id="Sa" JB_JV="+0.45859" Sr_JV="-0.40443" Sr_Sg="-0.45169" name="Sa Galaxy"/>
+   <WhiteRef id="Sb" JB_JV="+0.39106" Sr_JV="-0.38742" Sr_Sg="-0.39401" name="Sb Galaxy"/>
+   <WhiteRef id="Sc" JB_JV="+0.30523" Sr_JV="-0.36150" Sr_Sg="-0.31438" name="Sc Galaxy"/>
+   <WhiteRef id="Sd" JB_JV="+0.14321" Sr_JV="-0.30473" Sr_Sg="-0.15252" name="Sd Galaxy"/>
+   <WhiteRef id="Sdm" JB_JV="+0.06957" Sr_JV="-0.28085" Sr_Sg="-0.08171" name="Sdm Galaxy"/>
+   <WhiteRef id="E" JB_JV="+0.47937" Sr_JV="-0.40113" Sr_Sg="-0.45869" name="Elliptical Galaxy"/>
+   <WhiteRef id="photon" JB_JV="+0.00000" Sr_JV="+0.00000" Sr_Sg="+0.00000" name="Photon Equalization"/>
+   <WhiteRef id="A0I" JB_JV="-0.43273" Sr_JV="-0.00718" Sr_Sg="+0.54665" name="A0I Star"/>
+   <WhiteRef id="A0III" JB_JV="-0.40136" Sr_JV="+0.00058" Sr_Sg="+0.54393" name="A0III Star"/>
+   <WhiteRef id="A0IV" JB_JV="-0.48182" Sr_JV="+0.01137" Sr_Sg="+0.61009" name="A0IV Star"/>
+   <WhiteRef id="A0V" JB_JV="-0.42292" Sr_JV="+0.01597" Sr_Sg="+0.57518" name="A0V Star"/>
+   <WhiteRef id="A2V" JB_JV="-0.40862" Sr_JV="+0.00058" Sr_Sg="+0.54782" name="A2V Star"/>
+   <WhiteRef id="A3V" JB_JV="-0.34793" Sr_JV="-0.02351" Sr_Sg="+0.47704" name="A3V Star"/>
+   <WhiteRef id="A5III" JB_JV="-0.26452" Sr_JV="-0.04860" Sr_Sg="+0.40011" name="A5III Star"/>
+   <WhiteRef id="A5IV" JB_JV="-0.36370" Sr_JV="-0.02052" Sr_Sg="+0.50276" name="A5IV Star"/>
+   <WhiteRef id="A5V" JB_JV="-0.28496" Sr_JV="-0.03208" Sr_Sg="+0.42585" name="A5V Star"/>
+   <WhiteRef id="B0I" JB_JV="-0.65000" Sr_JV="+0.11072" Sr_Sg="+0.81661" name="B0I Star"/>
+   <WhiteRef id="B0V" JB_JV="-0.77057" Sr_JV="+0.12539" Sr_Sg="+0.90576" name="B0V Star"/>
+   <WhiteRef id="B1III" JB_JV="-0.69449" Sr_JV="+0.11016" Sr_Sg="+0.84301" name="B1III Star"/>
+   <WhiteRef id="B1V" JB_JV="-0.67354" Sr_JV="+0.09319" Sr_Sg="+0.80616" name="B1V Star"/>
+   <WhiteRef id="B2II" JB_JV="-0.60182" Sr_JV="+0.09666" Sr_Sg="+0.77336" name="B2II Star"/>
+   <WhiteRef id="B2IV" JB_JV="-0.73307" Sr_JV="+0.10012" Sr_Sg="+0.86378" name="B2IV Star"/>
+   <WhiteRef id="B3V" JB_JV="-0.63274" Sr_JV="+0.08536" Sr_Sg="+0.77891" name="B3V Star"/>
+   <WhiteRef id="B5I" JB_JV="-0.49334" Sr_JV="+0.02861" Sr_Sg="+0.62250" name="B5I Star"/>
+   <WhiteRef id="B5II" JB_JV="-0.55576" Sr_JV="+0.04401" Sr_Sg="+0.67997" name="B5II Star"/>
+   <WhiteRef id="B5III" JB_JV="-0.58505" Sr_JV="+0.06599" Sr_Sg="+0.73814" name="B5III Star"/>
+   <WhiteRef id="B6IV" JB_JV="-0.54822" Sr_JV="+0.03205" Sr_Sg="+0.67304" name="B6IV Star"/>
+   <WhiteRef id="B6V" JB_JV="-0.57247" Sr_JV="+0.05757" Sr_Sg="+0.71202" name="B6V Star"/>
+   <WhiteRef id="B8I" JB_JV="-0.43999" Sr_JV="+0.02705" Sr_Sg="+0.58992" name="B8I Star"/>
+   <WhiteRef id="B8V" JB_JV="-0.54152" Sr_JV="+0.02476" Sr_Sg="+0.65284" name="B8V Star"/>
+   <WhiteRef id="B9III" JB_JV="-0.51515" Sr_JV="+0.02524" Sr_Sg="+0.64403" name="B9III Star"/>
+   <WhiteRef id="F0I" JB_JV="-0.24138" Sr_JV="-0.08460" Sr_Sg="+0.34590" name="F0I Star"/>
+   <WhiteRef id="F0II" JB_JV="-0.29086" Sr_JV="-0.06314" Sr_Sg="+0.40116" name="F0II Star"/>
+   <WhiteRef id="F0III" JB_JV="-0.16965" Sr_JV="-0.10434" Sr_Sg="+0.28082" name="F0III Star"/>
+   <WhiteRef id="F0V" JB_JV="-0.13582" Sr_JV="-0.12836" Sr_Sg="+0.22902" name="F0V Star"/>
+   <WhiteRef id="F1IV" JB_JV="-0.10025" Sr_JV="-0.14832" Sr_Sg="+0.18417" name="F1IV Star"/>
+   <WhiteRef id="F2II" JB_JV="-0.10382" Sr_JV="-0.13705" Sr_Sg="+0.19783" name="F2II Star"/>
+   <WhiteRef id="F2V" JB_JV="-0.04494" Sr_JV="-0.15510" Sr_Sg="+0.14247" name="F2V Star"/>
+   <WhiteRef id="F5I" JB_JV="-0.17514" Sr_JV="-0.13011" Sr_Sg="+0.26735" name="F5I Star"/>
+   <WhiteRef id="F5III" JB_JV="-0.01507" Sr_JV="-0.18934" Sr_Sg="+0.08816" name="F5III Star"/>
+   <WhiteRef id="F5IV" JB_JV="-0.04214" Sr_JV="-0.18137" Sr_Sg="+0.11404" name="F5IV Star"/>
+   <WhiteRef id="F5V" JB_JV="+0.01698" Sr_JV="-0.18281" Sr_Sg="+0.07312" name="F5V Star"/>
+   <WhiteRef id="F8I" JB_JV="+0.15460" Sr_JV="-0.21403" Sr_Sg="-0.04074" name="F8I Star"/>
+   <WhiteRef id="F8IV" JB_JV="+0.10753" Sr_JV="-0.20899" Sr_Sg="-0.00475" name="F8IV Star"/>
+   <WhiteRef id="F8V" JB_JV="+0.10098" Sr_JV="-0.22756" Sr_Sg="-0.02755" name="F8V Star"/>
+   <WhiteRef id="G0I" JB_JV="+0.32960" Sr_JV="-0.29898" Sr_Sg="-0.24280" name="G0I Star"/>
+   <WhiteRef id="G0III" JB_JV="+0.21980" Sr_JV="-0.27698" Sr_Sg="-0.15262" name="G0III Star"/>
+   <WhiteRef id="G0IV" JB_JV="+0.15066" Sr_JV="-0.23845" Sr_Sg="-0.06310" name="G0IV Star"/>
+   <WhiteRef id="G0V" JB_JV="+0.12865" Sr_JV="-0.23378" Sr_Sg="-0.04597" name="G0V Star"/>
+   <WhiteRef id="G2IV" JB_JV="+0.23272" Sr_JV="-0.25498" Sr_Sg="-0.12539" name="G2IV Star"/>
+   <WhiteRef id="G2V" JB_JV="+0.19125" Sr_JV="-0.26263" Sr_Sg="-0.11785" name="G2V Star"/>
+   <WhiteRef id="G5I" JB_JV="+0.61974" Sr_JV="-0.36285" Sr_Sg="-0.47993" name="G5I Star"/>
+   <WhiteRef id="G5II" JB_JV="+0.45734" Sr_JV="-0.33661" Sr_Sg="-0.35750" name="G5II Star"/>
+   <WhiteRef id="G5III" JB_JV="+0.43839" Sr_JV="-0.33753" Sr_Sg="-0.33899" name="G5III Star"/>
+   <WhiteRef id="G5IV" JB_JV="+0.30659" Sr_JV="-0.29615" Sr_Sg="-0.21725" name="G5IV Star"/>
+   <WhiteRef id="G5V" JB_JV="+0.24204" Sr_JV="-0.26891" Sr_Sg="-0.15222" name="G5V Star"/>
+   <WhiteRef id="G8I" JB_JV="+0.75278" Sr_JV="-0.45677" Sr_Sg="-0.66158" name="G8I Star"/>
+   <WhiteRef id="G8III" JB_JV="+0.49895" Sr_JV="-0.36004" Sr_Sg="-0.40749" name="G8III Star"/>
+   <WhiteRef id="G8IV" JB_JV="+0.37667" Sr_JV="-0.33111" Sr_Sg="-0.30006" name="G8IV Star"/>
+   <WhiteRef id="G8V" JB_JV="+0.30684" Sr_JV="-0.31109" Sr_Sg="-0.23699" name="G8V Star"/>
+   <WhiteRef id="K0II" JB_JV="+0.81334" Sr_JV="-0.44846" Sr_Sg="-0.68911" name="K0II Star"/>
+   <WhiteRef id="K0III" JB_JV="+0.50663" Sr_JV="-0.37423" Sr_Sg="-0.41706" name="K0III Star"/>
+   <WhiteRef id="K0IV" JB_JV="+0.50294" Sr_JV="-0.38516" Sr_Sg="-0.43590" name="K0IV Star"/>
+   <WhiteRef id="K0V" JB_JV="+0.32724" Sr_JV="-0.33915" Sr_Sg="-0.28293" name="K0V Star"/>
+   <WhiteRef id="K1IV" JB_JV="+0.53049" Sr_JV="-0.42483" Sr_Sg="-0.50425" name="K1IV Star"/>
+   <WhiteRef id="K2I" JB_JV="+1.04789" Sr_JV="-0.52605" Sr_Sg="-0.92359" name="K2I Star"/>
+   <WhiteRef id="K2V" JB_JV="+0.47727" Sr_JV="-0.39897" Sr_Sg="-0.44044" name="K2V Star"/>
+   <WhiteRef id="K3II" JB_JV="+0.96966" Sr_JV="-0.52012" Sr_Sg="-0.86775" name="K3II Star"/>
+   <WhiteRef id="K3III" JB_JV="+0.75640" Sr_JV="-0.46830" Sr_Sg="-0.67507" name="K3III Star"/>
+   <WhiteRef id="K3IV" JB_JV="+0.73450" Sr_JV="-0.46265" Sr_Sg="-0.67143" name="K3IV Star"/>
+   <WhiteRef id="K4I" JB_JV="+1.20504" Sr_JV="-0.61120" Sr_Sg="-1.12198" name="K4I Star"/>
+   <WhiteRef id="K5III" JB_JV="+0.96895" Sr_JV="-0.56468" Sr_Sg="-0.92547" name="K5III Star"/>
+   <WhiteRef id="K5V" JB_JV="+0.76329" Sr_JV="-0.57955" Sr_Sg="-0.84691" name="K5V Star"/>
+   <WhiteRef id="K7V" JB_JV="+0.92538" Sr_JV="-0.62127" Sr_Sg="-1.00495" name="K7V Star"/>
+   <WhiteRef id="M0III" JB_JV="+0.97897" Sr_JV="-0.56307" Sr_Sg="-0.93738" name="M0III Star"/>
+   <WhiteRef id="M0V" JB_JV="+0.87720" Sr_JV="-0.62679" Sr_Sg="-0.97724" name="M0V Star"/>
+   <WhiteRef id="M10III" JB_JV="+0.59806" Sr_JV="-0.47760" Sr_Sg="-0.57182" name="M10III Star"/>
+   <WhiteRef id="M2I" JB_JV="+1.26946" Sr_JV="-0.67904" Sr_Sg="-1.22731" name="M2I Star"/>
+   <WhiteRef id="M2V" JB_JV="+0.99188" Sr_JV="-0.66806" Sr_Sg="-1.09188" name="M2V Star"/>
+   <WhiteRef id="M3II" JB_JV="+1.18984" Sr_JV="-0.64400" Sr_Sg="-1.14714" name="M3II Star"/>
+   <WhiteRef id="M4V" JB_JV="+1.13503" Sr_JV="-0.68291" Sr_Sg="-1.14388" name="M4V Star"/>
+   <WhiteRef id="M5III" JB_JV="+0.84095" Sr_JV="-0.51746" Sr_Sg="-0.78888" name="M5III Star"/>
+   <WhiteRef id="M5V" JB_JV="+1.20438" Sr_JV="-0.73832" Sr_Sg="-1.24846" name="M5V Star"/>
+   <WhiteRef id="O5V" JB_JV="-0.80782" Sr_JV="+0.13056" Sr_Sg="+0.93785" name="O5V Star"/>
+   <WhiteRef id="O8III" JB_JV="-0.76437" Sr_JV="+0.12255" Sr_Sg="+0.89822" name="O8III Star"/>
+   <WhiteRef id="O9V" JB_JV="-0.76201" Sr_JV="+0.15113" Sr_Sg="+0.93707" name="O9V Star"/>
+</xwrf>

@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | DynamicPSF</title>
+   <meta name="keywords" content="PSF fitting, PSF modeling, function fitting" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="A dynamic tool for interactive PSF fitting." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>DynamicPSF</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>A dynamic tool for interactive PSF fitting. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Image</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> PSF fitting, PSF modeling, function fitting</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_PSF_Model_Functions__">1.1&emsp;PSF Model Functions</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_PSF_Data__">2.1&emsp;PSF Data</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Creating_New_PSF_Fits__">2.2&emsp;Creating New PSF Fits</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Creating_New_PSF_Fits_:_Working_with_Color_images__">2.2.1&emsp;Working with Color images</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Selecting_PSF_Fits__">2.3&emsp;Selecting PSF Fits</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Removing_Items__">2.4&emsp;Removing Items</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Selecting_PSF_Model_Functions__">2.5&emsp;Selecting PSF Model Functions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Star_Detection_Parameters__">2.6&emsp;Star Detection Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Image_Scale_Parameters__">2.7&emsp;Image Scale Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Tracking_Stars__">2.8&emsp;Tracking Stars</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Regenerating_PSF_Fits__">2.9&emsp;Regenerating PSF Fits</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Sorting_PSF_Collections__">2.10&emsp;Sorting PSF Collections</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Exporting_a_Synthetic_PSF__">2.11&emsp;Exporting a Synthetic PSF</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Average_PSF_Parameters__">2.12&emsp;Average PSF Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Exporting_CSV_Files__">2.13&emsp;Exporting CSV Files</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Scripting_and_Automation__">3&emsp;Scripting and Automation</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage_Hints__">4&emsp;Usage Hints</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="margin-bottom:0.5em;" src="images/DynamicPSF.png" alt=""/>
+<p>DynamicPSF is a dynamic PixInsight tool for interactive point spread function (PSF) fitting. Although it can be used to model any point-like or relatively bright and isolated image feature, the main purpose of DynamicPSF is to fit mathematical modelling functions to star images. Once a function has been fitted to a selected image structure, DynamicPSF provides a number of useful parameters describing it, such as the coordinates of the object's centroid, mean local background, peak value, dimensions, shape, orientation and estimated quality of the fit, among others.</p>
+<p>As most dynamic PixInsight tools, DynamicPSF works in an interactive way using the resources of PixInsight's graphical interface, mainly image views and pointing devices. Typically, the user makes a mouse click on an image and DynamicPSF looks for a star (or a star-like object) around the selected coordinates. If something reasonably similar to a star can be found close to those coordinates, DynamicPSF tries to fit a three-dimensional function from a set of sampled image pixels. This operation can be repeated unlimited times on an unlimited number of images to form a set of <em>PSF collections</em> that can be further analyzed and reused.</p>
+<div class="pidoc_subsection" id="__Description_:_PSF_Model_Functions__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;PSF Model Functions</h4>
+<p>The current version of DynamicPSF can fit elliptical Gaussian and Moffat <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Moffat, A. F. J., <em>A Theoretical Investigation of Focal Stellar Images in the Photographic Emulsion and Application to Photographic Photometry</em>, Astronomy and Astrophysics, Vol. 3, p. 455 (1969)">[1]</a></sup> functions. These functions have been selected because their shapes make them particularly suitable to model stellar objects represented on most deep-sky images.</p>
+<p>DynamicPSF implements the <a href="http://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm" title="http://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm">Levenberg-Marquadt</a> algorithm as a <a href="http://en.wikipedia.org/wiki/Trust_region" title="http://en.wikipedia.org/wiki/Trust_region">model trust region</a> minimization procedure. Given sampled data consisting of two sets of independent and dependent variables, {x<sub>0</sub> &hellip; x<sub>N&ndash;1</sub>} and {y<sub>0</sub> &hellip; y<sub>N&ndash;1</sub>} respectively, the algorithm minimizes the sum of absolute differences of the model function <em>f</em> with the sampled data for a vector <strong>a</strong> of fitted function parameters:</p>
+
+<div style="text-align:center;">
+<img src="images/LMMinimizationFunction.svg" alt=""/>
+</div>
+<p>In this application the independent variables are pairs of pixel coordinates on the image, and the dependent variables are the corresponding pixel values. The underlying implementation is a custom adaptation of the MINPACK library <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+J. J. Moré, B. S. Garbow, and K. E. Hillstrom, <em>User Guide for MINPACK-1</em>, Argonne National Laboratory Report ANL-80-74, Argonne, Ill., 1980.">[2]</a></sup> <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Frédéric Devernay, <a href='http://devernay.free.fr/hacks/cminpack/cminpack.html' title='http://devernay.free.fr/hacks/cminpack/cminpack.html'>C/C++ Minpack Library</a>.">[3]</a></sup> to the PixInsight/PCL framework. Some routines also implement ideas and algorithms from other sources listed in the References section.<sup><a href="#__reference_4__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 4]<br/>
+Peter B. Stetson, <a href='http://ned.ipac.caltech.edu/level5/Stetson/Stetson_contents.html' title='http://ned.ipac.caltech.edu/level5/Stetson/Stetson_contents.html'>The Techniques of Least Squares and Stellar Photometry with CCDs</a> (A series of five lectures presented at the <em>V Escola Avancada de Astrofisica, 1989 July 30 - August 3, Aguas de Sao Pedro, Brazil</em>).">[4]</a></sup> <sup><a href="#__reference_5__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 5]<br/>
+William H. Press et al., <em>Numerical Recipes, The Art of Scientific Computing</em>, 3rd Ed., Cambridge University Press, 2007, &sect; 15.5.">[5]</a></sup></p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="gaussian_function"></a> Gaussian Function</p>
+</dt>
+<dd>
+<p>An elliptical Gaussian PSF fitting function is defined as:</p>
+
+<div style="text-align:center;">
+<img src="images/GaussianFunction.svg" alt=""/>
+</div>
+<p>where the parameters are as follows:</p>
+
+<ul class="pidoc_list">
+<li><strong>B</strong> &mdash; Average local background.</li>
+<li><strong>A</strong> &mdash; Amplitude, which is the maximum value of the fitted PSF, and also the function's value at the centroid coordinates.</li>
+<li><strong>x</strong><sub>0,</sub> <strong>y</strong><sub>0</sub> &mdash; Centroid coordinates in pixel units. This is the position of the center of symmetry of the fitted PSF.</li>
+<li><strong>&sigma;</strong><sub>x,</sub> <strong>&sigma;</strong><sub>y</sub> &mdash; Standard deviation of the Gaussian distribution on the horizontal and vertical axes, measured in pixels.</li>
+</ul>
+
+</dd>
+<dt>
+<p><a id="moffat_function"></a> Moffat Function</p>
+</dt>
+<dd>
+<p>An elliptical Moffat PSF fitting function is defined as:</p>
+
+<div style="text-align:center;">
+<img src="images/MoffatFunction.svg" alt=""/>
+</div>
+<p>where the parameters are as in the Gaussian case, and the &beta; exponent controls the overall shape of the fitting function. In the current implementation of DynamicPSF, the &beta; parameter can vary in the range ]0,10]. When &beta;=1, the above equation corresponds to a <a href="http://en.wikipedia.org/wiki/Lorentzian_function" title="http://en.wikipedia.org/wiki/Lorentzian_function">Lorentzian distribution</a>.</p>
+</dd>
+<dt>
+<p>Rotated Functions</p>
+</dt>
+<dd>
+<p>DynamicPSF also supports rotated PSF fitting functions. When the difference between &sigma;<sub>x</sub> and &sigma;<sub>y</sub> is larger than or equal to 0.01 pixel (the nominal fitting resolution), DynamicPSF fits an additional &theta; parameter, which is the rotation angle of the X axis with respect to the centroid coordinates. &theta; varies in the range [0&deg;,180&deg;[. For a rotated PSF, the x and y coordinates in the equations above must be replaced by their rotated counterparts x' and y', respectively:</p>
+
+<div style="text-align:center;">
+<img src="images/RotationFunction.svg" alt=""/>
+</div>
+<p>Rotation angles are measured in counter-clockwise direction, and can be represented either as unsigned values in the [0&deg;,180&deg;[ range, or as signed quantities in the [&ndash;90&deg;,+90&deg;] range. In all cases the functions are fitted to ensure that &sigma;<sub>x</sub> &ge; &sigma;<sub>y.</sub></p>
+</dd>
+<dt>
+<p>Graphical Function Representations</p>
+</dt>
+<dd>
+<p>Graphical representations are the best way to understand the geometries of different PSF fitting functions and how they change by varying their parameters. The figure below represents several functions graphically. Two-dimensional representations have been generated by running the following script in PixInsight:</p>
+
+<pre class="code"><span class="pidoc_sh_preprocessor">#include &lt;pjsr/UndoFlag.jsh&gt;</span>
+
+<span class="pidoc_sh_keyword">function</span> <span class="pidoc_sh_function">filterToImage</span>( filter, id )
+{
+   <span class="pidoc_sh_keyword">var</span> w = <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">ImageWindow</span>( <span class="pidoc_sh_number">1</span>, <span class="pidoc_sh_number">1</span> );
+   <span class="pidoc_sh_keyword">var</span> v = w.mainView;
+   v.<span class="pidoc_sh_function">beginProcess</span>( UndoFlag_NoSwapFile );
+   v.image.<span class="pidoc_sh_function">assign</span>( filter.<span class="pidoc_sh_function">toImage</span>() );
+   v.id = id;
+   v.<span class="pidoc_sh_function">endProcess</span>();
+   w.<span class="pidoc_sh_function">show</span>();
+   w.<span class="pidoc_sh_function">zoomToFit</span>();
+}
+
+<span class="pidoc_sh_preprocessor">#define FILTER_SIZE  101</span>
+
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">gaussianFilterBySize</span>( FILTER_SIZE ), <span class="pidoc_sh_quotation">"Gaussian"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( FILTER_SIZE, <span class="pidoc_sh_number">1.5</span> ), <span class="pidoc_sh_quotation">"Moffat_15"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">moffatFilterBySize</span>( FILTER_SIZE, <span class="pidoc_sh_number">4.0</span> ), <span class="pidoc_sh_quotation">"Moffat_40"</span> );
+<span class="pidoc_sh_function">filterToImage</span>( <span class="pidoc_sh_object">Matrix</span>.<span class="pidoc_sh_function">gaussianFilterBySize</span>( FILTER_SIZE, <span class="pidoc_sh_number">0.01</span>,
+                                            <span class="pidoc_sh_number">0.5</span>, <span class="pidoc_sh_object">Math</span>.<span class="pidoc_sh_function">rad</span>( <span class="pidoc_sh_number">45</span> ) ), <span class="pidoc_sh_quotation">"GaussianRotated"</span> );</pre>
+
+<p>The script represents four PSF fitting functions (those included in the following figure) as new image windows. This script can be easily modified to represent other Gaussian and Moffat functions with different parameters. Once we have the functions represented as images, the standard 3DPlot script can be used in PixInsight to generate high-quality, three-dimensional renditions.</p>
+
+<div class="pidoc_figure" style="margin-top:1em;">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div class="pidoc_group">
+<img style="float:left;" src="images/GaussianFunction2D.png" alt=""/>
+<img style="float:left;" src="images/GaussianFunction3D.png" alt=""/>
+
+<div class="pidoc_group" style="float:left;">
+<p>Gaussian function.</p>
+</div>
+</div>
+
+<div class="pidoc_group">
+<img style="float:left;" src="images/Moffat15Function2D.png" alt=""/>
+<img style="float:left;" src="images/Moffat15Function3D.png" alt=""/>
+
+<div class="pidoc_group" style="float:left;">
+<p>Moffat function, &beta;=1.5.</p>
+</div>
+</div>
+
+<div class="pidoc_group">
+<img style="float:left;" src="images/Moffat40Function2D.png" alt=""/>
+<img style="float:left;" src="images/Moffat40Function3D.png" alt=""/>
+
+<div class="pidoc_group" style="float:left;">
+<p>Moffat function, &beta;=4.</p>
+</div>
+</div>
+
+<div class="pidoc_group">
+<img style="float:left;" src="images/GaussianFunctionRotated2D.png" alt=""/>
+<img style="float:left;" src="images/GaussianFunctionRotated3D.png" alt=""/>
+
+<div class="pidoc_group" style="float:left;">
+<p>Gaussian function, &sigma;<sub>x</sub> = 2&sigma;<sub>y,</sub> &theta; = 45&deg;.</p>
+</div>
+</div>
+</div>
+</dd>
+<dt>
+<p>Full Width at Half Maximum (FWHM)</p>
+</dt>
+<dd>
+<p>For all PSF model functions DynamicPSF computes two additional <em>full width at half maximum</em> (FWHM) values:</p>
+
+<ul class="pidoc_list">
+<li><strong>FWHM</strong><sub>x</sub> &mdash; The FWHM on the X axis.</li>
+<li><strong>FWHM</strong><sub>y</sub> &mdash; The FWHM on the Y axis. For circular (undistorted, unrotated) functions, we have FWHM<sub>y</sub> = FWHM<sub>x.</sub></li>
+</ul>
+
+<p>The FWHM is a well-known, standardized and easy to understand measurement of the size of a star as seen on the image. It is the width in pixels of the fitted function, measured horizontally at half its height. The FWHM on the X axis is given by:</p>
+
+<div style="text-align:center;">
+<img src="images/FWHMx.svg" alt=""/>
+</div>
+<p>respectively for Gaussian and Moffat fitting functions, with similar expressions for the Y axis by replacing &sigma;<sub>x</sub> with &sigma;<sub>y.</sub> Note that FWHM measurements for Gaussian and Moffat functions are in general not compatible and should not be mutually compared.</p>
+</dd>
+<dt>
+<p><a id="goodness_of_fit"></a> Goodness of Fit</p>
+</dt>
+<dd>
+<p>For each fitted PSF DynamicPSF provides an estimate of the <em>goodness of fit</em>, or how well the computed PSF function agrees with the actual image pixels that have been sampled to perform the function fitting process. In the current version of DynamicPSF a <em>mean absolute difference</em> (MAD) function is computed for this purpose:</p>
+
+<div style="text-align:center;">
+<img src="images/MADFunction.svg" alt=""/>
+</div>
+<p>where <em>f</em> represents the fitted function and the <em>I</em><sub>i</sub> elements are the sampled pixels from the original image. The MAD function is intended to provide a robust estimate of the suitability of a model function and its fitted parameters to represent the actual sampled data. MAD estimates should be used to remove <em>outliers</em> from the set of fitted objects during a DynamicPSF session. In this context, outliers correspond to poorly sampled objects, such as saturated or too dim objects, or objects of the wrong type (e.g. nonstellar objects such as small background galaxies) that can contaminate the computed average PSF.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>You can start a DynamicPSF session in the usual way for dynamic tools in PixInsight: either directly from the Process Explorer window, where you'll find DynamicPSF under the Image category, or from an existing instance of the DynamicPSF process, such as a process icon or a processing history item. When you launch the process, the DynamicPSF interface is shown and activated.</p>
+<p>DynamicPSF works with <em>PSF collections</em>. Each collection groups a set of PSF fits performed on a particular image. You can perform an unlimited number of PSF fits on an unlimited number of images. Usually you'll work with a single image, but multiple collections allow you to compare PSF estimates for different images directly in a DynamicPSF session.</p>
+<div class="pidoc_subsection" id="__Usage_:_PSF_Data__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;PSF Data</h4>
+<p>The first and largest control on the DynamicPSF interface is a tree box control where the data for all fitted PSF model functions are shown in a hierarchical way. In the first hierarchy level we have PSF collections. There is one PSF collection item for each image involved in the current DynamicPSF session. Each PSF collection can have an unlimited number of <em>star item</em> descendants. Each star item, in turn, has one or more <em>PSF fits</em> performed for the same object, whose parameters are listed in the corresponding rows of the tree box. For color images, each channel is treated as a separate image, so there can be one, two or three PSF fits performed with the same parameters for each nominal channel of a RGB color image.</p>
+<p>The following table describes all the data items provided by the current version of DynamicPSF.</p>
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1<br/>
+PSF Data Items</span></caption>
+<tr>
+<th><p>Parameter</p>
+</th>
+<th><p>Description</p>
+</th>
+</tr>
+<tr>
+<td><p>Function type</p>
+</td>
+<td><p>Name of the PSF model function. The following functions are supported: Gaussian, Moffat (corresponding to a Moffat function with a variable (that is, automatically determined) beta exponent), Moffat10, Moffat8, Moffat6, Moffat4, Moffat25, Moffat15 (Moffat functions with fixed beta exponents of 10, 8, 6, 4, 2.5 and 1.5, respectively) and Lorentzian (beta=1).</p>
+</td>
+</tr>
+<tr>
+<td><p>Ch</p>
+</td>
+<td><p>Channel index of this fitted PSF: 0 for grayscale and red, 1 for green and 2 for blue.</p>
+</td>
+</tr>
+<tr>
+<td><p>B</p>
+</td>
+<td><p>Local background in the [0,1] range.</p>
+</td>
+</tr>
+<tr>
+<td><p>A</p>
+</td>
+<td><p>Amplitude. This is the peak value of the fitted function, located at the centroid coordinates.</p>
+</td>
+</tr>
+<tr>
+<td><p>cx</p>
+</td>
+<td><p>Horizontal (X axis) coordinate of the centroid in pixels, in the image coordinate system.</p>
+</td>
+</tr>
+<tr>
+<td><p>cy</p>
+</td>
+<td><p>Vertical (Y axis) coordinate of the centroid in pixels, in the image coordinate system.</p>
+</td>
+</tr>
+<tr>
+<td><p>sx</p>
+</td>
+<td><p>Size of the fitted function on the X axis in PSF coordinates, expressed in pixels. This is the &sigma;<sub>x</sub> parameter in the equations for the <a href="#gaussian_function">Gaussian</a> and <a href="#moffat_function">Moffat</a> functions.</p>
+</td>
+</tr>
+<tr>
+<td><p>sy</p>
+</td>
+<td><p>Size of the fitted function on the Y axis in PSF coordinates, expressed in pixels. This is the &sigma;<sub>x</sub> parameter in the equations for the <a href="#gaussian_function">Gaussian</a> and <a href="#moffat_function">Moffat</a> functions.</p>
+</td>
+</tr>
+<tr>
+<td><p>FWHMx</p>
+</td>
+<td><p>Full width at half maximum on the X axis in PSF coordinates, expressed either in pixels or arcseconds, depending on the current settings in the <a href="#image_scale_parameters">Image Scale</a> section.</p>
+</td>
+</tr>
+<tr>
+<td><p>FWHMy</p>
+</td>
+<td><p>Full width at half maximum on the Y axis in PSF coordinates, expressed either in pixels or arcseconds, depending on the current settings in the <a href="#image_scale_parameters">Image Scale</a> section.</p>
+</td>
+</tr>
+<tr>
+<td><p>r</p>
+</td>
+<td><p>Aspect ratio. This is the quotient sy/sx. Since sx &ge; sy by design, this parameter is always &le; 1.</p>
+</td>
+</tr>
+<tr>
+<td><p>theta</p>
+</td>
+<td><p>Rotation angle of the X axis of PSF coordinates in degrees, with respect to the X axis in the image coordinate system and center in the centroid position. The rotation angle can be shown either as an unsigned quantity in the range [0&deg;,180&deg;[, or as a signed angle in the range [&ndash;90&deg;,+90&deg;], depending on the current state of the <em>signed angles</em> option (see the <a href="#psf_model_functions">PSF Model Functions section</a>). When signed angles are shown, the counter-clockwise direction is positive and the clockwise direction is negative.</p>
+</td>
+</tr>
+<tr>
+<td><p>beta</p>
+</td>
+<td><p>The beta exponent of <a href="#moffat_function">Moffat PSF model functions</a> in the range ]0,10].</p>
+</td>
+</tr>
+<tr>
+<td><p>MAD</p>
+</td>
+<td><p><a href="#goodness_of_fit">Mean absolute difference</a> between the fitted PSF model function and the actual pixel values in the sampled PSF region. This is an estimate of fitting quality: the smaller this value, the better the achieved function fit.</p>
+</td>
+</tr>
+</table>
+
+<p>For circular functions, the <em>sy,</em> <em>FWHMy,</em> <em>r</em> and <em>theta</em> data items are not provided. For Gaussian functions the <em>beta</em> item is not provided.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Creating_New_PSF_Fits__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Creating New PSF Fits</h4>
+<p>A new PSF fitting process is performed when you click on an image and release the pointing device without dragging. If there are no PSF fits for the image where you clicked, a new PSF collection is created. A new <em>star item</em> is then created and appended at the end of the corresponding PSF collection, either a newly created or an already existing collection. Note that, depending on the selected options in <a href="#psf_model_functions">PSF Model Functions section</a>, this operation can create one or several PSF fits for the same object. As we have said before, you can repeat this operation unlimited times.</p>
+<img src="images/CreateNewPSFFits.png" alt=""/>
+<p>When you click on an image to create a new PSF fit, DynamicPSF automatically looks for the nearest small-scale, bright and concentrated image structure, so you don't have to click at any exact location; just clicking around a star is sufficient. The object detection routine is both <em>robust</em> and <em>stable.</em> It doesn't matter where you click on the image; as far as you click reasonably close to an object of interest, the routine will always converge at the same pixel coordinates and the fitted PSF parameters will always be the same for a given object, irrespective of the initial search location.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="float:left;margin-right:1.25em;" src="images/PSFCoordinates.png" alt=""/>
+<p>For each PSF fit, DynamicPSF generates a set of vector graphics elements on the target image. The PSF coordinate system is rotated by the angle &theta; with respect to the image coordinate system. In a three-dimensional representation of the PSF model function, the Z axis is perpendicular to the <em>image plane</em> (the XY plane), and Z coordinates correspond to image pixel values. The plotted ellipse represents the intersection between the 3D PSF model function and a plane parallel to the image plane, elevated by half the maximum value of the function. This defines the <em>full width at half maximum</em> on the X and Y directions, FWHMx and FWHMy, respectively.<br class="pidoc_clearfix"/></p>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Creating_New_PSF_Fits_:_Working_with_Color_images__">
+   <h5 class="pidoc_subsectionTitle">2.2.1&emsp;Working with Color images</h5>
+<p>When working with color images, three PSF fits are created by default for each fitted star, one for each nominal RGB channel (alpha channels are always ignored). You can restrict creation of new PSF fits for a particular channel by selecting it for display on the target image. For example, if you select the green channel (using the channel selector combo box, or pressing Ctrl+Shift+G), only one PSF fit will be created for that channel.</p>
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Selecting_PSF_Fits__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Selecting PSF Fits</h4>
+<p>You can select existing PSF fits in several ways:</p>
+
+<ul class="pidoc_list">
+<li>By clicking within an existing PSF fit on the image. Each PSF fit is plotted as an ellipse inside a bounding rectangle. To select a PSF fit you have to click inside its bounding rectangle. Hold the Shift key pressed while you click to add a PSF fit to the current selection.</li>
+<li class="pidoc_spaced_list_item">By clicking on the image and dragging to define a selection rectangle. All existing PSF fits within the selection rectangle will be selected.</li>
+<li class="pidoc_spaced_list_item">Using the tree box control on the DynamicPSF interface. You can click on a row of the tree box to select the corresponding star item and/or associated PSF fit(s), Shift+click or click and drag to define multiple selections, etc.</li>
+</ul>
+
+<p>Selected PSF fits are plotted with a special color on the image (green by default). Note that the current selection is always coherent between the vector graphics plotted on the image(s) and the items in the DynamicPSF interface.</p>
+<img src="images/SelectPSFFits.png" alt=""/>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Removing_Items__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Removing Items</h4>
+
+<div style="text-align:center;">
+<img src="images/RemoveSelectedItems.png" alt=""/>
+</div>
+<p>PSF fits can be removed in two ways:</p>
+
+<ul class="pidoc_list">
+<li>By clicking the <em>Remove</em> button. This will delete all selected objects, which can be star items (each item with one or more PSF fits) and/or individual PSF fits, depending on the current selection.</li>
+<li class="pidoc_spaced_list_item">By defining a selection and pressing the Del or Backspace key. This works in the same way as the Remove button described above.</li>
+</ul>
+
+<p>Be careful as item removal operations cannot be undone.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Selecting_PSF_Model_Functions__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;<a id="psf_model_functions"></a>Selecting PSF Model Functions</h4>
+
+<div style="text-align:center;">
+<img src="images/PSFModelFunctionsSection.png" alt=""/>
+</div>
+<p>The <em>PSF Model Functions</em> section of the DynamicPSF interface allows you to select one or more PSF model functions to use in new PSF fits. The following options are available:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Auto</p>
+</dt>
+<dd>
+<p>Select this option to let DynamicPSF find the best model function for each fitted object. When this option is selected, DynamicPSF fits a Gaussian function and one or several Moffat functions, with variable or fixed &beta; exponent, and selects the function that best reproduces the sampled image data. This is the default option. Note that when this option is selected, the Gaussian and Moffat options (see below) are unavailable.</p>
+</dd>
+<dt>
+<p>Gaussian</p>
+</dt>
+<dd>
+<p>Select this option to fit <a href="#gaussian_function">Gaussian PSF model functions</a>.</p>
+</dd>
+<dt>
+<p>Moffat</p>
+</dt>
+<dd>
+<p>Select this option to fit <a href="#moffat_function">Moffat PSF model functions</a> with variable (that is, fitted) &beta; parameters.</p>
+</dd>
+<dt>
+<p>Moffat10, Moffat8, Moffat6, Moffat4, Moffat25, Moffat15, Lorentzian</p>
+</dt>
+<dd>
+<p>Select one or more of these options to fit Moffat PSF model functions with fixed &beta; parameters of 10, 8, 6, 4, 2.5, 1.5 and 1.0, respectively (a Lorentzian function is equivalent to a Moffat function with &beta;=1).</p>
+</dd>
+<dt>
+<p>Circular PSF</p>
+</dt>
+<dd>
+<p>Select this option to fit circular PSF functions. Disable it to fit elliptical functions. An elliptical function provides two separate axes and a rotation angle. In general, elliptical functions are preferable because they provide more information about the true shapes and orientations of the fitted PSFs. Sometimes, however, circular functions may be preferable. For example, strongly undersampled images usually don't provide enough data to fit elliptical functions reliably. Uncertainty due to high noise levels also affects complex function fittings adversely. In such cases a circular function can provide more robust and useful results. Elliptical PSF functions are fitted by default.</p>
+</dd>
+<dt>
+<p>Signed angles</p>
+</dt>
+<dd>
+<p>When this option is enabled, rotation angles are shown as <em>signed</em> values in the [&ndash;90&deg;,+90&deg;;] range. When this option is disabled, rotation angles are represented as unsigned quantities in the [0&deg;,180&deg;[ range. Signed angles are useful to prevent ambiguities introduced by small rotations around zero degrees. These 'oscillatory' rotations occur frequently due to uncertainty in fitting rotation angles for nearly circular stars. For example, imagine a set of PSF fits where we have two subsets with rotations around zero and 180&deg;. If we compute average PSF parameters, the resulting average rotation would be around 90&deg;. This may be incorrect if both subsets are actually due to dispersion caused by fitting uncertainty, in which case the correct average rotation would be a value close to zero degrees. This option is enabled by default.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Star_Detection_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.6&emsp;Star Detection Parameters</h4>
+
+<div style="text-align:center;">
+<img src="images/StarDetectionSection.png" alt=""/>
+</div>
+<p>The <em>Star Detection</em> section provides options to control how DynamicPSF searches and detects stellar objects for PSF fitting:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="search_radius"></a> Search radius</p>
+</dt>
+<dd>
+<p>This parameter determines the size in pixels of the initial search box used to detect stars when you clic on an image. Increase it to favor detection of larger stars. Decrease it to facilitate selection of smaller stars. For example, a smaller search radius may be necessary to deal with dense star fields. The valid range is from one to 127 pixels. The default value of eight pixels is quite appropriate in most cases.</p>
+</dd>
+<dt>
+<p><a id="background_threshold"></a> Background threshold</p>
+</dt>
+<dd>
+<p>Threshold value for rejection of background pixels, in sigma units. This value is used by the object detection routine to classify sampled pixels into two disjoint sets: pixels belonging to the local background, and pixels belonging to the object being detected. A smaller threshold value makes the star detection routine less sensitive. This can be useful to avoid detection of very faint objects. On the other hand, a higher threshold allows you to isolate very small and faint objects, which may or may not be a good idea, depending on what you want to do and on the image you are working with. This parameter can range from 0.05 to 5 in sigma units. The default value of one sigma is normally appropriate in most cases.</p>
+</dd>
+<dt>
+<p><a id="automatic_aperture"></a> Automatic aperture</p>
+</dt>
+<dd>
+<p>A PSF fitting process uses a square <em>sampling region</em> around the fitted object to gather a set of source image pixels. Then a PSF model function is fitted to minimize the difference with the sampled source pixels. When this option is enabled, DynamicPSF computes optimal sampling dimensions adaptively for each fitted star.</p>
+<p>If the sampling region is too small, the local background cannot be determined accurately, and hence the PSF fit will be less accurate. If the sampling region is too large, pixels from nearby objects can contaminate the sample, and computation times grow unnecessarily (bear in mind that they are proportional to the <em>square</em> of the sampling size). The automatic aperture feature of DynamicPSF implements a fast and robust algorithm to find the smallest sampling region necessary to minimize uncertainty in the evaluation of the local background. This option is enabled by default. Disabling it is <em>not recommended</em> under normal working conditions, and can lead to a significant degradation in performance and fitting accuracy.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Image_Scale_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.7&emsp;<a id="image_scale_parameters"></a>Image Scale Parameters</h4>
+
+<div style="text-align:center;">
+<img src="images/ImageScaleSection.png" alt=""/>
+</div>
+<p>This section allows you to specify the scale of the image in arcseconds per pixel. When the image scale is available, DynamicPSF represent FWHM values directly in arcseconds, instead of pixels. The following parameters can be used for this purpose:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Scale mode</p>
+</dt>
+<dd>
+<p>Defines a method to compute the image scale. Can be one of:</p>
+
+<ul class="pidoc_list">
+<li><strong>Standard FITS keywords.</strong> If this mode is selected, DynamicPSF will try to read standard FOCALLEN, XPIXSZ and YPIXSZ FITS header keywords to compute the image scale in arcseconds per pixel. If these keywords are not present or contain invalid values, no image scale is computed and FWHM is expressed in pixels.</li>
+<li><strong>Literal value.</strong> This mode allows you to enter the image scale directly in arcseconds per pixel (see the next parameter).</li>
+<li><strong>Custom FITS keyword.</strong> This mode allows you to specify the name of a custom FITS keyword whose value is the image scale in arcseconds per pixel.</li>
+<li><strong>Pixels.</strong> This will ignore image scale to show FWHM in pixel units. This is the default option.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Image scale</p>
+</dt>
+<dd>
+<p>When the <em>literal value</em> mode is selected, this control allows you to enter the image scale in arcseconds per pixel. Note that this value will be used for all the images involved in the current DynamicPSF session.</p>
+</dd>
+<dt>
+<p>Custom keyword</p>
+</dt>
+<dd>
+<p>When the <em>custom FITS keyword</em> mode is selected, this control allows you to enter the name of the special FITS header keyword that provides the image scale in arcseconds per pixel. If the specified keyword is not available, image scale will be ignored and FWHM will be shown in pixel units.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Tracking_Stars__">
+   <h4 class="pidoc_subsectionTitle">2.8&emsp;Tracking Stars</h4>
+
+<div style="text-align:center;">
+<img src="images/TrackStars.png" alt=""/>
+</div>
+<p>When the <em>Track Stars</em> option is enabled (button pushed), DynamicPSF automatically centers the selected star on its corresponding target image and brings the corresponding view to the top of PixInsight's workspace, if necessary. This is very useful to work at high magnifications, as it frees you from having to zoom in/out and pan the images when you are reviewing a set of PSF fits. This option is disabled by default.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Regenerating_PSF_Fits__">
+   <h4 class="pidoc_subsectionTitle">2.9&emsp;Regenerating PSF Fits</h4>
+
+<div style="text-align:center;">
+<img src="images/RegeneratePSFFits.png" alt=""/>
+</div>
+<p>You can <em>regenerate</em> existing PSF fits, which allows you to calculate new PSF parameters after changing some parameters in the <a href="#psf_model_functions">PSF Model Functions</a> section. For example, suppose you have generated a number of PSF fits using elliptical functions. Later you decide to fit circular functions for the same stars. You don't need to remove the previous fits and perform the tedious (and error prone) task of redefining new ones; just select the corresponding option (<em>circular functions</em>) and regenerate the PSF fits that you have already defined. You can regenerate in two ways:</p>
+
+<ul class="pidoc_list">
+<li><strong>Regenerate selected stars.</strong> Click this button to recalculate only the set of selected PSF fits.</li>
+<li><strong>Regenerate all.</strong> Click this button to recalculate all PSF fits, irrespective of the current selection.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Sorting_PSF_Collections__">
+   <h4 class="pidoc_subsectionTitle">2.10&emsp;Sorting PSF Collections</h4>
+
+<div style="text-align:center;">
+<img src="images/SortPSFCollections.png" alt=""/>
+</div>
+<p>The <em>Sort Stars</em> button allows you to sort all the existing PSF fits in ascending order by selectable criteria. When you click this button, the Sort PSF Collections dialog opens as shown below.</p>
+
+<div style="text-align:center;">
+<img src="images/SortPSFCollectionsDialog.png" alt=""/>
+</div>
+<p>On this dialog you can select one of the following sorting criteria:</p>
+
+<ul class="pidoc_list">
+<li><strong>Star Id.</strong> Each PSF fit is assigned an identifier, which is a running number that is unique within its parent PSF collection. Sorting by identifier classifies the PSF fits by creation order.</li>
+<li class="pidoc_spaced_list_item"><strong>Background.</strong> Sorts PSF fits by the <em>mean local background</em> parameter (B).</li>
+<li class="pidoc_spaced_list_item"><strong>Amplitude.</strong> Sorts PSF fits by the <em>amplitude</em> parameter (A), which is the peak value of the fitted PSF model function.</li>
+<li class="pidoc_spaced_list_item"><strong>Standard</strong> deviation. Sorts PSF fits by their sizes. Note that the size in the X axis (PSF coordinates) is always used, that is the <em>sx</em> data item. Sorting by this criterion is equivalent to sorting by FWHM.</li>
+<li class="pidoc_spaced_list_item"><strong>Aspect ratio.</strong> Sorts by the quotient sy/sx (r data item), that is by the <em>degree of distortion</em> of the fitted PSF model function.</li>
+<li class="pidoc_spaced_list_item"><strong>Rotation angle.</strong> Sorts by the rotation angles of fitted PSF model functions (theta parameter). Note that the resulting order depends on whether <em>signed angles</em> are being used in the range [&ndash;90&deg;,+90&deg;] or unsigned angles in [0&deg;,180&deg;[. Circular functions are considered to have a zero rotation angle, and are sorted accordingly.</li>
+<li class="pidoc_spaced_list_item"><strong>Rotation angle (absolute value).</strong> Same as the preceding criterion, but angles are evaluated in the [0&deg;,180&deg;[ range, irrespective of the current state of the <em>signed angles</em> option.</li>
+<li class="pidoc_spaced_list_item"><strong>Beta exponent.</strong> Sorts by the Moffat beta parameter. Gaussian functions are assumed to have a zero beta exponent, and hence are always placed at the top of the list when this sorting criterion is used.</li>
+<li class="pidoc_spaced_list_item"><strong>Mean absolute difference.</strong> Sorts by the MAD data item. This is the default sorting criterion. Use it to classify PSF fits by their <a href="#goodness_of_fit">quality estimates</a>.</li>
+</ul>
+
+<p>Sorting your PSF collections is very useful to find and remove <em>outliers</em> in the sets of fitted stars. The most obvious use of this feature is to sort by fitting quality (the default MAD sorting criterion). MAD estimates allow you to easily <em>cut</em> the lists of PSF fits below a given quality limit. However, other sorting criteria can provide more sophisticated ways to detect incorrect PSF fits that may be difficult to evidence otherwise. For example, if you know that your tracking is accurate and hence all of the stars in your image should have nearly circular shapes, then if there are some objects fitted with relatively small aspect ratios&mdash;even if they show pretty low MAD values&mdash;, they are clearly nonstellar objects or spurious image features that should be removed from your PSF collections.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Exporting_a_Synthetic_PSF__">
+   <h4 class="pidoc_subsectionTitle">2.11&emsp;<a id="exporting_a_synthetic_psf"></a>Exporting a Synthetic PSF</h4>
+
+<div style="text-align:center;">
+<img src="images/ExportSyntheticPSF.png" alt=""/>
+</div>
+<p>By clicking the <em>Export Synthetic PSF</em> button, DynamicPSF will generate a new image window with an <em>average PSF</em> computed for the current set of selected PSF fits (you have to select at least one fit for this function to work). Note that the generated PSF image is <em>not</em> the result of averaging all PSF function parameters, but something much more robust and accurate. DynamicPSF generates a synthetic PSF by rendering all fitted PSF model functions superposed by transparency over a black canvas, large enough to accomodate the largest PSF, and all of them centered at their centroid positions. This effectively works as if you had acquired all of the fitted stars centered in the same field of view with multiple exposures of a hypothetical CCD camera, able to accumulate the light from all of them without saturation. The main advantage of this method is that the generated PSF image is almost immune to small variations, and hence very accurate to represent the actual PSF of the image; this quality is what we denote as <em>robustness</em> in this context.</p>
+<p>A synthetic PSF is the recommended way to generate a PSF image that can be used with PixInsight's <a href="../../tools/Deconvolution/Deconvolution.html" title="../../tools/Deconvolution/Deconvolution.html">Deconvolution</a> tool as an <em>external PSF</em>. In general, this method provides the best results to deconvolve an image because the obtained PSF is usually very accurate. Achieving similar accuracy by trial and error work with parametric PSFs is a difficult and time consuming task.</p>
+<img src="images/SyntheticPSFExample.jpg" alt=""/>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Average_PSF_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.12&emsp;Average PSF Parameters</h4>
+
+<div style="text-align:center;">
+<img src="images/AveragePSFParameters.png" alt=""/>
+</div>
+<p>DynamicPSF also allows you to read <em>average PSF parameters</em> for the set of selected PSF fits. This is only possible when the selected PSF fits are <em>congruent,</em> that is when the selected set only contains either Gaussian or Moffat modelling functions. When you click the <em>Average PSF Parameters</em> button the Average Star Data dialog opens and shows a list of parameter values calculated by averaging the set of selected fits, as shown in the following screenshot.</p>
+
+<div style="text-align:center;">
+<img src="images/AverageStarDataDialog.png" alt=""/>
+</div>
+<p>The Average Star Data dialog also has a button to generate a new PSF image computed from average parameters. Note that this has <em>nothing</em> to do with the average PSF image generated when you <a href="#exporting_a_synthetic_psf">export a synthetic PSF</a>, which is much more accurate and robust.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Exporting_CSV_Files__">
+   <h4 class="pidoc_subsectionTitle">2.13&emsp;Exporting CSV Files</h4>
+
+<div style="text-align:center;">
+<img src="images/ExportCSVFile.png" alt=""/>
+</div>
+<p>The <a href="http://en.wikipedia.org/wiki/Comma-separated_values" title="http://en.wikipedia.org/wiki/Comma-separated_values">comma separated value format</a> (CSV) is a well-known, de facto standard to share data among applications. It is a rather simple format consisting of plain text data items separated with a delimiter, usually a comma character. The fact that virtually all spreadsheet and database management systems support CSV has encouraged us to implement it, as the best way to export fitted PSF parameters that can be further analyzed with other software applications.</p>
+<p>CSV files exported by the DynamicPSF tool in PixInsight have the following properties and organization:</p>
+
+<ul class="pidoc_list">
+<li>Exported .csv files are plain ASCII text files.</li>
+<li>The data delimiter is a single comma character (ASCII code 44<sub>10</sub> = 2C<sub>16).</sub></li>
+<li>The decimal separator is a single period character (ASCII code 46<sub>10</sub> = 2E<sub>16).</sub></li>
+<li>The first line of an exported .csv file contains the names of the data items, namely: &quot;ViewId,StarId,Channel,Function,B,A,cx,cy,sx,sy,FWHMx,FWHMy,unit,r,theta,beta,MAD&quot;</li>
+<li>Each one of the rest of lines contains the data for a PSF fit. Note that the first item of each line is the identifier of the source view.</li>
+</ul>
+
+<p>The block of text below shows an example CSV file generated with DynamicPSF:</p>
+
+<pre>ViewId,StarId,Channel,Function,B,A,cx,cy,sx,sy,FWHMx,FWHMy,unit,r,theta,beta,MAD
+NGC1808_L,28,0,Moffat,0.010567,0.037276,995.48,1533.27,4.54,4.21,3.69,3.42,px,0.926,50.29,4.53,2.823e-03
+NGC1808_L,7,0,Moffat,0.010599,0.027557,1427.22,579.95,4.88,4.31,3.76,3.32,px,0.884,58.90,5.01,2.823e-03
+NGC1808_L,22,0,Moffat,0.010589,0.035163,1917.89,1228.73,5.05,4.53,3.79,3.39,px,0.896,52.51,5.27,3.120e-03
+NGC1808_L,4,0,Moffat,0.010674,0.017232,1520.77,772.01,4.66,4.19,3.69,3.32,px,0.899,55.69,4.76,3.146e-03
+NGC1808_L,30,0,Gaussian,0.011444,0.408243,672.41,706.42,1.70,1.70,4.01,4.01,px,1.000,0.00,0.00,3.206e-03
+NGC1808_L,19,0,Moffat,0.010816,0.017442,1798.46,772.15,4.74,4.15,3.75,3.28,px,0.877,57.03,4.77,3.376e-03
+NGC1808_L,31,0,Gaussian,0.011924,0.648031,1876.11,380.91,1.67,1.67,3.93,3.93,px,1.000,0.00,0.00,3.386e-03
+NGC1808_L,25,0,Moffat,0.010521,0.012280,1220.03,611.32,4.43,4.05,3.65,3.34,px,0.914,55.97,4.42,3.567e-03
+NGC1808_L,6,0,Moffat,0.010647,0.016519,1320.62,714.95,4.87,4.38,3.68,3.32,px,0.901,57.33,5.17,3.825e-03
+NGC1808_L,32,0,Moffat,0.010511,0.013898,1297.07,424.24,4.66,4.66,3.62,3.62,px,1.000,0.00,4.94,4.928e-03
+NGC1808_L,11,0,Moffat,0.010764,0.008830,1437.17,1169.46,4.67,3.98,3.79,3.23,px,0.851,55.29,4.55,5.594e-03</pre>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Scripting_and_Automation__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Scripting and Automation</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Scripting_and_Automation', this );">[hide]</p>
+   <div id="Scripting_and_Automation">
+<p>The DynamicPSF process can be easily automated via scripting with the PixInsight JavaScript Runtime (PJSR). This allows you to apply a predefined DynamicPSF instance (e.g., as a process icon) to a set of co-registered images of the same region of the sky. This type of batch procedures can be implemented to perform a variety of analysis tasks such as image grading, automated PSF evaluation, seeing and optical performance anaylisis, etc.</p>
+<p>To automate DynamicPSF execution, a script must invoke the <span class="pidoc_code">executeGlobal</span> method of a DynamicPSF instance. By setting appropriate process parameters before this call, the script can force one or more target images and control regeneration of all the PSF fits defined in the instance. DynamicPSF provides the following useful parameters for scripting:</p>
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_2__"></a>
+<span class="pidoc_table_title">Table 2</span></caption>
+<tr>
+<td><p><strong><span class="pidoc_code">views</span></strong> (Table)</p>
+</td>
+<td><p>This table has a single column of string type. Each row in this table specifies the identifier of a target view where the DynamicPSF instance will perform PSF fits.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">stars</span></strong> (Table)</p>
+</td>
+<td><p>Each row in this table corresponds to a fitted object. This table has the following columns:</p>
+
+<table class="pidoc_table" style="margin-top:1em;width:100%;">
+<caption><a id="__table_3__"></a>
+<span class="pidoc_table_title">Table 3</span></caption>
+<tr>
+<td><p><strong><span class="pidoc_code">viewIndex</span></strong> (UInt32)</p>
+</td>
+<td><p>The index of the target view in the <span class="pidoc_code">views</span> table.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">channel</span></strong> (Int32)</p>
+</td>
+<td><p>The channel index.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">status</span></strong> (Enumeration)</p>
+</td>
+<td><p>Exit status of the star detection routine. Can be one of:</p>
+<p>DynamicPSF.prototype.Star_NotDetected<br/>
+ DynamicPSF.prototype.Star_DetectedOk<br/>
+ DynamicPSF.prototype.Star_NoSignificantData<br/>
+ DynamicPSF.prototype.Star_CrossingEdges<br/>
+ DynamicPSF.prototype.Star_OutsideImage<br/>
+ DynamicPSF.prototype.Star_NoConvergence<br/>
+ DynamicPSF.prototype.Star_UnknownError</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">x0</span></strong> (Int32)</p>
+</td>
+<td><p>Horizontal coordinate of the top left corner of the star sampling region.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">y0</span></strong> (Int32)</p>
+</td>
+<td><p>Vertical coordinate of the top left corner of the star sampling region.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">x1</span></strong> (Int32)</p>
+</td>
+<td><p>Horizontal coordinate of the bottom right corner of the star sampling region.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">y1</span></strong> (Int32)</p>
+</td>
+<td><p>Vertical coordinate of the top bottom right of the star sampling region.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">x</span></strong> (Float)</p>
+</td>
+<td><p>Horizontal coordinate of the star's barycenter.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">y</span></strong> (Float)</p>
+</td>
+<td><p>Vertical coordinate of the star's barycenter.</p>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">psf</span></strong> (Table)</p>
+</td>
+<td><p>Each row in this table corresponds to a PSF fit. This table has the following columns:</p>
+
+<table class="pidoc_table" style="margin-top:1em;width:100%;">
+<caption><a id="__table_4__"></a>
+<span class="pidoc_table_title">Table 4</span></caption>
+<tr>
+<td><p><strong><span class="pidoc_code">starIndex</span></strong> (UInt32)</p>
+</td>
+<td><p>The index of the fitted star in the <span class="pidoc_code">stars</span> table.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">function</span></strong> (Enumeration)</p>
+</td>
+<td><p>Fitted PSF model function. Can be one of:</p>
+<p>DynamicPSF.prototype.Function_Gaussian<br/>
+ DynamicPSF.prototype.Function_Moffat<br/>
+ DynamicPSF.prototype.Function_Moffat10<br/>
+ DynamicPSF.prototype.Function_Moffat8<br/>
+ DynamicPSF.prototype.Function_Moffat6<br/>
+ DynamicPSF.prototype.Function_Moffat4<br/>
+ DynamicPSF.prototype.Function_Moffat25<br/>
+ DynamicPSF.prototype.Function_Moffat15<br/>
+ DynamicPSF.prototype.Function_Lorentzian</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">circular</span></strong> (Boolean)</p>
+</td>
+<td><p>True if a circular PSF model function has been fitted; false if the function is elliptic. For circular functions the <span class="pidoc_code">sy</span> and <span class="pidoc_code">theta</span> columns are undefined.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">status</span></strong> (Enumeration)</p>
+</td>
+<td><p>Exit status of the PSF fitting routine. Can be one of:</p>
+<p>DynamicPSF.prototype.PSF_NotFitted<br/>
+ DynamicPSF.prototype.PSF_FittedOk<br/>
+ DynamicPSF.prototype.PSF_BadParameters<br/>
+ DynamicPSF.prototype.PSF_NoSolution<br/>
+ DynamicPSF.prototype.PSF_NoConvergence<br/>
+ DynamicPSF.prototype.PSF_InaccurateSolution<br/>
+ DynamicPSF.prototype.PSF_UnknownError</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">B</span></strong> (Float)</p>
+</td>
+<td><p>Average local background.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">A</span></strong> (Float)</p>
+</td>
+<td><p>Amplitude, or function peak value, also the function's value at the centroid coordinates.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">cx</span></strong> (Float)</p>
+</td>
+<td><p>Horizontal coordinate of the centroid, in image pixel coordinates.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">cy</span></strong> (Float)</p>
+</td>
+<td><p>Vertical coordinate of the centroid, in image pixel coordinates.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">sx</span></strong> (Float)</p>
+</td>
+<td><p>Standard deviation on the X axis, in PSF pixel coordinates.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">sy</span></strong> (Float)</p>
+</td>
+<td><p>Standard deviation on the Y axis, in PSF pixel coordinates.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">theta</span></strong> (Float)</p>
+</td>
+<td><p>Rotation angle in degrees, in the [0&deg;,180&deg;[ range. Undefined for circular functions.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">beta</span></strong> (Float)</p>
+</td>
+<td><p>Beta exponent parameter of a Moffat model function. Undefined for Gaussian functions.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">mad</span></strong> (Float)</p>
+</td>
+<td><p>Mean absolute difference for this PSF fit.</p>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">autoPSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Enables the automatic model function feature of DynamicPSF.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">circularPSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit circular PSF model functions; otherwise fit elliptical functions.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">gaussianPSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Gaussian PSF model functions.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffatPSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with variable &beta; exponent.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffat10PSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with fixed &beta;=10.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffat8PSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with fixed &beta;=8.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffat6PSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with fixed &beta;=6.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffat4PSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with fixed &beta;=4.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffat25PSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with fixed &beta;=2.5.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">moffat15PSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Moffat PSF model functions with fixed &beta;=1.5.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">lorentzianPSF</span></strong> (Boolean)</p>
+</td>
+<td><p>Fit Lorentzian PSF model functions (equivalent to a Moffat function with fixed &beta;=1).</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">signedAngles</span></strong> (Boolean)</p>
+</td>
+<td><p>Represent rotation angles as signed values in the [&ndash;90&deg;,+90&deg;]. Otherwise represent angles in the [0&deg;,180&deg;] range.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">regenerate</span></strong> (Boolean)</p>
+</td>
+<td><p>Enable regeneration of all PSF fits defined in the <span class="pidoc_code">psf</span> table. This will force the DynamicPSF instance to re-search all stars before fitting new PSF model functions. If this parameter is set to false, PSF fits will be recalculated at their original coordinates, which can be faster but less accurate.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">searchRadius</span></strong> (Int32)</p>
+</td>
+<td><p>Value of the <a href="#search_radius">search radius</a> parameter of DynamicPSF.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">threshold</span></strong> (Float)</p>
+</td>
+<td><p>Value of the <a href="#background_threshold">background threshold</a> parameter of DynamicPSF.</p>
+</td>
+</tr>
+<tr>
+<td><p><strong><span class="pidoc_code">autoAperture</span></strong> (Boolean)</p>
+</td>
+<td><p>Enable the <a href="#automatic_aperture">automatic aperture</a> feature of DynamicPSF.</p>
+</td>
+</tr>
+</table>
+
+<p>After execution in the global context, the <span class="pidoc_code">stars</span> and <span class="pidoc_code">psf</span> table parameters of the executed instance contain all the information associated with the new PSF fits performed.</p>
+<p>The following script is a simple example of DynamicPSF automation. The script creates a new instance of the DynamicPSF process as a duplicate of the instance transported by an existing process icon. The new instance is then initialized to fit circular Gaussian functions for the main view of the active image window. Once executed, the script explores the <span class="pidoc_code">psf</span> table of the instance to compute a weighted average FWHM estimate for the image. The weighting factors are derived from the computed MAD values for each PSF fit.</p>
+
+<pre class="code"><span class="pidoc_sh_multiLineComment">/*
+ * An example script to demonstrate automation of the DynamicPSF process.
+ */</span>
+
+<span class="pidoc_sh_singleLineComment">// Identifier of the working process icon.</span>
+<span class="pidoc_sh_preprocessor">#define ICON_ID   Process01</span>
+
+<span class="pidoc_sh_singleLineComment">// Indexes of the columns in the 'psf' table of DynamicPSF.</span>
+<span class="pidoc_sh_preprocessor">#define PSF_starIndex   0</span>
+<span class="pidoc_sh_preprocessor">#define PSF_function    1</span>
+<span class="pidoc_sh_preprocessor">#define PSF_circular    2</span>
+<span class="pidoc_sh_preprocessor">#define PSF_status      3</span>
+<span class="pidoc_sh_preprocessor">#define PSF_B           4</span>
+<span class="pidoc_sh_preprocessor">#define PSF_A           5</span>
+<span class="pidoc_sh_preprocessor">#define PSF_cx          6</span>
+<span class="pidoc_sh_preprocessor">#define PSF_cy          7</span>
+<span class="pidoc_sh_preprocessor">#define PSF_sx          8</span>
+<span class="pidoc_sh_preprocessor">#define PSF_sy          9</span>
+<span class="pidoc_sh_preprocessor">#define PSF_theta      10</span>
+<span class="pidoc_sh_preprocessor">#define PSF_beta       11</span>
+<span class="pidoc_sh_preprocessor">#define PSF_mad        12</span>
+
+<span class="pidoc_sh_singleLineComment">// FWHM of a Gaussian function</span>
+<span class="pidoc_sh_keyword">function</span> <span class="pidoc_sh_function">FWHM</span>( sigma )
+{
+   <span class="pidoc_sh_keyword">return</span> <span class="pidoc_sh_number">2.35482</span>*sigma;
+}
+
+<span class="pidoc_sh_singleLineComment">// We'll work with the active image window. Make sure we have one.</span>
+<span class="pidoc_sh_keyword">if</span> ( <span class="pidoc_sh_object">ImageWindow</span>.activeWindow.isNull )
+   <span class="pidoc_sh_keyword">throw</span> <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">Error</span>( <span class="pidoc_sh_quotation">"There is no active image window."</span> );
+
+<span class="pidoc_sh_singleLineComment">// Get the instance transported by the specified icon.</span>
+<span class="pidoc_sh_singleLineComment">// *** Requires PixInsight Core &gt;= 1.7.3</span>
+<span class="pidoc_sh_keyword">var</span> instance = <span class="pidoc_sh_object">ProcessInstance</span>.<span class="pidoc_sh_function">fromIcon</span>( #ICON_ID );
+
+<span class="pidoc_sh_singleLineComment">// Make sure the icon exists and it is a process icon.</span>
+<span class="pidoc_sh_keyword">if</span> ( instance == <span class="pidoc_sh_keyword">null</span> )
+   <span class="pidoc_sh_keyword">throw</span> <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">Error</span>( <span class="pidoc_sh_quotation">"No such process icon: \'"</span> + #ICON_ID + <span class="pidoc_sh_quotation">"\'"</span> );
+
+<span class="pidoc_sh_singleLineComment">// Make sure the icon transports a DynamicPSF instance.</span>
+<span class="pidoc_sh_keyword">if</span> ( !instance <span class="pidoc_sh_keyword">instanceof</span> <span class="pidoc_sh_externalObject">DynamicPSF</span> )
+   <span class="pidoc_sh_keyword">throw</span> <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">Error</span>( <span class="pidoc_sh_quotation">"The \'"</span> + #ICON_ID + <span class="pidoc_sh_quotation">"\' "</span> +
+                    <span class="pidoc_sh_quotation">"icon does not transport an instance of the DynamicPSF process."</span> );
+
+<span class="pidoc_sh_singleLineComment">// Disable the automatic PSF model function feature.</span>
+instance.autoPSF = <span class="pidoc_sh_keyword">false</span>;
+
+<span class="pidoc_sh_singleLineComment">// We want to fit circular PSF model functions.</span>
+instance.circularPSF = <span class="pidoc_sh_keyword">true</span>;
+
+<span class="pidoc_sh_singleLineComment">// We only want to fit Gaussian PSF model functions.</span>
+instance.gaussianPSF = <span class="pidoc_sh_keyword">true</span>;
+instance.moffatPSF =
+instance.moffat10PSF =
+instance.moffat8PSF =
+instance.moffat6PSF =
+instance.moffat4PSF =
+instance.moffat25PSF =
+instance.moffat15PSF =
+instance.lorentzianPSF = <span class="pidoc_sh_keyword">false</span>;
+
+<span class="pidoc_sh_singleLineComment">// Enable regeneration of all PSF fits. This will force the DynamicPSF instance</span>
+<span class="pidoc_sh_singleLineComment">// to re-search all stars before fitting new PSF model functions. If this</span>
+<span class="pidoc_sh_singleLineComment">// parameter is set to false, PSF fits will be recalculated at their original</span>
+<span class="pidoc_sh_singleLineComment">// coordinates, which can be faster but less accurate.</span>
+instance.regenerate = <span class="pidoc_sh_keyword">true</span>;
+
+<span class="pidoc_sh_singleLineComment">// Force the instance to work on the active image. We assume this instance has</span>
+<span class="pidoc_sh_singleLineComment">// a single PSF collection.</span>
+instance.views[<span class="pidoc_sh_number">0</span>] = <span class="pidoc_sh_object">ImageWindow</span>.activeWindow.mainView.id;
+
+<span class="pidoc_sh_singleLineComment">// Execute the instance in the global context.</span>
+<span class="pidoc_sh_keyword">if</span> ( !instance.<span class="pidoc_sh_function">executeGlobal</span>() )
+   <span class="pidoc_sh_keyword">throw</span> <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">Error</span>( <span class="pidoc_sh_quotation">"Couldn't execute DynamicPSF in the global context."</span> );
+
+<span class="pidoc_sh_singleLineComment">// Get the minimum MAD value for normalization.</span>
+<span class="pidoc_sh_keyword">var</span> minMAD = <span class="pidoc_sh_number">1</span>;
+<span class="pidoc_sh_keyword">for</span> ( <span class="pidoc_sh_keyword">var</span> i = <span class="pidoc_sh_number">0</span>; i &lt; instance.psf.length; ++i )
+   <span class="pidoc_sh_keyword">if</span> ( instance.psf[i][PSF_status] == <span class="pidoc_sh_externalObject">DynamicPSF</span>.<span class="pidoc_sh_keyword">prototype</span>.PSF_FittedOk )
+      <span class="pidoc_sh_keyword">if</span> ( instance.psf[i][PSF_mad] &lt; minMAD )
+         minMAD = instance.psf[i][PSF_mad];
+<span class="pidoc_sh_keyword">if</span> ( minMAD == <span class="pidoc_sh_number">1</span> )
+   <span class="pidoc_sh_keyword">throw</span> <span class="pidoc_sh_keyword">new</span> <span class="pidoc_sh_object">Error</span>( <span class="pidoc_sh_quotation">"No valid PSF fit could be performed."</span> );
+
+console.<span class="pidoc_sh_function">show</span>();
+
+<span class="pidoc_sh_singleLineComment">// List all valid PSF fits and compute a weighted average FWHM.</span>
+<span class="pidoc_sh_keyword">var</span> count = <span class="pidoc_sh_number">0</span>;
+<span class="pidoc_sh_keyword">var</span> avgSigma = <span class="pidoc_sh_number">0</span>;
+<span class="pidoc_sh_keyword">var</span> sumWeight = <span class="pidoc_sh_number">0</span>;
+console.<span class="pidoc_sh_function">writeln</span>( <span class="pidoc_sh_quotation">"PSF#   FWHM      MAD     weight"</span> );
+console.<span class="pidoc_sh_function">writeln</span>( <span class="pidoc_sh_quotation">"====  ======  =========  ======"</span> );
+<span class="pidoc_sh_keyword">for</span> ( <span class="pidoc_sh_keyword">var</span> i = <span class="pidoc_sh_number">0</span>; i &lt; instance.psf.length; ++i )
+{
+   <span class="pidoc_sh_keyword">var</span> psf = instance.psf[i];
+   <span class="pidoc_sh_keyword">if</span> ( psf[PSF_status] == <span class="pidoc_sh_externalObject">DynamicPSF</span>.<span class="pidoc_sh_keyword">prototype</span>.PSF_FittedOk )
+   {
+      <span class="pidoc_sh_keyword">var</span> weight = minMAD/psf[PSF_mad];
+      console.<span class="pidoc_sh_function">writeln</span>( <span class="pidoc_sh_function">format</span>( <span class="pidoc_sh_quotation">"%4u  %6.2f  %.3e  %6.4f"</span>,
+                               i, <span class="pidoc_sh_function">FWHM</span>( psf[PSF_sx] ), psf[PSF_mad], weight ) );
+      ++count;
+      avgSigma += psf[PSF_sx]*weight;
+      sumWeight += weight;
+   }
+}
+avgSigma /= sumWeight;
+console.<span class="pidoc_sh_function">writeln</span>( <span class="pidoc_sh_quotation">""</span> );
+console.<span class="pidoc_sh_function">writeln</span>( <span class="pidoc_sh_function">format</span>( <span class="pidoc_sh_quotation">"Total fitted stars ...... %u"</span>, count ) );
+console.<span class="pidoc_sh_function">writeln</span>( <span class="pidoc_sh_function">format</span>( <span class="pidoc_sh_quotation">"Weighted average FWHM ... %.2f px"</span>, <span class="pidoc_sh_function">FWHM</span>( avgSigma ) ) );</pre>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage_Hints__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Usage Hints</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage_Hints', this );">[hide]</p>
+   <div id="Usage_Hints">
+
+<ul class="pidoc_list">
+<li><strong>PSF measurements are only possible with linear images.</strong> Meaningful PSF measurements are not feasible with nonlinear images. After a large-scale nonlinear transformation, such as the initial stretch applied with a histogram transformation for example, there no longer exists a valid PSF for the whole image. In general, you should use the DynamicPSF tool <em>exclusively</em> with linear raw images. You can use DynamicPSF with a deconvolved image to evaluate the star size reduction achieved after deconvolution, but other than this special use, trying to estimate PSFs doesn't make any sense unless raw CCD or DSLR data are used.</li>
+</ul>
+
+
+<div class="pidoc_figure" style="margin-top:1em;">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+<img style="float:left;margin-right:1.25em;margin-bottom:8px;" src="images/StarsLinear.jpg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>To the left, a crop of a linear raw CCD image with stars of varied brightness. The 3D rendition below has been generated from the linear data with the 3DPlot script in PixInsight. On a linear image, the disks of all well sampled stars (unsaturated, not too dim stars) have approximately the same diameter, irrespective of their brightness. This happens because the stars, being point sources, are representative of the <em>point spread function</em> (PSF) of the image, which does not depend on light flux.<br class="pidoc_clearfix"/></p>
+
+<div style="text-align:center;">
+<img src="images/StarsLinear3D.png" alt=""/>
+</div>
+<img style="float:left;margin-right:1.25em;margin-bottom:8px;" src="images/StarsNonlinear.jpg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>This is the same crop used above after applying a nonlinear intensity transformation (automatic screen stretch with the <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">ScreenTransferFunction</a> tool). As can be seen on the 3D rendition, nonlinear images don't preserve, in general, the shape and dimensions of the PSF.<br class="pidoc_clearfix"/></p>
+
+<div style="text-align:center;">
+<img src="images/StarsNonlinear3D.png" alt=""/>
+</div>
+</div>
+
+<ul class="pidoc_list">
+<li><strong>Use the <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">ScreenTransferFunction</a> tool</strong> to make the image visible during a DynamicPSF session. In general, this is the only way you can work with raw images because linear data usually have too much contrast to be displayed on the screen.</li>
+<li class="pidoc_spaced_list_item"><strong>Use only moderately bright, <em>average stars</em>, and avoid saturated stars, too bright and too dim stars.</strong> If you represent a saturated star in three dimensions you can see that its shape has been truncated, and hence cannot be accurately represented with any PSF model function. Too dim stars cannot be modelled well either, because their tails are <em>submerged</em> under the background noise.</li>
+<li class="pidoc_spaced_list_item"><strong>Don't try to fit elliptical PSF model functions with high uncertainty.</strong> A large dispersion in the estimated rotation angles usually means that the data are insufficiently sampled or too uncertain to provide useful estimates. You know that this happens when you get significantly different estimates of the <em>r</em> and/or <em>rotation angle</em> parameters for similar stars in a more or less random way. In these cases you should select the <em>Circular PSF</em> option to avoid meaningless results. Typically, fitting elliptical PSF functions does not work in two cases: strongly undersampled images (e.g., wide field images) and raw frames with high noise levels.</li>
+</ul>
+
+
+<div class="pidoc_figure" style="margin-top:1em;">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+<div class="pidoc_mouseover" style="margin-bottom:8px;"><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('f1e4hCCtcS6J3RUL', 'images/WrongEllipticFitStretched.jpg');" onmouseout="pidoc_setImgSrc('f1e4hCCtcS6J3RUL', 'images/WrongEllipticFitLinear.png');"><img src="images/WrongEllipticFitLinear.png" id="f1e4hCCtcS6J3RUL" alt="" /></a>
+<p><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('f1e4hCCtcS6J3RUL', 'images/WrongEllipticFitStretched.jpg');" onmouseout="pidoc_setImgSrc('f1e4hCCtcS6J3RUL', 'images/WrongEllipticFitLinear.png');">[mouseover]</a></p></div>
+<p>An example of wrong use of elliptical PSF model functions. In the set of fitted stars shown on this figure, rotation angles and aspect ratios are inconsistent due to the high noise levels in this raw CCD frame (mouse over the image to see a stretched version). The fitted elliptical functions are meaningless; much more robust and accurate results would be obtained by fitting circular Gaussian or fixed-beta Moffat functions.</p>
+</div>
+
+<ul class="pidoc_list">
+<li><strong>In general, you don't need <em>hundreds</em> of PSF fits</strong> to get a good estimate of the true PSF of an image. Usually a relatively small number of <em>carefully chosen</em> stars are sufficient to achieve an excellent result with the DynamicPSF tool in just a few minutes.</li>
+<li class="pidoc_spaced_list_item"><strong>Use the <em>export synthetic PSF</em> feature</strong> to generate a <em>robust average</em> of the PSF fits for the selected stars that you can use with the Deconvolution tool, for example. Don't use a PSF image generated with the <em>average PSF parameters</em> because it is much more sensitive to small deviations, and hence much less accurate.</li>
+<li class="pidoc_spaced_list_item"><strong>Avoid comparing FWHM and other fitted star parameters with the results obtained in other applications,</strong> unless you know what you are doing and have enough information on the fitting functions and algorithms used by the other application(s). Each application implements different methods in very different ways and the results are in general not compatible.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Moffat, A. F. J., <em>A Theoretical Investigation of Focal Stellar Images in the Photographic Emulsion and Application to Photographic Photometry</em>, Astronomy and Astrophysics, Vol. 3, p. 455 (1969)</p>
+      <p id="__reference_2__"><strong>[2]</strong> J. J. Moré, B. S. Garbow, and K. E. Hillstrom, <em>User Guide for MINPACK-1</em>, Argonne National Laboratory Report ANL-80-74, Argonne, Ill., 1980.</p>
+      <p id="__reference_3__"><strong>[3]</strong> Frédéric Devernay, <a href="http://devernay.free.fr/hacks/cminpack/cminpack.html" title="http://devernay.free.fr/hacks/cminpack/cminpack.html">C/C++ Minpack Library</a>.</p>
+      <p id="__reference_4__"><strong>[4]</strong> Peter B. Stetson, <a href="http://ned.ipac.caltech.edu/level5/Stetson/Stetson_contents.html" title="http://ned.ipac.caltech.edu/level5/Stetson/Stetson_contents.html">The Techniques of Least Squares and Stellar Photometry with CCDs</a> (A series of five lectures presented at the <em>V Escola Avancada de Astrofisica, 1989 July 30 - August 3, Aguas de Sao Pedro, Brazil</em>).</p>
+      <p id="__reference_5__"><strong>[5]</strong> William H. Press et al., <em>Numerical Recipes, The Art of Scientific Computing</em>, 3rd Ed., Cambridge University Press, 2007, &sect; 15.5.</p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:19 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

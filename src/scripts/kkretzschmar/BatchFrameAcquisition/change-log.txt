@@ -1,0 +1,7 @@
+===============================================================================
+BatchFrameAcquisition Script Changelog
+===============================================================================
+
+2020/01/24 - v0.2.1
+
+   - Code revision and refactoring. Released for PixInsight core 1.8.8-4.

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | FITSFileManager</title>
+   <meta name="keywords" content="documentation, reference documentation. PIDoc" />
+   <meta name="author" content="Jean-Marc Lugrin, PI user" />
+   <meta name="description" content="This script copy or rename FITS files following rules based on FITS keywords and original file name." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.5" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>FITSFileManager</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>This script copy or rename FITS files following rules based on FITS keywords and original file name. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> documentation, reference documentation. PIDoc</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Operations__">1.1&emsp;Operations</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Input__">2.1&emsp;Input</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Variables__">2.2&emsp;Variables</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Target_template__">2.3&emsp;Target template</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Source_filename_reg_exp__">2.4&emsp;Source filename reg exp</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Group_template__">2.5&emsp;Group template</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Manage_configurations__">2.6&emsp;Manage configurations</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_base_directory__">2.7&emsp;Output base directory</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Operations__">2.8&emsp;Operations</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Configurations__">2.9&emsp;Configurations</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Configurations_:_Date_format__">2.9.1&emsp;Date format</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__related_resources__">Related Resources</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+
+<div style="text-align:center;">
+<img src="images/FITSFileManager.png" alt=""/>
+</div>
+<p>The script FITSFileManager allows you to rename FITS image files by copying or moving them to new locations selected by a set of Regular_Expressions. The new location path is build from a template where <a href="#variables">variables</a> are replaced with values extracted from FITS keys, from the original file name or from a <a href="#counter">counter</a> of copied files. Alternatively to copying/moving the file, the script can load/save the images, which allow adding keywords about the original file and/or converting them to the XISF file format.</p>
+<div class="pidoc_subsection" id="__Description_:_Operations__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;Operations</h4>
+<p>To rename a set of files proceed as follow:</p>
+
+<ol class="pidoc_list">
+<li>Select the files to move or copy. The selected files can be individually checked or un-checked. Currently you should probably process the different type of files (science, bias, dark, flats) separetely.</li>
+<li>Select a predefined configuration. You can also select <a href="#manage_configurations">Manage configurations...</a> and load or edit configuration information. A configuration defines the way to parse and format the FITS keys of the files to process.</li>
+<li>Select a predefined template or enter a new <a href="#target_template">target files template</a> to generate the target path relative to the <a href="#output_base_directory">output base directory</a>.<br/>
+ In a <a href="#target_template">template</a> you can use variables like <var>&OBJECT;</var> or <var>&binning;</var> to substitute values based on the source file name or content. The name of the variables are the FITS keywords and the synthethic variables defined in your <a href="#manage_configurations">configuration</a>. It is possible to specify the formatting of the value of the variables, including in case of missing value.</li>
+<li><em>Advanced usage:</em> If needed adapt the <a href="#file_name_regexp">File name regular expression</a> used to select parts of the file name to use as variable in the template.</li>
+<li>You can also enter a <a href="#group_template">Group template</a> to control a <a href="#counter">counter</a> of files by sub-group (for example by filter or output directory).</li>
+<li>Specifiy the <a href="#output_base_directory">Output base directory</a>.</li>
+<li>Finally select the <a href="#operation">operation</a> to move the files, to copy them or to load/save them to check their validity and add a FITS keyword about the original file name.</li>
+</ol>
+
+<p>The list of transformation is updated as you type templates and other parameters and is visible in the window <em>Resulting operations</em>. Errors are immediately reported (the correspongi files or fields turn red).</p>
+<p>The synthetic variables are defined in a <em>configuration</em> that you may edit.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p><a id="input_files"></a></p>
+<p><a id="variables"></a></p>
+<p><a id="target_template"></a></p>
+<p><a id="file_name_regexp"></a></p>
+<p><a id="group_template"></a> <a id="counter"></a></p>
+<p><a id="manage_configurations"></a></p>
+<p><a id="output_base_directory"></a></p>
+<p><a id="operation"></a></p>
+<p><a id="configuration"></a></p>
+<div class="pidoc_subsection" id="__Usage_:_Input__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Input</h4>
+<p>The input section provides the usual PixInsight facilities to select individual files or all files of a directory. In addition the files can be enabled or disabled. The files can be sorted by any header (the order may be important if you add a sequence number to the file name).</p>
+<p>The tool button at left (<em>Show all keywords</em>) will pop-up a window with the list of FITS keywords and synthetic keywords:</p>
+
+<div style="text-align:center;">
+<img src="images/FITSFileManagerKeywords.png" alt=""/>
+</div>
+<p>The checked keywords are shown as columns in the table of input files.</p>
+<p>They keywords in red are missing in the current file.</p>
+<p><em>Note:</em> You can also use the Pixinsight process <em>FITSHeader</em> to examine the FITS header of images to discover the interesting headers.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Variables__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Variables</h4>
+<p>The variables have the general form <var>'&amp;name:present?missing;'</var>, although most of the time they have simply the form <var>'&name;'</var>. The 'name' identifies the variable, it may be a FITS key or a synthetic variable name.</p>
+
+<ul class="pidoc_list">
+<li>The optional 'present' part is the string that will be used as the replacement value if the variable or FITS key has a value. Usually <var>:present</var> is not specified and the value of the variable is used as the replacement string. You can also have an empty 'present' value (as <var>&amp;TELESCOP:;</var>), in which case the variable is checked for presence (an error is generated if the variable is missing) but its value does not contribute to the target path.</li>
+<li>The optional <var>?missing</var> part is used if the variable is not present in the file (for example <var>'&amp;OBJECT?unknown;</var>). You can also have an empty 'missing' value (like <var>'&amp;binning?;</var>) in which case there is no error if the corresponding variable or FITS key has no value.</li>
+</ul>
+
+<p>The synthetic variables are described in the section 'target template' below. They are built from the FITS keywords (following rules specified in a 'configuration'), from the sequence number of the file being processed or from a regular expression (an extraction of parts of the name) applied to the file name. The source file regular expression can be used, for example, to extract the part of the file name before the first dash and use it as a prefix when forming the output file name.</p>
+<p>The files are processed in the order they appear in the table, the variable <var>&rank;</var> provides the image number to help generating a unique file file. In addition a 'group' string can be generated using from the 'group' template. A <var>&count;</var> variable is increased for each different group (for example each target directory if the group template contained the target directory).</p>
+<p>The value of the variables are cleaned up of special characters, so that they can be used to form legal file names.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Target_template__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Target template</h4>
+<p>Define how the target file path will be generated. It may contain slashes as directory separators. The text of this field is used as the output path (after the output base directory), except that the variables are replaced by their values according to the current <em>configuration.</em> The <a href="#variables">variables</a> include the FITS keywords and the synthetic variables defined in the configuration. The generated file name must include the extension (as <em>.fits</em> or <em>.xisf</em>) to specify the file format. A typical configuration contains the following keywords (your actual configuration may be different):</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>&binning;</p>
+</dt>
+<dd>
+<p>Binning from XBINNING and YBINNING as integers, like 2x2.</p>
+</dd>
+<dt>
+<p>&exposure;</p>
+</dt>
+<dd>
+<p>The exposure from EXPOSURE, but as an integer (assume seconds).</p>
+</dd>
+<dt>
+<p>&extension;</p>
+</dt>
+<dd>
+<p>The extension of the source file (with the dot.), will use input extension if not specified.</p>
+</dd>
+<dt>
+<p>&filename;</p>
+</dt>
+<dd>
+<p>The file name part of the source file.</p>
+</dd>
+<dt>
+<p>&filter;</p>
+</dt>
+<dd>
+<p>The filter name from FILTER as lower case trimmed normalized name.</p>
+</dd>
+<dt>
+<p>&night;</p>
+</dt>
+<dd>
+<p>An integer identifying the night, requires JD and LONG-OBS - EXPERIMENTAL.</p>
+</dd>
+<dt>
+<p>&temp;</p>
+</dt>
+<dd>
+<p>The SET-TEMP temperature in C as an integer.</p>
+</dd>
+<dt>
+<p>&type;</p>
+</dt>
+<dd>
+<p>The IMAGETYP normalized to 'flat', 'bias', 'dark', 'light'.</p>
+</dd>
+<dt>
+<p>&amp;0; &amp;1;, ...</p>
+</dt>
+<dd>
+<p>The corresponding match from the source file name regular expression field. &amp;0; is the whole match, the following are the corresponding subgroups.</p>
+</dd>
+</dl>
+
+<p>The following keywords are dynamic (their values depends on the ordering of the files in the input table). They are built in the system and are always present:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>&count;</p>
+</dt>
+<dd>
+<p>The number of the file being moved/copied in the current group as specified by the <a href="#group_template">Group template</a>.</p>
+</dd>
+<dt>
+<p>&rank;</p>
+</dt>
+<dd>
+<p>The number of the file in the order of the input file list (global counter).</p>
+</dd>
+</dl>
+
+<p>You can enter the template or select one of the predefined one and optionaly modify it.</p>
+<p>Example of template:</p>
+
+<pre class="code"> &amp;1;_&binning;_&temp;C_&type;_&exposure;s_&filter;_&count;&extension;</pre>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Source_filename_reg_exp__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Source filename reg exp</h4>
+<p>Defines a regular expression (without the surrounding slashes) that will be applied to all file names, without the extension. The 'match' array resulting from the regular expression matching can be used in the target file name template as numbered variables. <var>&amp;0;</var> represent the whole matched expression, '&amp;1' the first group, and so on. In case of error the field turns red. You can enter the regexp or select one of the predefined one and optionally modify it.</p>
+<p>See <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Regular_Expressions" title="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Regular_Expressions">Javascript Regular_Expressions</a> for more informations on regular expresssions.</p>
+<p>Example of regular expression:</p>
+
+<pre class="code">([^-_.]+)(?:[._-]|$)</pre>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Group_template__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;Group template</h4>
+<p>A synthetic variable named <var>&count;</var> defines a number that can be used in the <a href="#target_template">target template</a> to form a unique file name. By default the variable <var>&count;</var> run from 1 to the number of input files, in the order of the input list. You can change the numbering order by sorting the input file list using one of the headers. You can count by group of images (for example count each filter independently) by defining the field <em>group template</em> to generate the group name of each image. A group name is generated for each image in the same way as the output file name is generated, but using the <em>group template</em> instead of the <a href="#target_template">target template</a>. The count of images will be kept for each different group name and can be used as the variable <var>&count;</var> in the target path template. All variables can be used in the group template, except <var>&count;</var>. In addition you can use the variable <span class="pidoc_code">&targetDir;</span>:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p><span class="pidoc_code">&targetDir;</span></p>
+</dt>
+<dd>
+<p>The directory part of the target file name.</p>
+</dd>
+</dl>
+
+<p>This is useful to implement the common case of counting the images by directory, in case your template already output them in different directories (for example using <var>&amp;filter</var>; in the directory part of the output template).</p>
+<p>Leave the field group template blank or use a fixed name to have a single global counter.</p>
+<p>Example of group templates:</p>
+
+<pre class="code">&filter;</pre>
+
+<p>Counts the images separetely for each filter (independently of the target directory).</p>
+<p>You can enter the template or select one of the predefined one and optionaly modify it.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Manage_configurations__">
+   <h4 class="pidoc_subsectionTitle">2.6&emsp;Manage configurations</h4>
+<p>A <em>configuration</em> defines how the synthetic variables are created. Synthetic variables are created by rules and parameters, for example by specifying the FITS key to use, the format of the value and operations like changing case or renaming filter names. This is described in the section <a href="#configuration">configurations.</a> FITSFileManager keeps track of multiple configurations but only one is active at any time. It is expected that most users could use the default configuration, possibly with some simple adjustments. It is also possible to have a set of configuration for different image type, but currently you must still change the configuration or the template between image types. Some configuration options may require a good understanding of regular expressions and of the FITS key words.</p>
+<p>The configurations are kept in the settings of PixInsight, you can edit, add (duplicate and edit) or remove configurations. They can also be saved and loaded to/from files and so shared with other users.</p>
+<p>Click on the the button <em>Manage configurations...</em> to change or edit the <a href="#configuration">configuration.</a></p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_base_directory__">
+   <h4 class="pidoc_subsectionTitle">2.7&emsp;Output base directory</h4>
+<p>Select the directory for the destination files. The target file template may specify directories in the name, in which case the required subdirectories will be created if needed.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Operations__">
+   <h4 class="pidoc_subsectionTitle">2.8&emsp;Operations</h4>
+<p>The operations <em>Copy</em> and <em>Move</em> copy or move the files directly without adding any FITS keywords or doing any conversion. The content of the file is absolutely not modified, so this is the safest to keep the original file untouched. The file extension must be one of <em>.fit</em>, <em>.fits</em> or <em>.fts</em>.</p>
+<p>The operation <em>Load/SaveAs</em> loads each image temporarily in the workspace and save it to the new location. An ORIGFILE keyword with the original file name is added if it is not already present. You can use this method to output <em>FITS</em> or <em>XISF</em> files. The operation <em>Load/Save</em> must be used if the extension of the target template implies a format conversion. This feature is supported only to convert to the <em>XISF</em> file format (extension <em>.xisf</em>).</p>
+<p>The operation buttons may be disabled if the operation is not possible (for example if the output directory is not specified). You can use the button <em>Check validity</em> if the reason why an operation is not possible is not obvious, it will list the possible errors.</p>
+<p>When an operation is completed, the script will ask you if you want to remove the files from the input section of FITSFileManager (this does not remove the files from the disk!) or if you want to continue processing them (for example to select and copy other files in the same set).</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Configurations__">
+   <h4 class="pidoc_subsectionTitle">2.9&emsp;Configurations</h4>
+<p>The configurations window is displayed by the button <a href="#manage_configurations">manage configurations</a>.</p>
+
+<div style="text-align:center;">
+<img src="images/FITSFileManagerConfiguration.png" alt=""/>
+</div>
+<p>The configuration window allows to copy, edit or delete configurations to define a set of synthetic variables that you can use to form the template of the target file name or group.</p>
+<p>You select the configuration to work on in the <em>configuration section</em>, where you can also delete a configuration, duplicated it or change its name and description. To create a new configuration, duplicate an existing one and change its name.</p>
+<p>You can save the current configuration or all configurations to a file, and load a configuration file in your environment. When you load a configuration file, the loaded configuration(s) will replace the current configurations having a matching name or will be added the the current list of configurations if it has a new name. A default configuration is located in the same directory as the scripts and can be reloaded if desired. Note that currently the configuration files do not include the output template, group template or file name RegExp, those are only part of the settings (this may change in a future release). The configuration files are in a JSON format (a commonly used text format) but are not designed for editing with a text editor.</p>
+<p>In the area <em>select variable</em> you can add, remove or move synthetic variables. If the definition of a variable references other variables the order may be important. The parameters of the currently selected variables are defined in the right part of the window.</p>
+<p>The area <em>parameters of the variables</em> specifies how the value of the variable is calculated. The <em>resolver</em> specifies the rule to use. It is one of:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Text</p>
+</dt>
+<dd>
+<p>The trimmed value of a FITS key used as text, but with characters not allowed in file names filtered. If the trimmed value is empty, the key is considered missing (this can be handled with the <em>&amp;var?missing;</em> form)</p>
+</dd>
+<dt>
+<p>Integer</p>
+</dt>
+<dd>
+<p>The value of a FITS key interpreted as an integer.</p>
+</dd>
+<dt>
+<p>IntegerPair</p>
+</dt>
+<dd>
+<p>The value of two FITS key interpreted as a pair of integer (for example size or binning).</p>
+</dd>
+<dt>
+<p>DateTime</p>
+</dt>
+<dd>
+<p>The value of a FITS key interpreted as a date or time, see the section <a href="#date_format">date format</a>.</p>
+</dd>
+<dt>
+<p>RegExpList</p>
+</dt>
+<dd>
+<p>The value of a FITS key is tested agains list of regexp, the first match defines the value. This is typically used to normalize the name of a filter or image type.</p>
+</dd>
+<dt>
+<p>Constant</p>
+</dt>
+<dd>
+<p>A fixed text value. This may be useful to parameterize some constant parts of a template.</p>
+</dd>
+<dt>
+<p>FileName</p>
+</dt>
+<dd>
+<p>The original file name. Usually a single variable named <em>&amp;filename</em> is defined with this rule.</p>
+</dd>
+<dt>
+<p>FileExtension</p>
+</dt>
+<dd>
+<p>The original file extension. Usually a single variable named <em>&amp;extension</em> is defined with this rule, but you can also define <em>&amp;extension</em> as a <span class="pidoc_code">Constant</span> type with a desired fixed value as <em>.fits</em> or <em>.xisf</em></p>
+</dd>
+</dl>
+
+<p>You can change the name, description and its default presence in the file tables for all parameters. Additional parameters are presented depending of the <em>resolver</em>. Most resolvers have a field to define the <em>format</em> of the variable.</p>
+<p>The area <em>built-in variable formats</em> is used to specify the format of the built-in synthethic variables <span class="pidoc_code">&rank;</span> and <span class="pidoc_code">&count;</span>.</p>
+<p><a id="date_format"></a></p>
+<div class="pidoc_subsection" id="__Usage_:_Configurations_:_Date_format__">
+   <h5 class="pidoc_subsectionTitle">2.9.1&emsp;Date format</h5>
+<p>The DateTime fields can be formatted using a format string. The format string consists of zero or more conversion specifications and ordinary characters. A conversion specification consists of a % character and a terminating conversion character that determines the conversion specification's behaviour. All ordinary characters are copied unchanged into the array. If copying takes place between objects that overlap, the behaviour is undefined. Each conversion specification is replaced by appropriate characters as described in the following list.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>%d</p>
+</dt>
+<dd>
+<p>is replaced by the day of the month as a decimal number [01,31].</p>
+</dd>
+<dt>
+<p>%H</p>
+</dt>
+<dd>
+<p>is replaced by the hour (24-hour clock) as a decimal number [00,23].</p>
+</dd>
+<dt>
+<p>%j</p>
+</dt>
+<dd>
+<p>is replaced by the julian day.</p>
+</dd>
+<dt>
+<p>%L</p>
+</dt>
+<dd>
+<p>is replaced by the milliseconds padded to 3 digits.</p>
+</dd>
+<dt>
+<p>%m</p>
+</dt>
+<dd>
+<p>is replaced by the month as a decimal number [01,12].</p>
+</dd>
+<dt>
+<p>%M</p>
+</dt>
+<dd>
+<p>is replaced by the minute as a decimal number [00,59].</p>
+</dd>
+<dt>
+<p>%S</p>
+</dt>
+<dd>
+<p>is replaced by the second as a decimal number [00,61].</p>
+</dd>
+<dt>
+<p>%y</p>
+</dt>
+<dd>
+<p>is replaced by the year without century as a decimal number [00,99].</p>
+</dd>
+<dt>
+<p>%Y</p>
+</dt>
+<dd>
+<p>is replaced by the year with century as a decimal number.</p>
+</dd>
+<dt>
+<p>%%</p>
+</dt>
+<dd>
+<p>is replaced by %.</p>
+</dd>
+</dl>
+
+<p>If a conversion specification does not correspond to any of the above, the format character itself is output.</p>
+<p>A common format is</p>
+
+<pre class="code">%Y%m%d</pre>
+
+<p>which result in a string as <em>20190227</em>.</p>
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_resources__">
+   <h3 class="pidoc_sectionTitle">Related Resources</h3>
+   <div id="related_resources">
+<ul>
+   <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions" title="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions">Regular_Expressions</a></li>
+   <li><a href="http://fits.gsfc.nasa.gov/fits_home.html" title="http://fits.gsfc.nasa.gov/fits_home.html">FITS standard</a></li>
+</ul>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2014-2020, Jean-Marc Lugrin</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.5 on 2020-01-27 18:10:55 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

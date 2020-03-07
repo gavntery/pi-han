@@ -1,0 +1,409 @@
+/*
+ * PixInsight Default Filter Library
+ *
+ * Released 2011 May 25
+ */
+
+SeparableFilter {
+   name { Box Average (3) }
+   row-vector { 1 1 1 }
+   col-vector { 1 1 1 }
+}
+
+SeparableFilter {
+   name { Box Average (5) }
+   row-vector { 1 1 1 1 1 }
+   col-vector { 1 1 1 1 1 }
+}
+
+SeparableFilter {
+   name { Box Average (7) }
+   row-vector { 1 1 1 1 1 1 1 }
+   col-vector { 1 1 1 1 1 1 1 }
+}
+
+SeparableFilter {
+   name { Box Average (9) }
+   row-vector { 1 1 1 1 1 1 1 1 1 }
+   col-vector { 1 1 1 1 1 1 1 1 1 }
+}
+
+SeparableFilter {
+   name { Linear Interpolation (3) }
+   row-vector { 0.5 1 0.5 }
+   col-vector { 0.5 1 0.5 }
+}
+
+SeparableFilter {
+   name { B3 Spline (5) }
+   row-vector { 0.0625 0.25 0.375 0.25 0.0625 }
+   col-vector { 0.0625 0.25 0.375 0.25 0.0625 }
+}
+
+SeparableFilter {
+   name { Gaussian (5) }
+   row-vector { 0.010000 0.316228 1.000000 0.316228 0.010000 }
+   col-vector { 0.010000 0.316228 1.000000 0.316228 0.010000 }
+}
+
+SeparableFilter {
+   name { Gaussian (7) }
+   row-vector { 0.010000 0.129155 0.599484 1.000000 0.599484 0.129155 0.010000 }
+   col-vector { 0.010000 0.129155 0.599484 1.000000 0.599484 0.129155 0.010000 }
+}
+
+SeparableFilter {
+   name { Gaussian (9) }
+   row-vector { 0.010000 0.074989 0.316228 0.749894 1.000000 0.749894 0.316228 0.074989 0.010000 }
+   col-vector { 0.010000 0.074989 0.316228 0.749894 1.000000 0.749894 0.316228 0.074989 0.010000 }
+}
+
+SeparableFilter {
+   name { Gaussian (11) }
+   row-vector { 0.010000 0.052481 0.190546 0.478630 0.831764 1.000000 0.831764 0.478630 0.190546 0.052481 0.010000 }
+   col-vector { 0.010000 0.052481 0.190546 0.478630 0.831764 1.000000 0.831764 0.478630 0.190546 0.052481 0.010000 }
+}
+
+KernelFilter {
+   name { Sharpen (3) }
+   coefficients {  0 -1  0
+                  -1  5 -1
+                   0 -1  0 }
+}
+
+KernelFilter {
+   name { Sharpen Hard (3) }
+   coefficients {  0 -2  0
+                  -2  9 -2
+                   0 -2  0 }
+}
+
+KernelFilter {
+   name { Sharpen Mild (3) }
+   coefficients {  0 -1  0
+                  -1  6 -1
+                   0 -1  0 }
+}
+
+KernelFilter {
+   name { Mexican Hat (5) }
+   coefficients {  0      0     -0.005  0      0
+                   0     -0.406  0     -0.406  0
+                  -0.005  0      1      0     -0.005
+                   0     -0.406  0     -0.406  0
+                   0      0     -0.005  0      0 }
+}
+
+KernelFilter {
+   name { Emboss (3) }
+   coefficients { -1 0 0
+                   0 0 0
+                   0 0 1 }
+}
+
+KernelFilter {
+   name { Emboss Heavy (3) }
+   coefficients { -1 -1  0
+                  -1  0  1
+                   0  1  1 }
+}
+
+KernelFilter {
+   name { Laplacian 4 (3) }
+   coefficients {  0 -1  0
+                  -1  4 -1
+                   0 -1  0 }
+}
+
+KernelFilter {
+   name { Laplacian 8 (3) }
+   coefficients { -1 -1 -1
+                  -1  8 -1
+                  -1 -1 -1 }
+}
+
+KernelFilter {
+   name { Laplacian 12 (3) }
+   coefficients { -1 -2 -1
+                  -2 12 -2
+                  -1 -2 -1 }
+}
+
+SeparableFilter {
+   /*
+   -1 -2 -1
+    0  0  0
+    1  2  1
+    */
+   name { Sobel Edge North (3) }
+   row-vector {  0.759836  1.519671  0.759836 }
+   col-vector { -1.316074  0.000000  1.316074 }
+}
+
+SeparableFilter {
+   /*
+    1  2  1
+    0  0  0
+   -1 -2 -1
+    */
+   name { Sobel Edge South (3) }
+   row-vector { -0.759836 -1.519671 -0.759836 }
+   col-vector { -1.316074  0.000000  1.316074 }
+}
+
+SeparableFilter {
+   /*
+    1  0 -1
+    2  0 -2
+    1  0 -1
+    */
+   name { Sobel Edge East (3) }
+   row-vector { -1.316074  0.000000  1.316074 }
+   col-vector { -0.759836 -1.519671 -0.759836 }
+}
+
+SeparableFilter {
+   /*
+   -1  0  1
+   -2  0  2
+   -1  0  1
+    */
+   name { Sobel Edge West (3) }
+   row-vector {  1.316074  0.000000 -1.316074 }
+   col-vector { -0.759836 -1.519671 -0.759836 }
+}
+
+KernelFilter {
+   name { Edge Diagonal (3) }
+   coefficients {  0  1  0
+                  -1  0  1
+                   0 -1  0 }
+}
+
+SeparableFilter {
+   /*
+    0 0 0
+   -1 1 0
+    0 0 0
+    */
+   name { Backward Horizontal Gradient (3) }
+   row-vector { -0.840896 0.840896 -0.000000 }
+   col-vector {  0.000000 1.189207 -0.000000 }
+}
+
+SeparableFilter {
+   /*
+    0  0  0
+    0 -1  1
+    0  0  0
+    */
+   name { Forward Horizontal Gradient (3) }
+   row-vector { 0.000000  0.840896 -0.840896 }
+   col-vector { 0.000000 -1.189207  0.000000 }
+}
+
+SeparableFilter {
+   /*
+    0 -1  0
+    0  1  0
+    0  0  0
+    */
+   name { Backward Vertical Gradient (3) }
+   row-vector { 0.000000 -1.189207 0.000000 }
+   col-vector { 0.840896 -0.840896 0.000000 }
+}
+
+SeparableFilter {
+   /*
+    0  0  0
+    0 -1  0
+    0  1  0
+    */
+   name { Forward Vertical Gradient (3) }
+   row-vector { 0.000000  1.189207 0.000000 }
+   col-vector { 0.000000 -0.840896 0.840896 }
+}
+
+SeparableFilter {
+   /*
+   -1 -1 -1
+    0  0  0
+    1  1  1
+    */
+   name { Prewitt Edge North (3) }
+   row-vector {  0.903602  0.903602 0.903602 }
+   col-vector { -1.106682 -0.000000 1.106682 }
+}
+
+SeparableFilter {
+   /*
+    1  1  1
+    0  0  0
+   -1 -1 -1
+    */
+   name { Prewitt Edge South (3) }
+   row-vector { -0.903602 -0.903602 -0.903602 }
+   col-vector { -1.106682 -0.000000  1.106682 }
+}
+
+SeparableFilter {
+   /*
+    1  0 -1
+    1  0 -1
+    1  0 -1
+    */
+   name { Prewitt Edge East (3) }
+   row-vector { -1.106682 -0.000000  1.106682 }
+   col-vector { -0.903602 -0.903602 -0.903602 }
+}
+
+SeparableFilter {
+   /*
+   -1  0  1
+   -1  0  1
+   -1  0  1
+    */
+   name { Prewitt Edge West (3) }
+   row-vector {  1.106682  0.000000 -1.106682 }
+   col-vector { -0.903602 -0.903602 -0.903602 }
+}
+
+SeparableFilter {
+   /*
+   -1   -1.414214  -1
+    0    0          0
+    1    1.414214   1
+    */
+   name { Fei-Chen Edge North (3) }
+   row-vector {  0.840896  1.189207  0.840896 }
+   col-vector { -1.189207  0.000000  1.189207 }
+}
+
+SeparableFilter {
+   /*
+    1    1.414214   1
+    0    0          0
+   -1   -1.414214  -1
+    */
+   name { Fei-Chen Edge South (3) }
+   row-vector {  0.840896  1.189207  0.840896 }
+   col-vector {  1.189207  0.000000 -1.189207 }
+}
+
+SeparableFilter {
+   /*
+    1        0 -1
+    1.414214 0 -1.414214
+    1        0 -1
+    */
+   name { Fei-Chen Edge East (3) }
+   row-vector { -1.189207 -0.000000  1.189207 }
+   col-vector { -0.840896 -1.189207 -0.840896 }
+}
+
+SeparableFilter {
+   /*
+   -1        0  1
+   -1.414214 0  1.414214
+   -1        0  1
+    */
+   name { Fei-Chen Edge West (3) }
+   row-vector {  1.189207  0.000000 -1.189207 }
+   col-vector { -0.840896 -1.189207 -0.840896 }
+}
+
+SeparableFilter {
+   /*
+   -3 -10 -3
+    0   0  0
+    3  10  3
+    */
+   name { Scharr Edge North (3) }
+   row-vector { -1.082451 -3.608170 -1.082451 }
+   col-vector {  2.771488  0.000000 -2.771488 }
+}
+
+SeparableFilter {
+   /*
+    3  10  3
+    0   0  0
+   -3 -10 -3
+    */
+   name { Scharr Edge South (3) }
+   row-vector {  1.082451  3.608170  1.082451 }
+   col-vector {  2.771488  0.000000 -2.771488 }
+}
+
+SeparableFilter {
+   /*
+    -3  0   3
+   -10  0  10
+    -3  0   3
+    */
+   name { Scharr Edge East (3) }
+   row-vector {  2.771488 -0.000000 -2.771488 }
+   col-vector { -1.082451 -3.608170 -1.082451 }
+}
+
+SeparableFilter {
+   /*
+     3  0  -3
+    10  0 -10
+     3  0  -3
+    */
+   name { Scharr Edge West (3) }
+   row-vector { -2.771488 -0.000000  2.771488 }
+   col-vector { -1.082451 -3.608170 -1.082451 }
+}
+
+KernelFilter {
+   name { Prewitt Compass East (3) }
+   coefficients { 1  1 -1
+                  1 -2 -1
+                  1  1 -1 }
+}
+
+KernelFilter {
+   name { Kirsch East (3) }
+   coefficients { 5 -3 -3
+                  5  0 -3
+                  5 -3 -3 }
+}
+
+KernelFilter {
+   name { Kroon Derivative North (5) }
+   coefficients { -0.0007 -0.0052 -0.0370 -0.0052 -0.0007
+                  -0.0037 -0.1187 -0.2589 -0.1187 -0.0037
+                   0       0       0       0       0
+                  +0.0037 +0.1187 +0.2589 +0.1187 +0.0037
+                  +0.0007 +0.0052 +0.0370 +0.0052 +0.0007 }
+}
+
+KernelFilter {
+   name { Kroon Derivative South (5) }
+   coefficients { +0.0007 +0.0052 +0.0370 +0.0052 +0.0007
+                  +0.0037 +0.1187 +0.2589 +0.1187 +0.0037
+                   0       0       0       0       0
+                  -0.0037 -0.1187 -0.2589 -0.1187 -0.0037
+                  -0.0007 -0.0052 -0.0370 -0.0052 -0.0007 }
+}
+
+KernelFilter {
+   name { Kroon Derivative East (5) }
+   coefficients { +0.0007 +0.0037 0 -0.0037 -0.0007
+                  +0.0052 +0.1187 0 -0.1187 -0.0052
+                  +0.0370 +0.2589 0 -0.2589 -0.0370
+                  +0.0052 +0.1187 0 -0.1187 -0.0052
+                  +0.0007 +0.0037 0 -0.0037 -0.0007 }
+}
+
+KernelFilter {
+   name { Kroon Derivative West (5) }
+   coefficients { -0.0007 -0.0037 0 +0.0037 +0.0007
+                  -0.0052 -0.1187 0 +0.1187 +0.0052
+                  -0.0370 -0.2589 0 +0.2589 +0.0370
+                  -0.0052 -0.1187 0 +0.1187 +0.0052
+                  -0.0007 -0.0037 0 +0.0037 +0.0007 }
+}
+
+// EOF default.filters

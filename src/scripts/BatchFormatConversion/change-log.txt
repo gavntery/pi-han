@@ -1,0 +1,13 @@
+===============================================================================
+BatchFormatConversion Script Changelog
+===============================================================================
+
+2020/01/14 - v1.4.0
+
+- Updated version released with PixInsight core 1.8.8-4.
+
+- Added support for image properties.
+
+- Improved error managements.
+
+- Improved tooltips.

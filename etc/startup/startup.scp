@@ -1,0 +1,199 @@
+// _____________       ________            _____        ______ _____
+// ___  __ \__(_)___  _____  _/_______________(_)______ ___  /___  /_
+// __  /_/ /_  /__  |/_/__  /__  __ \_  ___/_  /__  __ `/_  __ \  __/
+// _  ____/_  / __>  < __/ / _  / / /(__  )_  / _  /_/ /_  / / / /_
+// /_/     /_/  /_/|_| /___/ /_/ /_//____/ /_/  _\__, / /_/ /_/\__/
+//                                              /____/
+// ----------------------------------------------------------------------------
+// PixInsight Core Application Version 01.08.05.1397 Ripley
+// ----------------------------------------------------------------------------
+// Core Startup Command-Line Script
+// /PixInsight/etc/startup/startup.scp
+// Released 2018 OCT 14
+// ----------------------------------------------------------------------------
+// Copyright (c) 2003-2018 Pleiades Astrophoto S.L. All Rights Reserved.
+// ----------------------------------------------------------------------------
+
+/*
+ * Information on PixInsight Startup Scripts
+ *
+ * PixInsight runs startup scripts automatically upon execution of the core
+ * application. When a startup script is executed, all scheduled modules have
+ * been installed, the JavaScript runtime has been initialized, and all GUI
+ * components have been created. This means that the PixInsight platform is
+ * fully operational.
+ *
+ * By default, the PixInsight Core application executes all existing script
+ * files on the etc/startup installation directory upon startup. Additional
+ * startup scripts can be executed by specifying them with the -s command line
+ * argument to the core application, and execution of startup scripts can also
+ * be disabled completely with the --no-startup-script argument. Run the
+ * PixInsight Core application with the --help argument for more information.
+ *
+ * Startup scripts are very useful to ensure initialization of command aliases
+ * (with the alias command) and global settings (for example, with the set
+ * command). The standard startup.scp script defines common aliases for some
+ * frequently used commands (both internal and external) and processes. It also
+ * defines a set of environment variables that facilitate computation of basic
+ * image statistics with the JavaScript runtime and the js command.
+ *
+ * A period character (.) at the start of a command disables 'echo' of the
+ * command line on the console. Note that all commands in this script disable
+ * echo to avoid unnecessary pollution of the console.
+ */
+
+/*
+ * Aliases to internal commands
+ */
+
+#ifndef __NO_INTERNAL_ALIASES
+
+.alias clr      clear
+.alias cls      clear
+.alias cd       chdir
+.alias quit     exit
+.alias bye      exit
+.alias seeyou   exit
+.alias aurevoir exit
+.alias abientot exit
+.alias adeu     exit
+.alias adios    exit
+.alias j        js
+.alias llimg    "lsimg -l"
+.alias llws     "lsws  -l"
+
+#endif   // !__NO_INTERNAL_ALIASES
+
+/*
+ * Aliases to shell commands and utilities
+ */
+
+#ifndef __NO_EXTERNAL_ALIASES
+
+// The GNU/Linux version of ls allows us to colorize console output
+#ifeq __PI_PLATFORM__ LINUX
+.alias l       "![ls --color=always"
+.alias ll      "![ls --color=always -l"
+.alias la      "![ls --color=always -la"
+#endif
+
+#ifoneof __PI_PLATFORM__ FREEBSD MACOSX
+.alias l       "![ls"
+.alias ll      "![ls -l"
+.alias la      "![ls -la"
+#endif
+
+#ifoneof __PI_PLATFORM__ FREEBSD LINUX MACOSX
+.alias mkdir   "![mkdir"
+.alias rmdir   "![rmdir"
+.alias cp      "![cp"
+.alias rm      "![rm"
+.alias chmod   "![chmod"
+.alias find    "![find"
+.alias grep    "![grep"
+#endif
+
+#ifeq __PI_PLATFORM__ MSWINDOWS
+.alias dir     "![dir"
+.alias l       "![dir"
+.alias ll      "![dir"
+.alias la      "![dir"
+.alias mkdir   "![mkdir"
+.alias md      "![mkdir"
+.alias rmdir   "![rmdir"
+.alias cp      "![copy"
+.alias xcopy   "![xcopy"
+.alias rm      "![del"
+.alias chmod   "![attrib"
+#endif
+
+#endif   // !__NO_EXTERNAL_ALIASES
+
+/*
+ * Aliases to standard PixInsight processes
+ */
+
+#ifndef __NO_PROCESS_ALIASES
+
+/*
+ * Frequently used processes
+ */
+.alias abe     AutomaticBackgroundExtractor
+.alias acdnr   ACDNR
+.alias atwt    MultiscaleLinearTransform  // compatibility option, was ATrousWaveletTransform
+.alias bin     Binarize
+.alias c2gray  ConvertToGrayscale         // without parameters, converts the current image to grayscale
+.alias c2grey  ConvertToGrayscale         // ...
+.alias c2rgb   ConvertToRGBColor          // without parameters, converts the current image to RGB color
+.alias ct      CurvesTransformation
+.alias curves  CurvesTransformation
+.alias dbe     DynamicBackgroundExtraction
+.alias dcrop   DynamicCrop
+.alias greycs  GREYCstoration
+.alias hdrmt   HDRMultiscaleTransform
+.alias hdrwt   HDRMultiscaleTransform     // compatibility option, was HDRWaveletTransform
+.alias hist    HistogramTransformation
+.alias ht      HistogramTransformation
+.alias id      ImageIdentifier
+.alias inv     Invert                     // without parameters, inverts the current image
+.alias levels  HistogramTransformation    // yeah, one PS-ism shouldn't hurt :)
+.alias mlt     MultiscaleLinearTransform
+.alias mmt     MultiscaleMedianTransform
+.alias mt      MorphologicalTransformation
+.alias new     NewImage
+.alias pm      PixelMath
+.alias pmath   PixelMath
+.alias prefs   Preferences
+.alias rsc     Rescale                    // without parameters, rescales the current image
+.alias ropts   ReadoutOptions
+.alias scnr    SCNR
+.alias stats   Statistics
+.alias stf     ScreenTransferFunction
+.alias tgvd    TGVDenoise
+.alias usm     UnsharpMask
+
+/*
+ * Fast rotations
+ */
+.alias r180    "FastRotation -r180"       // Rotate 180 degrees
+.alias r90     "FastRotation -r90ccw"     // Rotate 90 degrees, counter-clockwise
+.alias r90ccw  r90                        //      idem
+.alias r90cw   "FastRotation -r90cw"      // Rotate 90 degrees, clockwise
+.alias horzm   "FastRotation -mh"         // Horizontal mirror
+.alias vertm   "FastRotation -mv"         // Vertical mirror
+
+/*
+ * Sample format conversions
+ */
+.alias i8  "SampleFormatConversion -i8"   // Convert to 8-bit integer sample format
+.alias i16 "SampleFormatConversion -i16"  // Convert to 16-bit integer sample format
+.alias i32 "SampleFormatConversion -i32"  // Convert to 32-bit integer sample format
+.alias f32 "SampleFormatConversion -f32"  // Convert to 32-bit floating point sample format
+.alias f64 "SampleFormatConversion -f64"  // Convert to 64-bit floating point sample format
+
+#endif   // !__NO_PROCESS_ALIASES
+
+#ifndef __NO_PJSR_VARIABLES
+
+/*
+ * PJSR statistical shortcuts exported as environment variables
+ * Use them with '$' prepended to trigger macro-expansion. For example: j $max
+ */
+.export Qn="ImageWindow.activeWindow.currentView.image.Qn()"
+.export Sn="ImageWindow.activeWindow.currentView.image.Sn()"
+.export avgdev="ImageWindow.activeWindow.currentView.image.avgDev()"
+.export bwmv="ImageWindow.activeWindow.currentView.image.BWMV()"
+.export mad="ImageWindow.activeWindow.currentView.image.MAD()"
+.export max="ImageWindow.activeWindow.currentView.image.maximum()"
+.export mean="ImageWindow.activeWindow.currentView.image.mean()"
+.export median="ImageWindow.activeWindow.currentView.image.median()"
+.export min="ImageWindow.activeWindow.currentView.image.minimum()"
+.export stddev="ImageWindow.activeWindow.currentView.image.stdDev()"
+
+#endif   // !__NO_PJSR_VARIABLES
+
+.open /Users/gaoteng/Documents/pi_config/fav.xpsm
+
+// ----------------------------------------------------------------------------
+// /PixInsight/etc/startup/startup.scp
+// Released 2018 OCT 14

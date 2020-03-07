@@ -1,0 +1,172 @@
+===============================================================================
+SubframeSelector Script Changelog
+===============================================================================
+
+-------------------------------------------------------------------------------
+2018.11.05 - v1.12
+
+- Add minimum/maximum properties for SNRWeight, Eccentricity, FWHM. Contributed
+  by GitHub user; see: https://github.com/PixInsight/PJSR/pull/42
+
+-------------------------------------------------------------------------------
+2016.12.28 - v1.11
+
+- Disabled GUI messages from Crop process.
+
+- Disabled Use file cache option to avoid setting file performance issues.
+
+-------------------------------------------------------------------------------
+2016.05.12 - v1.10
+
+- Fixed bugs on images with zero measured noise.
+
+- Fixed bugs on images with clipped backgrounds (DynamicPSF failure).
+
+- Added support for dialog resizing.
+
+- Switched to pjsr/CryptographicHash for faster file caching.
+
+- Use Global Preferences > File I/O Settings > Default Save As image file
+  extension when copying non-fit/non-xisf files with added weight keyword.
+
+-------------------------------------------------------------------------------
+2016.04.30 - v1.8
+
+- Added apply hot pixel filter to detection image parameter.
+
+- Replaced the About section with a version label button and tool tip.
+
+- Fixed minor dialog layout bugs.
+
+-------------------------------------------------------------------------------
+2016.04.06 - v1.6
+
+- Fixed Save Plots As file extension problem on newer Win versions.
+
+-------------------------------------------------------------------------------
+2016.04.06 - v1.5
+
+- Fixed non .fit/.fits/.fts/.xisf file copy with weight keyword bugs.
+
+-------------------------------------------------------------------------------
+2016.01.24 - v1.4
+
+- Fixed XISF file copy extension and FITS keywords bugs.
+
+- Improved handling of corrupted script settings and parameters.
+
+- Removed open and save file dialog initial path machinery.
+
+-------------------------------------------------------------------------------
+2015.08.09 - v1.3
+
+- Improved high-res monitor support.
+
+- Updated tool tips and copyright.
+
+-------------------------------------------------------------------------------
+2014.08.07 - v0.103:
+
+- Added Star Detection and Fitting > Upper limit
+   - Stars with peak values larger than this value won't be measured.
+   - This feature may be used to avoid the measurement of saturated and bloomed
+     stars.
+   - To disable this feature, set this parameter to one.
+   - To disable star detection entirely, set this parameters to zero.
+
+- Removed insufficient and excessive number of fitted stars warnings.
+
+- Added sanity checking on file path settings.
+
+- Add explicit contour plot font specification.
+
+- Add error handling for cross-platform issues.
+
+- Updated PiDoc documentation.
+
+-------------------------------------------------------------------------------
+2014.01.14 - v0.97:
+
+- Modified File.copy() routine:
+  - Use File.copyFile() to fix a reported memory exhaustion problem due to
+    postponed garbage collection.
+  - Use File.sameFile() (new in PI Core build 1075) to prevent copying a file
+    to itself.
+  - Secure file copy process with temporary backup to prevent losing an already
+    existing file in the event of I/O error.
+
+- The main dialog has now a fixed width of 800 pixels. This is a temporary
+  fix for the sake of usability, while we improve window layouts so this script
+  can have a fully resizable dialog.
+
+- Updated copyright year to 2014.
+
+-------------------------------------------------------------------------------
+2013.12.03 - v0.96:
+
+- Use standard SectionBar controls.
+
+-------------------------------------------------------------------------------
+2013.09.02 - v0.95:
+
+- Replaced original tool-tip based help button with a standard browse
+  documentation button.
+
+-------------------------------------------------------------------------------
+           - v0.9:
+
+- Integrate Juan's new star detector.
+
+-------------------------------------------------------------------------------
+           - v0.8:
+
+- Integrate Juan's new star detector.
+
+-------------------------------------------------------------------------------
+           - v0.7:
+
+- Integrate Juan's new star detector.
+
+- Update contour plots in include model funtion labeling.
+
+-------------------------------------------------------------------------------
+           - v0.6:
+
+- Made various modification for PixInsight 1.8 compatibility.
+
+- Fixed PlotSaveAs and TabulationSaveAs file path name bug.
+
+-------------------------------------------------------------------------------
+           - v0.5:
+
+- Added a parameter to specify a rectangular measurement region.
+
+- Added a parameter to specify a circular or elliptical point spread function.
+
+- Added parameters to copy/move the approved/rejected subframes to different output directories.
+
+- Added a parameter to specify a star map output directory.
+
+- Added a horizontal scroll bar to the plot.
+
+- Imposed a lower bound on the horizontal spacing between points in the plot.
+
+- Changed the default weight keyword to empty (blank).
+
+- Removed weight keyword from star map files.
+
+- Improved file copy performance.
+
+- Improved file cache performance.
+
+- Fixed OpenFileDialog and SaveFileDialog default directory bugs.
+
+- Fixed duplicate weight keyword bug.
+
+- Updated console logs, tool tips and documentation.
+
+-------------------------------------------------------------------------------
+           - v0.4:
+
+- Initial release.
+-------------------------------------------------------------------------------

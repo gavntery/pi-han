@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ImageSolver</title>
+   <meta name="keywords" content="coordinates, annotation" />
+   <meta name="author" content="Andrés del Pozo" />
+   <meta name="description" content="Script for solving the coordinates of astronomical images" />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ImageSolver</h1>
+
+<div id="authors">
+<p>By Andrés del Pozo</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for solving the coordinates of astronomical images <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> coordinates, annotation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Target_Images__">2.1&emsp;Target Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Image_Parameters__">2.2&emsp;Image Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Model_Parameters__">2.3&emsp;Model Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Advanced_Parameters__">2.4&emsp;Advanced Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Distortion_correction__">2.5&emsp;Distortion correction </a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__What_to_do_when_the_script_doesnt_solve_an_image__">3&emsp;What to do when the script doesn't solve an image</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__What_to_do_when_the_script_doesnt_solve_an_image_:_General_tips__">3.1&emsp;General tips</a></li>
+<li class="pidoc_tocSubitem"><a href="#__What_to_do_when_the_script_doesnt_solve_an_image_:_Stretched_images__">3.2&emsp;Stretched images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__What_to_do_when_the_script_doesnt_solve_an_image_:_Wide_field_images__">3.3&emsp;Wide field images</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Creation_of_a_distortion_model__">4&emsp;Creation of a distortion model </a></li>
+<li class="pidoc_tocItem"><a href="#__How_to_copy_the_coordinates_between_images__">5&emsp;How to copy the coordinates between images </a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__How_to_copy_the_coordinates_between_images_:_FITSHeader__">5.1&emsp;FITSHeader</a></li>
+<li class="pidoc_tocSubitem"><a href="#__How_to_copy_the_coordinates_between_images_:_CopyCoordinates__">5.2&emsp;CopyCoordinates </a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Limitations__">6&emsp;Limitations</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<img style="float:right;width:304px;height:auto;" src="images/Dialog.png" alt=""/>
+<p>The ImageSolver script analyzes the geometry of an astronomical image and calculates the transformations necessary for converting pixel coordinates to celestial coordinates. The result is written in keywords of the FITS files so it can be used by other scripts like <a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a> or <a href="../../scripts/MosaicByCoordinates/MosaicByCoordinates.html" title="../../scripts/MosaicByCoordinates/MosaicByCoordinates.html">MosaicByCoordinates</a>.</p>
+<p>The coordinates are stored in the image following the specifications at <a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">fits.gsfc.nasa.gov/fits_wcs.html</a> <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+E. W. Greisen, M. R. Calabretta (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+M. R. Calabretta, E. W. Greisen (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122">[2]</a></sup>. This makes them compatible with other applications.</p>
+<p><strong>This is not a &quot;blind solver&quot;</strong>: The script requires to know in advance an approximation to the resolution and coordinates of the center of the image. Usually it is enough that the starting coordinates are inside of the image and that the resolution has an error less that 50%. The algorithm works comparing the image with the position of the stars extracted from a catalog. Then it calculates a transformation matrix that converts from pixel coordinates to celestial coordinates. Since the script is designed for solving optical images, it is initally configured to use the <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">Gnomonic projection</a> that models how most optical systems generate the images. The script allows several other projections for images that cannot be modelled by the Gnomonic projection.</p>
+<p>The script can solve distorted images using <a href="#Distortion">surface splines</a> and <a href="#DistortionModel">distortion models</a>. The distortion models are compatible with <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> and can be generated using ImageSolver and <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a>. When a image is solved with the distortion correction activated, the solution is not compatible with the WCS standard. The splines are stored in the properties of the image using a non-standard format. In this case the algorithm also stores in the WCS keywords a solution without the correction that can be used by other applications.</p>
+<p>Some images can be difficult to solve because of the noise or low SNR, lack of enough stars or heavy distortions. In these cases <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> should be able to solve the image.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Target_Images__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Target Images</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div style="text-align:center;">
+<img style="border:1px solid black;" src="images/TargetImage.png" alt=""/>
+</div>
+</div>
+<p>This section defines the images the script will solve.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Active window</p>
+</dt>
+<dd>
+<p>When this option is selected the script will solve the active image in PixInsight. This option is enabled only when there is at least one image open in the application. The solution will be stored as new keywords in the active image but the results are not written to the disk.</p>
+</dd>
+<dt>
+<p>List of files <a id="ListFiles"></a></p>
+</dt>
+<dd>
+<p>When this option is selected the script will solve a list of files. The results are written to copies of the original images. The names of the output images are composed appending a suffix to the original names.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<p>The list can be managed with the buttons <strong>Add files</strong>, <strong>Remove files</strong> and <strong>Clear files</strong>.</p>
+</dd>
+<dt>
+<p>Output file suffix</p>
+</dt>
+<dd>
+<p>This suffix is added to the file name of the output files in order to differentiate them from the original files. This option is only available when the option <a href="#ListFiles">List of files</a> is checked.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Image_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Image Parameters</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+
+<div style="text-align:center;">
+<img style="border:1px solid black;" src="images/ImageParams.png" alt=""/>
+</div>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Only apply optimization <a id="Optimization"></a></p>
+</dt>
+<dd>
+<p>This option requires that the image is already solved. The script doesn't apply the initial alignment algorithm and only tries to optimize the solution.</p>
+<p>This option is useful when the image has a rough solution and we need to improve it. For example, after solving the image with ManualImageSolver using very few control points, <em>Only apply optimization</em> allows to get a more precise solution. This option can also be used to test the effect of different values of the parameters of the script.</p>
+</dd>
+<dt>
+<p>Coordinates <a id="Coordinates"></a></p>
+</dt>
+<dd>
+<p>The <strong>Right ascension</strong> and <strong>Declination</strong> fields define the starting point for the algorithm. The coordinates have to be equatorial coordinates using the standard equinox J2000. These coordinates must be inside the image, and it is better that they as near to the center of the image as possible.</p>
+<p>If the image has the keywords <strong>OBJCTRA</strong> and <strong>OBJCTDEC</strong> the script initializes the coordinates to the values of these keywords. Most capture programs have the capability of reading the position of the telescope and fill these keywords. Since having a good starting position is very important to configure the capture program to fill <strong>OBJCTRA</strong> and <strong>OBJCTDEC</strong> if possible.</p>
+</dd>
+<dt>
+<p>Search</p>
+</dt>
+<dd>
+<p>This button opens a dialog that allows to search the name of astronomical objects in an online search engine (<a href="http://cds.u-strasbg.fr/cgi-bin/Sesame" title="http://cds.u-strasbg.fr/cgi-bin/Sesame">Sesame</a>). The search can be done by name or identifier: &quot;Rossete nebula&quot;, &quot;Altair&quot;, &quot;M31&quot;, &quot;TYC 1058-3399-1&quot;. The coordinates of the selected object are copied to the <a href="#Coordinates">Coordinates</a> fields.</p>
+</dd>
+<dt>
+<p>Obs. Date</p>
+</dt>
+<dd>
+<p>This field (Observation date) defines the date when the image was taken. It is necessary for calculating the position of the stars using their <a href="http://en.wikipedia.org/wiki/Proper_motion" title="http://en.wikipedia.org/wiki/Proper_motion">proper motion</a>.</p>
+<p>If the image has a valid <strong>DATE-OBS</strong> keyword the script initializes this field to the date in this keyword.</p>
+</dd>
+<dt>
+<p>Image Scale <a id="ImageScale"></a></p>
+</dt>
+<dd>
+<p>The scale of the image can be defined using the fields <strong>Resolution</strong> or <strong>Focal length</strong>. These parameters don't need to be exact since the script is able to find its exact value. However the initial value should be as precise as possible since this increases the probability of the image being solved.</p>
+<p>The parameter <strong>Focal Length</strong> can only be used when <a href="#PixelSize">Pixel size</a> has a value greater than zero. The focal length must be the effective focal length after taking in account focal reducers, Barlows or any effect that modifies the focal length. In some telescopes, like many amateur Schmidt–Cassegrain, the focusing is done moving the main mirror and this modifies the focal length of the system.</p>
+<p>The parameter <strong>Focal Length</strong> is initialized automatically if the image has the keywords <strong>FOCALLEN</strong> and <strong>XPIXSZ</strong>.</p>
+</dd>
+<dt>
+<p>Pixel size <a id="PixelSize"></a></p>
+</dt>
+<dd>
+<p>This parameter defines the size in micrometers of the pixels of the image sensor. This parameter is optional, but if it is not filled, you can not use the focal length for defining the <a href="#ImageScale">image scale</a>. If you do use this parameter you must set the exact value since the script can not optimize it.</p>
+<p>The parameter <strong>PixelSize</strong> is initialized automatically if the image has the keyword <strong>XPIXSZ</strong>.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Model_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Model Parameters</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+
+<div style="text-align:center;">
+<img style="border:1px solid black;" src="images/ModelParams.png" alt=""/>
+</div>
+</div>
+<p>The script solves the image comparing it against stars extracted from a star catalog. This section describes how to configure the catalog.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Automatic catalog <a id="Catalog"></a></p>
+</dt>
+<dd>
+<p>When this option is selected the script chooses the best catalog for the estimated field of view of the image.</p>
+</dd>
+<dt>
+<p>Local catalog</p>
+</dt>
+<dd>
+<p>If this option is selected the script uses a catalog stored locally. In this case you have to configure the path where the catalog is stored.</p>
+<p>The script supports two formats:</p>
+
+<ul class="pidoc_list">
+<li><strong>StarGenerator format</strong>: The process StarGenerator uses the PPMX astrometric catalog stored in a .bin file. The PPMX catalog can be downloaded from <a href="http://pixinsight.com/download/" title="http://pixinsight.com/download/">http://pixinsight.com/download/</a>. This catalog has stars of magnitude less than 12.8.</li>
+<li><strong>Custom catalog format</strong>: These files can be created downloading star data from an online catalog. Pressing the download button the script opens the download dialog that allows to select one of the supported catalogs and the working area. <br/>
+ The catalog downloader has a limit of 2 million of objects. Some catalogs also have a maximum field of view (i.e. the online PPMX catalog has a maximum field of view of 60 degrees). When the catalog has proper motion data the coordinates of the stars are stored for the given epoch.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Online star catalog</p>
+</dt>
+<dd>
+<p><a href="http://vizier.u-strasbg.fr/" title="http://vizier.u-strasbg.fr/">VizieR</a> is an online catalog server that provides information of many catalogs. The script allows to use a subset of the available catalogs:</p>
+
+<ul class="pidoc_list">
+<li><a href="http://cdsarc.u-strasbg.fr/viz-bin/Cat?V/50" title="http://cdsarc.u-strasbg.fr/viz-bin/Cat?V/50">BrightStars</a>: This catalog contains the 9100 brightest stars (magnitude&lt;8)</li>
+<li><a href="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/259" title="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/259">TYCHO-2</a>: This catalog is the result of the Hipparcos space telescope and contains the 2.5 million brightest stars (magnitude&lt;13).</li>
+<li><a href="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/315" title="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/315">UCAC3</a>: This catalog contains stars of magnitudes between 8 and 16.</li>
+<li><a href="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/317" title="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/317">PPMXL</a>: This catalog contains stars of magnitude up to 20.</li>
+<li><a href="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/337" title="http://cdsarc.u-strasbg.fr/viz-bin/Cat?I/337">Gaia DR1</a>: This catalog contains stars of magnitude up to 20.</li>
+</ul>
+
+<p>You have to select the catalog best suited for your image. For example for very wide field images (focal length&lt;25mm) you should use the catalog <em>BrightStars</em> since it has enough stars and the queries are fast for big fields. <em>PPMXL</em> and <em>UCAC-3</em> are useful for very deep images since they have very dim stars. However the queries in these two catalogs are very slow for big fields.</p>
+<p>VizieR has several mirror servers that provide the same data. You have to select the best server for you, usually the nearest.</p>
+</dd>
+<dt>
+<p>Limit magnitude <a id="Magnitude"></a></p>
+</dt>
+<dd>
+<p>This parameter limits the number of stars extracted from the catalog to those with magnitude less than this value. This magnitude should be similar to the magnitude of the dimmest stars in the image. If the value is too low the script won't have enough stars to compare, but if it is too high the script will try to match stars of the image to stars that aren't visible. This will slow the process and it could confuse the algorithm and prevent finding a solution or worse: it could find a bad solution.</p>
+</dd>
+<dt>
+<p>Automatic magnitude</p>
+</dt>
+<dd>
+<p>When this option is selected the script chooses the optimal magnitude limit for the estimated field of view of the image.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Advanced_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Advanced Parameters</h4>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+
+<div style="text-align:center;">
+<img style="border:1px solid black;" src="images/AdvancedParams.png" alt=""/>
+</div>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Projection</p>
+</dt>
+<dd>
+<p>Most images can be solved using the Gnomonic projection. However some images, specially very wide field images (focal length less than 10-15mm), require other <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">projections</a>. The script provides several projections that could be more suitable for wide angle images.</p>
+</dd>
+<dt>
+<p>Align algorithm</p>
+</dt>
+<dd>
+<p>The first step for solving an image consists in aligning the image with <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> using the catalog stars as reference. This parameter defines which algorithm StarAlignment uses during the alignment.</p>
+<p>There are two options:</p>
+
+<ul class="pidoc_list">
+<li><strong>Triangles</strong>: Uses a triangle similarity algorithm which is fast, works in most images but have problems in images with strong distortions.</li>
+<li><strong>Polygons</strong>: Uses an algorithm based on the comparison of polygons which is more tolerant to distortions and scale differences, but <em><u>it doesn't work with mirrored images</u></em>.</li>
+</ul>
+
+<p>You should use <strong>Polygons</strong> when you are sure that the image is not mirrored and <strong>Triangles</strong> in the other cases.</p>
+</dd>
+<dt>
+<p>Star sensitivity <a id="StarSensitivity"></a></p>
+</dt>
+<dd>
+<p>This parameter configures the sensitivity of the star detection. Increase the value to detect less stars.</p>
+<p>It is important to set a good value for this parameter so the script detects all the stars of the image and it doesn't mistake noise by stars. The default value of -1 is usually good for lineal images. Stretched images usually require a higher value (0-1).</p>
+<p>You can use the option <a href="#ShowStars">Show stars</a> for checking which stars are being detected.</p>
+</dd>
+<dt>
+<p>Show stars <a id="ShowStars"></a></p>
+</dt>
+<dd>
+<p>When this option is active the script generates a new image with marks on the position of the detected stars in the original image. It is useful for finding a good value for the <a href="#StarSensitivity">Star sensitivity</a> parameter.</p>
+</dd>
+<dt>
+<p>Noise reduction <a id="Noise"></a></p>
+</dt>
+<dd>
+<p>Some images have so much noise that the script could mistake noise by stars. This parameter removes noise from the image in order to improve the star detection.</p>
+<p>The value represents the number of wavelet layers that will be removed for noise reduction. Use 0 for no noise reduction.</p>
+</dd>
+<dt>
+<p>Generate residuals image <a id="Residuals"></a></p>
+</dt>
+<dd>
+<p>When this option is selected the script generates an image which shows the residuals of the solution. The image shows as green crosses the predicted position of the stars using the calculated solution. Red lines from each star join the predicted position to the actual position of the star.</p>
+<p>This image can be used to analyze the errors of the solution. In a good solution the green crosses should be centered on stars and all the red lines should be very short (in a perfect solution the lines should have degenerated to points). When most red lines are long the solution is not good.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<img style="width:100%;height:auto;" src="images/Residuals.png" alt=""/>
+</div>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Distortion_correction__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;Distortion correction <a id="Distortion"></a></h4>
+
+<div class="pidoc_figure">
+<a id="__figure_6__"></a>
+<p class="pidoc_figure_title">Figure 6</p>
+
+<div style="text-align:center;">
+<img style="border:1px solid black;" src="images/DistortionParams.png" alt=""/>
+</div>
+</div>
+<p>This parameter activates the distortion correction using surface splines. This option should be selected when the image deviates from an ideal projected image. This usually happens in images taken with focal lengths shorter than 400mm.</p>
+<p>When this option is active ImageSolver stores the solution in the properties of the image using a non-standard format. In order to be able to use the solution in other applications, ImageSolver also computes a lineal solution (without distortion correction) and stores it in the keywords of the image in the WCS format.</p>
+<p>The options <a href="#DistortionMap">Show distortion map</a> and <a href="#Residuals">Generate residuals image</a> can help to evaluate the quality of the distortion correction.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Spline smoothing</p>
+</dt>
+<dd>
+<p>Sometimes the algorithm mistakes a star by another star or a noise pixel. When the solution is computed using many stars these errors mostly cancel each other but the final result can be &quot;lumpy&quot;. This situation can be detected analyzing the image generated by <a href="#DistortionMap">Show distortion map</a>.</p>
+<p>The splines can be smoothed in order to reduce the lumpiness caused by the misidentification of stars. Usually very small values (0 - 0.05) are good enough but sometimes can produce &quot;lumpy&quot; images. Greater values produce smoother images but the correction could not fix distortions too big.</p>
+</dd>
+<dt>
+<p>Show distortion map <a id="DistortionMap"></a></p>
+</dt>
+<dd>
+<p>When this option is activated the script creates a new window with a representation of the distortions in the image. The new image contains a grid with arrows at the center of each cell. The arrows point to the point where the center of the cells would be located if the image didn't have optical aberrations.</p>
+<p>This option is only enabled when the <a href="#Distortion">distortion correction</a> is active.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_7__"></a>
+<p class="pidoc_figure_title">Figure 7</p>
+<img style="width:100%;height:auto;" src="images/DistortionMap.png" alt=""/>
+</div>
+</dd>
+<dt>
+<p>Distortion model <a id="DistortionModel"></a></p>
+</dt>
+<dd>
+<p>When the image has strong geometric distortions a distortion model helps to solve the image. The distortion models used by ImageSolver are compatible with the distortion models of StarAligment. The section <a href="#DistortionModelHowTo">Creation of a distortion model</a> explains how to create a distortion model.</p>
+</dd>
+<dt>
+<p>Generate distortion model <a id="CreateDistortionModel"></a></p>
+</dt>
+<dd>
+<p>When this option is active the script generates a distortion model. This model can be used by <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> or by <a href="#DistortionModel">ImageSolver</a> for solving other images.</p>
+<p>The model is saved as a text file in the same directory as the image and with the same name and the extension .CSV. This option is only enabled when the distortion correction is activated.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__What_to_do_when_the_script_doesnt_solve_an_image__">
+   <h3 class="pidoc_sectionTitle">3&emsp;What to do when the script doesn't solve an image</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'What_to_do_when_the_script_doesnt_solve_an_image', this );">[hide]</p>
+   <div id="What_to_do_when_the_script_doesnt_solve_an_image">
+<div class="pidoc_subsection" id="__What_to_do_when_the_script_doesnt_solve_an_image_:_General_tips__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;General tips</h4>
+
+<ul class="pidoc_list">
+<li>Activate the option <a href="#ShowStars">Show stars</a> and check if the script detects at least 100 stars and that there aren't many false positives. If there are few stars, decrease the value of the <a href="#StarSensitivity">Star sensitivity</a>. If there are many false positives increase the value of the <a href="#StarSensitivity">Star sensitivity</a>. If there are many noise pixels identified as stars you can increase the value of the <a href="#Noise">noise reduction</a>.</li>
+<li>The script works better when the <a href="#Coordinates">starting coordinates</a> or the <a href="#ImageScale">image scale</a> have a good starting value. If both are far from the real value the script could have problems for finding a solution. For finding a better starting value for the coordinates and the resolution you can search in a planetarium program o celestial chart the coordinates of a star near the center of the image. The coordinates must be in the equinox J2000. For finding an approximation to the resolution of the image is necessary to know the optical system used for taking the image and what geometric transformations have been done to it.</li>
+<li> The <a href="#Magnitude">limit of the magnitude</a> of the stars of the <a href="#Catalog">catalog</a> has to be matched to the stars visible in the image. You can know the number of stars extracted finding a line in the console like this:
+<pre class="code">Catalog PPMXL size: 154 objects inside the image</pre>
+
+This number should be more than 100 and it should be in the same order of magnitude as the <a href="#ShowStars">detected stars</a>.  Remember to select a <a href="#Catalog">catalog</a> suitable for your image:
+<ul class="pidoc_list">
+<li><strong>Bright stars</strong>: Wide field images with stars up to 8 magnitude.</li>
+<li><strong>TYCHO-2</strong>: Medium field images (50-400mm) with stars up to 12 magnitude.</li>
+<li><strong>PPMXL</strong>: Narrow field images (&gt;400mm).</li>
+</ul>
+
+</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__What_to_do_when_the_script_doesnt_solve_an_image_:_Stretched_images__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Stretched images</h4>
+<p>The histogram stretch is one of the fundamental steps processing an image. However it can interfere with ImageSolver: when the image is stretched the stars are usually blown up and the noise is magnified. This can make noise to be confused with stars. Also the brightest stars get saturated and sometimes are not identified as stars. This situation can be detected activating the option <a href="#ShowStars">Show stars</a>.</p>
+<p>Fortunately this problem is not very frequent but when it occurs you can solve it &quot;un-stretching&quot; the image:</p>
+
+<ul class="pidoc_list">
+<li>Clone the image</li>
+<li>Convert the clone to a 32 bits pixel format using <a href="../../tools/SampleFormatConversion/SampleFormatConversion.html" title="../../tools/SampleFormatConversion/SampleFormatConversion.html">SampleFormatConversion</a>.</li>
+<li>Apply an HistogramTransformation with a midtones value greater that 0.5. This is what un-stretches the image.</li>
+<li>Activate the option <a href="#Noise">Noise reduction</a> in ImageSolver. Usually values of 1 or 2 are enough.</li>
+<li>Solve the clone. If ImageSolver is successful copy the coordinates of the clone to the original image using one of the methods in the section <a href="#CopyWCS">How to copy the coordinates between images</a>.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__What_to_do_when_the_script_doesnt_solve_an_image_:_Wide_field_images__">
+   <h4 class="pidoc_subsectionTitle">3.3&emsp;Wide field images</h4>
+<p>In this context wide field images are those with a focal length of less than 100mm. These images usually are taken with lenses that have serious geometric distortions that can make quite difficult to solve them. For this kind of images the distortion correction should be always activated.</p>
+<p>There are a several strategies for solving these images:</p>
+
+<ul class="pidoc_list">
+<li><strong>Changing the projection</strong>: Images taken with very short focal lengths (fish eye lenses, all-sky cameras) can not be modelled with the Gnomonic projection. ImageSolver has projections (i.e. <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">Orthographic</a>, <a href="../../docs/Projections/Projections.html" title="../../docs/Projections/Projections.html">Zenithal Equal Area</a>) that could adapt better to these images.</li>
+<li> <strong>Distortion model</strong>: The best method for solving wide field images is using a distortion model. The distortion model allows the script to remove the distortion and simplify the process. The distortion model can be created following the instructions at <a href="#DistortionModelHowTo">Creation of a distortion model</a>.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+You can use the distortion model setting its path in the field <a href="#DistortionModel">Distortion model</a>. After a run of the script with a distortion model you can improve the solution running it again activating the option <a href="#Optimization">Only apply optimization</a> and deactivating the distortion model.</li>
+<li><strong>Rough solution with <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a></strong>: Sometimes the problem is too hard for ImageSolver. In this case you can use <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> for getting a rough solution that can be used as a starting point for ImageSolver. A solution with only a few well distributed control points (5-10) is usually enough. The rough solution can be improved executing ImageSolver with the option <a href="#Optimization">Only apply optimization</a>. When the image has strong distortions a greater number of control points (20-50) is necessary. It is also very important that the control points cover the entire surface of the image specially the edges and corners.</li>
+</ul>
+
+<p>If neither of these methods works, you can always use <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> for solving the image.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Creation_of_a_distortion_model__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Creation of a distortion model <a id="DistortionModelHowTo"></a></h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Creation_of_a_distortion_model', this );">[hide]</p>
+   <div id="Creation_of_a_distortion_model">
+<p>The distortion models define how the pixels of an image are displaced from its theoretical position if the image were taken by an ideal optical system. The distortion models are usually only necessary for short focal lenses (less than 100-200mm) and most telescopes don't need them. The models have to be calculated for each lens and focal length (for variable focal lenses).</p>
+<p>Although creating a distortion model can be quite involved, it only has to be done once for each focal length of each lens. Since most people use only a few lenses for astronomical images this is not usually a problem.</p>
+<p>For creating a distortion model you have to follow these steps:</p>
+
+<ul class="pidoc_list">
+<li>First you have to choose a reference image. This image has to be completely covered by stars; it must not touch the horizon or have any part covered by clouds or foreground objects. It is necessary that this image is of a known part of the sky where you are able to identify some of the stars. The best way to get this image is to take a separate shot of a known part of the sky near the zenith. Since the distortion model only depends of the lens and focal length, the resulting model can be used for other images taken with the same optical configuration. If the reference image is partially covered by buildings, trees or the horizon, it can still be used but it won't be able to assist in the distortion correction of those areas.</li>
+<li> Using <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> generate a solution for the reference image. You have to set control points at least at the four corners of the image and the center. 20 well distributed control points should be enough since this solution doesn't need to be very precise. It is necessary only as an starting point for the next step.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+If you select many control points (100-200) you can generate the distortion model directly from ManualImageSolver. In this case you can omit the following steps.</li>
+<li>Optimize the solution using ImageSolver. This is done checking the option <a href="#Optimization">&quot;Only apply optimization&quot;</a>. Before optimizing the image activate also the option <a href="#CreateDistortionModel">&quot;Generate distortion model&quot;</a>.</li>
+<li>Check the solution analyzing the residuals images and an annotated version.</li>
+<li>When you are sure that the solution is the best possible, the distortion model is available at the same directory of the image with the extension .CSV. It is useful to keep the distortion map that <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> generates when the option <a href="#DistortionMap">&quot;Show distortion map&quot;</a>. This map can be used for validating the solutions of the rest of the images.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__How_to_copy_the_coordinates_between_images__">
+   <h3 class="pidoc_sectionTitle">5&emsp;How to copy the coordinates between images <a id="CopyWCS"></a></h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'How_to_copy_the_coordinates_between_images', this );">[hide]</p>
+   <div id="How_to_copy_the_coordinates_between_images">
+<p>There are two methods for copying the coordinates from one image to another:</p>
+
+<ul class="pidoc_list">
+<li><a href="../../tools/FITSHeader/FITSHeader.html" title="../../tools/FITSHeader/FITSHeader.html">FITSHeader</a>.</li>
+<li>Script <strong>CopyCoordinates</strong>.</li>
+</ul>
+
+<div class="pidoc_subsection" id="__How_to_copy_the_coordinates_between_images_:_FITSHeader__">
+   <h4 class="pidoc_subsectionTitle">5.1&emsp;FITSHeader</h4>
+<p>The first method can be used when the solution has <u>no distortion correction</u> and both images have exactly the same geometry: same dimensions and the stars in the same exact position. This is usually the case when you extract one of the channels of the image or between the original unprocessed image and the final image if there are not crops nor resizings.</p>
+<p>In this case you can follow this instructions:</p>
+
+<ul class="pidoc_list">
+<li>Select in the workspace the image with the coordinates.</li>
+<li>Open the tool <a href="../../tools/FITSHeader/FITSHeader.html" title="../../tools/FITSHeader/FITSHeader.html">FITSHeader</a>.</li>
+<li>Activate the <em>Track view</em> mode in FITSHeader. It is the button with the check mark at the right of the lower tool bar.</li>
+<li>Create an icon with the state of FITSHeader: drag to the workspace the triangle at the left of the lower tool bar.</li>
+<li>Drag the icon to the target image for the coordinates.</li>
+</ul>
+
+<p>Beware that this copies <u>all</u> the keywords of the source image to the target image.</p>
+</div>
+
+<div class="pidoc_subsection" id="__How_to_copy_the_coordinates_between_images_:_CopyCoordinates__">
+   <h4 class="pidoc_subsectionTitle">5.2&emsp;CopyCoordinates <a id="CopyCoordinates"></a></h4>
+<p>The script CopyCoordinates can be used for copying the coordinates of a source image to the image in the active window. This script has two modes:</p>
+
+<ul class="pidoc_list">
+<li><em>Simple copy</em>: The script copies the coordinates of the source image to the target image without any transformation. This only works when both images have the same geometry so it typically can only be used between cloned images.</li>
+<li><em>Transform copy</em>: The script tries to register the target image against the source image. If a transformation is found, the script applies it to the coordinates of the source image and then sets the transformed coordinates on the target image. This can be used when the target image is the result of cropping, scaling or rotating the source image (or any combination of these processes and in general any affine transformation).</li>
+</ul>
+
+<p>The instructions for copying the coordinates from an image to another are these:</p>
+
+<ul class="pidoc_list">
+<li>Select in the workspace the target image for the coordinates.</li>
+<li>Open the script <strong>CopyCoordinates</strong>.</li>
+<li>Select the reference image with known coordinates in the field <em>Source image</em>.</li>
+<li>Chose between the simple copy and the transform copy. Please read the explanation in the previous paragraphs.</li>
+<li>Clicking <em>OK</em> the script copies the source coordinates to the target image.</li>
+</ul>
+
+
+<div class="pidoc_figure">
+<a id="__figure_8__"></a>
+<p class="pidoc_figure_title">Figure 8</p>
+
+<div style="text-align:center;">
+<img src="images/CopyCoordinates.png" alt=""/>
+</div>
+</div>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Limitations__">
+   <h3 class="pidoc_sectionTitle">6&emsp;Limitations</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Limitations', this );">[hide]</p>
+   <div id="Limitations">
+
+<ul class="pidoc_list">
+<li>ImageSolver is designed for solving deep sky images where enough stars can be detected and matched to a catalog. It can not solve images with too few stars.</li>
+<li>ImageSolver is not a <em>blind solver</em> which could solve any image knowing nothing about it. You need to know a approximation to the resolution of the image and to the coordinates of the center.</li>
+<li>ImageSolver can not solve images with discontinuities. This is usually the case of mosaics where the tiles have been joined in a sloppy way.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> E. W. Greisen, M. R. Calabretta (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075</p>
+      <p id="__reference_2__"><strong>[2]</strong> M. R. Calabretta, E. W. Greisen (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>, <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>, <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a>, <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012-17, Andrés del Pozo</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:27 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

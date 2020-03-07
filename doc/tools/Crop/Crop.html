@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | Crop</title>
+   <meta name="keywords" content="cropping, margins, canvas, image resolution" />
+   <meta name="author" content="Javier Sanchis Muñoz, PTeam" />
+   <meta name="description" content="Adds or removes image margins." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>Crop</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Adds or removes image margins. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Geometry</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> cropping, margins, canvas, image resolution</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MarginsAnchors__">2.1&emsp;Margins/Anchors</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Dimensions__">2.2&emsp;Dimensions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Resolution__">2.3&emsp;Resolution</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Process_Mode__">2.4&emsp;Process Mode</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Fill_Color__">2.5&emsp;Fill Color</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/Crop.png" alt=""/>
+<p>Crop is a basic geometrical tool to change the dimensions of a target image by adding or removing margins of user-defined lengths. Crop is a versatile tool that allows working either with absolute dimensions in pixels, centimeters or inches, or with relative dimensions. It can create margins filled with a user-defined color and opacity, remove rows and columns of pixels, or modify the printing resolution of the target image.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The first element in the Crop interface is a <em>view selector</em>, which can be used to copy geometric properties from an image to the <a href="#dimensions_section">Dimensions</a> section of the interface. Selecting a view is optional and has no effect at all on the selected view. Changes can be applied to the active view by clicking the <em>Apply</em> button (or by pressing F5), or by direct application of an instance of the process to a view, as part of the usual procedures to execute a process in PixInsight.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/DimensionsSectionDefault.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/DimensionsSectionFromView.png" alt=""/>
+</div>
+<p>The left picture above shows the default <a href="#dimensions_section">Dimensions</a> section. In the right image the Dimensions section has acquired the geometric properties of the image specified by the view selector. Note the disabled <em>Original px Width</em> and <em>Heigth</em> edit boxes. When a view is selected, both fields are no longer modifiable since the <em>Original px</em> dimensions correspond to those of the selected view.</p>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_MarginsAnchors__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;<a id="margins_anchors_section"></a>Margins/Anchors</h4>
+<img style="border:1px solid black;" src="images/MarginAnchors.png" alt=""/>
+<p>This section allows creating or removing margins in an image with four edit boxes and an <em>arrow pad</em>. The extent of each of the four margins in pixels is specified by its corresponding edit box. When an edit box has a positive value, the specified margin in pixels will be <em>added</em> at the corresponding side of the target image. In this case the newly created rows or columns of pixels will be filled with the color and opacity specified in the <a href="#fill_color_section">Fill Color</a> section. Specifying a negative margin in an edit box <em>removes</em> it from the corresponding side. The values expressed in the four edit boxes can have different meanings, depending on the selected <a href="#process_mode_section">Process Mode</a>.</p>
+<p>The user can easily redistribute the total margin lengths by clicking one of the nine <em>arrow pad buttons</em>. The table below exemplifies the use of the edit boxes and the arrow pad in the <a href="#process_mode_section">Absolute margins in pixels</a> process mode.</p>
+
+<div style="text-align:center;">
+
+<table class="pidoc_table" style="margin-top:1em;width:100%;">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1</span></caption>
+<tr>
+<th>
+<div style="text-align:center;">
+<p>Arrow Pad</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Image Sample</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Image Dimensions</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Description</p>
+</div>
+</th>
+</tr>
+<tr>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_01.png" alt=""/>
+</td>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_02.png" alt=""/>
+</td>
+<td><p>133x200</p>
+</td>
+<td>
+<div style="text-align:left;">
+<p>Original image without margins and default arrow pad.</p>
+</div>
+</td>
+</tr>
+<tr>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_03.png" alt=""/>
+</td>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_04.png" alt=""/>
+</td>
+<td><p>113x180</p>
+</td>
+<td>
+<div style="text-align:left;">
+<p>A margin of 10 pixels has been removed from each side of the original picture.<br/>
+<br/>
+ Use negative values in the width edit boxes to remove a margin of the specified length from the corresponding side.</p>
+</div>
+</td>
+</tr>
+<tr>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_05.png" alt=""/>
+</td>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_06.png" alt=""/>
+</td>
+<td><p>153x220</p>
+</td>
+<td>
+<div style="text-align:left;">
+<p>A margin of 10 pixels (see the <a href="#fill_color_section">Fill Color</a> section) has been added to each side of the original picture.<br/>
+<br/>
+ Use the center key to come back to the default arrow pad and to distribute the margin lengths equally on the vertical and horizontal directions.</p>
+</div>
+</td>
+</tr>
+<tr>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_07.png" alt=""/>
+</td>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_08.png" alt=""/>
+</td>
+<td><p>153x220</p>
+</td>
+<td>
+<div style="text-align:left;">
+<p>The image has no margin at its left side and a 20 pixels margin at its right side. This is the result of specifying a margin of 10 pixels for each edit box, then clicking on the center-left arrow.<br/>
+<br/>
+ Use the central arrow buttons on each side of the arrow pad to apply the total length of the horizontal and vertical margins at the oppsosite sides to the clicked button.</p>
+</div>
+</td>
+</tr>
+<tr>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_09.png" alt=""/>
+</td>
+<td><img style="border:1px solid black;" src="images/MarginAnchorsExample_10.png" alt=""/>
+</td>
+<td><p>153x220</p>
+</td>
+<td>
+<div style="text-align:left;">
+<p>The image has no margins at its top and left sides, but it has a 20 pixels margin at its right and bottom sides. This is the result of specifying a margin of 10 pixels for each edit box, then clicking the top left corner arrow button.<br/>
+<br/>
+ Use the corner arrow buttons to apply the total length of the horizontal and vertical margins only at the opposite sides to the clicked corner button.</p>
+</div>
+</td>
+</tr>
+</table>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Dimensions__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;<a id="dimensions_section"></a>Dimensions</h4>
+<img style="border:1px solid black;" src="images/Dimensions.png" alt=""/>
+<p>In this section you can specify the new dimensions of the target image directly by specifying a new width and height, either in pixels, as a percentage of the original picture, in centimeters, or in inches. The <em>cm</em> and <em>inch</em> fields depend on the resolution of the image, which can be changed in the <a href="#resolution_section">Resolution</a> section. The text area below the edit fields provides information on the dimensions of the resulting image. The final dimensions are calculated from the current dimensions in <em>Original px</em>. When no view is selected in the view selector, a default 32-bit format is considered for dimensions calculation.</p>
+<p>Special attention must be paid to understand that this tool performs a redimensioning of the target image by adding or removing margins, and <em>not by resizing or rescaling the original image</em> (for this purpose refer to the <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a> tool). As a result, the Crop tool performs no interpolation of pixel values.</p>
+<p>When new margins are created in the target image, they will be filled with a user-specified color and opacity (see the <a href="#fill_color_section">Fill Color</a> section).</p>
+<p>When new dimensions (different from the <em>Original px</em> dimensions) are specified in this section, new values appear automatically on the four edit boxes of the <a href="#margins_anchors_section">Margins/Anchors</a> section. These values correspond to the positive or negative margins to be applied in order to achieve the specified dimensions for the target image. By default, the positive or negative margins are referred to the center of the image, but this behavior can be changed either by modifying the edit boxes directly, or by clicking the nine buttons on the arrow pad.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Resolution__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;<a id="resolution_section"></a>Resolution</h4>
+<img style="border:1px solid black;" src="images/Resolution.png" alt=""/>
+<p>The resolution of an image is used to specify its final dimensions, in inches or centimeters, when the image is to be <em>printed.</em> The resolution is relevant when the image is imported in a page layout application, such as a word processor or a desktop edition application. It is important to point out that <em>changing the resolution of an image does not change its dimensions in pixels</em>. It is just <em>the dimensions of a printed pixel</em> what image resolution specifies. A default resolution of 72x72 pixels/inch is predefined.</p>
+<p><br class="pidoc_clearfix"/></p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Horizontal and Vertical</p>
+</dt>
+<dd>
+<p>The user can specify the horizontal and vertical resolution either in centimeters or inches. The physical width and heigth of the pinted image depend on the resolution and the dimensions in pixels; for instance, a 1000x1000 pixels image with a resolution of 100 pixels per inch in both axes would be printed over a square of 10x10 inches.</p>
+</dd>
+<dt>
+<p>Force resolution</p>
+</dt>
+<dd>
+<p>When this checkbox is checked the resolution of the target image is effectively modified when the process is executed. Otherwise, when this chekbox is unchecked, resolution values are used <em>for informative purposes exclusively</em>, but they won't change the current resolution of the target image. In both cases, the specified horizontal and vertical resolutions are used to calculate the <em>cm</em> and <em>inch</em> fields of the <a href="#dimensions_section">Dimensions</a> section.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Process_Mode__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;<a id="process_mode_section"></a>Process Mode</h4>
+<img style="border:1px solid black;" src="images/ProcessMode.png" alt=""/>
+<p>This section allows specifying the working mode of the <a href="#margins_anchors_section">Margins/Anchors</a> section.</p>
+<p><br class="pidoc_clearfix"/></p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Relative margins</p>
+</dt>
+<dd>
+<p>When this mode is selected, the margin values are expressed as relative values, where the unity on each axis corresponds to the original dimension of the target image. For instance, a value of 0.2 in the left side edit box will add a left margin of the 20% of the <em>Original px Width</em> field.</p>
+</dd>
+<dt>
+<p>Absolute margins in pixels</p>
+</dt>
+<dd>
+<p>In this mode, the values of the <em>Margins/Anchors</em> section are expressed in pixels. This is the default mode.</p>
+</dd>
+<dt>
+<p>Absolute margins in centimeters</p>
+</dt>
+<dd>
+<p>The values of the <em>Margins/Anchors</em> section are expressed in centimeters.</p>
+</dd>
+<dt>
+<p>Absolute margins in inches</p>
+</dt>
+<dd>
+<p>The values of the <em>Margins/Anchors</em> section are expressed in inches.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Fill_Color__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;<a id="fill_color_section"></a>Fill Color</h4>
+<img style="border:1px solid black;" src="images/FillColor.png" alt=""/>
+<p>In this section you can define the color and opacity of newly created margins (when positive margins are specified) by adjusting three sliders corresponding to the individual RGB channels plus one corresponding to the alpha channel. A color sample area below the sliders shows the custom color and opacity.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a>, <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a>, <a href="../../tools/IntegerResample/IntegerResample.html" title="../../tools/IntegerResample/IntegerResample.html">IntegerResample</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:17 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

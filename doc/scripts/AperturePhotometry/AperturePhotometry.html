@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | AperturePhotometry</title>
+   <meta name="keywords" content="photometry, aperture photometry" />
+   <meta name="author" content="Andrés del Pozo" />
+   <meta name="description" content="Script for measuring the flux of the known stars in astronomical images." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>AperturePhotometry</h1>
+
+<div id="authors">
+<p>By Andrés del Pozo</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for measuring the flux of the known stars in astronomical images. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> photometry, aperture photometry</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Images__">2.1&emsp;Images</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Images_:_Platesolve_parameters__">2.1.1&emsp;Plate-solve parameters</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Stars__">2.2&emsp;Stars</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Stars_:_Stars_Catalog__">2.2.1&emsp;Stars Catalog</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Stars_:_User_defined_objects__">2.2.2&emsp;User defined objects</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Stars_:_Source_for_star_extraction__">2.2.3&emsp;Source for star extraction</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Star_Flux__">2.3&emsp;Star Flux</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Background__">2.4&emsp;Background</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Background_:_Background_aperture__">2.4.1&emsp;Background aperture</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Background_:_Background_model__">2.4.2&emsp;Background model</a></li>
+</ul>
+</li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output__">2.5&emsp;Output </a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_:_Debug_Images__">2.5.1&emsp;Debug Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_:_Photometry_tables__">2.5.2&emsp;Photometry tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Output_tables__">3&emsp;Output tables</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Output_tables_:_Image_Table__">3.1&emsp;Image Table </a></li>
+<li class="pidoc_tocSubitem"><a href="#__Output_tables_:_Batch_Table__">3.2&emsp;Batch Table </a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Output_tables_:_Batch_Table_:_Image_section_Light_red__">3.2.1&emsp;Image section (<em>Light red</em>)</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Output_tables_:_Batch_Table_:_Star_section_Light_blue__">3.2.2&emsp;Star section (<em>Light blue</em>)</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Output_tables_:_Batch_Table_:_Values_section_Yellow__">3.2.3&emsp;Values section (<em>Yellow</em>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>Wikipedia defines <a href="http://en.wikipedia.org/wiki/Photometry_%28astronomy%29" title="http://en.wikipedia.org/wiki/Photometry_%28astronomy%29">Photometry</a> <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Wikipedia contributors, <em><a href='http://en.wikipedia.org/wiki/Photometry_%28astronomy%29' title='http://en.wikipedia.org/wiki/Photometry_%28astronomy%29'>Photometry</a></em>, Wikipedia, The Free Encyclopedia">[3]</a></sup> as <em>a technique of astronomy concerned with measuring the flux, or intensity of an astronomical object's electromagnetic radiation</em>. Although there are several methods for measuring the flux, this script uses one based on what we call <em>apertures</em>: windows of a given size where the flux is integrated.</p>
+<p>This script is limited to the flux calculation. Further analysis must be done using other tools.</p>
+<p>For each star we want to measure, an aperture is centered on the star with dimensions chosen by the user. The flux is obtained by adding the value of each pixel contained in the aperture and subtracting the estimated background level. The script implements two different algorithms for calculating the flux depending on how the background is estimated.</p>
+<p>When the background is estimated from a background model (see <a href="#MMT">Multiscale Median Transform</a> or <a href="#ABE">Automatic Background Extraction</a>), the script uses this formula:</p>
+<a id="__equation_1__"></a><div class="pidoc_equation"><img src="images/eqn_0001.svg" alt=""/><span class="pidoc_equation_number">[1]</span></div>
+<p>Where <img style="vertical-align:middle;" src="images/eqn_0002.svg" alt=""/> is the index of each pixel of the image. <img style="vertical-align:middle;" src="images/eqn_0003.svg" alt=""/> is the area of the intersection of the pixel and the aperture. The values of <img style="vertical-align:middle;" src="images/eqn_0003.svg" alt=""/> are such that the area of the aperture is the sum of the values of <img style="vertical-align:middle;" src="images/eqn_0003.svg" alt=""/> for all the pixels:</p>
+<a id="__equation_2__"></a><div class="pidoc_equation"><img src="images/eqn_0004.svg" alt=""/><span class="pidoc_equation_number">[2]</span></div>
+<p>When the background is estimated from the source image (see <a href="#SourceImage">Source Image</a>), the script uses this formula:</p>
+<a id="__equation_3__"></a><div class="pidoc_equation"><img src="images/eqn_0005.svg" alt=""/><span class="pidoc_equation_number">[3]</span></div>
+<p>The background level is estimated by calculating the median value of the pixels inside the background aperture (see <a href="#SquareRing">Square ring</a>). This value is calculated after making a <em>sigma clipping</em> outlier rejection inside the background aperture (see <a href="#SquareRing">Square ring</a>).</p>
+<p>The script currently only measures the flux of known stars in one of the supported catalogs.</p>
+<p>The script uses the following steps:</p>
+
+<ul class="pidoc_list">
+<li><strong>Image selection</strong>: The user can choose between analyzing the active image in PixInsight or processing a list of images. The images must be plate-solved in order before applying the script. If the images do not have an astrometric solution yet, the script can solve them.</li>
+<li><strong>Star extraction</strong>: For each image the script queries a catalog to get the catalogued stars in the field of view of the image. Then, these stars are projected into the image and their exact position is calculated.</li>
+<li><strong>Flux calculation</strong>: For each star the script calculates the <em>raw flux</em> adding the value (in electrons) of each pixel inside the aperture. The pixels only partially inside the aperture are weighted proportionally to the area inside of it.</li>
+<li><strong>Background calculation</strong>: For each star the script calculates the <em>background flux</em>. This calculation can be using different methods. The <em>net flux</em> of the star is obtained subtracting the background flux from the raw flux.</li>
+<li><strong>Output</strong>: After measuring all the stars in the images, the scrip can write the results to files. The user can choose what types of data wants to write.</li>
+</ul>
+
+<p>The configuration dialog of the script is structured mirroring these steps. The dialog has a tab for configuring each step. The usage of the script is explained in the next section.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The photometry script has many configuration parameters. To simplify its use the configuration dialog has been divided in separate sections. Each allows to define a set of parameters.</p>
+<div class="pidoc_subsection" id="__Usage_:_Images__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Images</h4>
+<p>The objective of the <strong>Images</strong> tab is the selection of the image or images that the script will process:</p>
+
+<div style="text-align:center;">
+<img src="images/images.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Active image in PixInsight</p>
+</dt>
+<dd>
+<p>When this option is selected the script will process the active image in PixInsight. This option is enabled only when there is at least one image open in the application.</p>
+</dd>
+<dt>
+<p>Files</p>
+</dt>
+<dd>
+<p>Click this option to select a list of files to process. Use the buttons <strong>Add files</strong> and <strong>Remove files</strong> to add or remove files to the list. The button <strong>Clear files</strong> removes all the files in the list.</p>
+<p>The files in this list don't need to be open in the application as the script opens them before processing each one.</p>
+</dd>
+</dl>
+
+<div class="pidoc_subsection" id="__Usage_:_Images_:_Platesolve_parameters__">
+   <h5 class="pidoc_subsectionTitle">2.1.1&emsp;Plate-solve parameters</h5>
+<p>This collapsible section allows to define the plate-solving parameters for the images.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Plate-solve the unsolved images</p>
+</dt>
+<dd>
+<p>The script requires an astrometric solution for each image, stored in tags using the WCS convention <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+E. W. Greisen, M. R. Calabretta (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+M. R. Calabretta, E. W. Greisen (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122">[2]</a></sup>. If the image has not coordinates and this option is selected the script tries to solve it by using the <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> script. If the image cannot be solved, the script skips it and jumps to the next image.</p>
+<p>The button <strong>Configure solver</strong> opens the configuration dialog of ImageSolver. These parameters are used as a starting point when solving the images. This forces to have a similar center and resolution for all the image set. If the images are from different sky areas, they must be solved prior to running the AperturePhotometry script, using ImageSolver on each one.</p>
+</dd>
+<dt>
+<p>Use image metadata</p>
+</dt>
+<dd>
+<p>When solving an image the solver will prioritize the image metadata (Coordinates, focal length, epoch). If any of the parameters is not available the solver will substitute them with the values in the solver dialog.</p>
+</dd>
+<dt>
+<p>Use solver configuration</p>
+</dt>
+<dd>
+<p>When solving an image the solver will use the configuration in the solver dialog while ignoring the values (coordinates, focal length, epoch, ...) that the images could have.</p>
+</dd>
+<dt>
+<p>Force plate-solving the already solved images</p>
+</dt>
+<dd>
+<p>When this option is active the script tries to plate-solve all the images, including those already solved.</p>
+<p>This option can be used when the current astrometric solution is not good enough and you desire to improve it.</p>
+</dd>
+<dt>
+<p>Save the solution of the plate-solving</p>
+</dt>
+<dd>
+<p>If this option is selected the images are saved with the newly found astrometric solution. When this option is not selected the images are not modified in the disk and the coordinates are lost when the script finishes. This option is only enabled when <strong>Plate-solve the unsolved images</strong> is selected.</p>
+</dd>
+<dt>
+<p>Output file suffix</p>
+</dt>
+<dd>
+<p>This suffix will be appended to the filename when saving the plate-solve solution. If it is empty, the original file will be overwritten.</p>
+</dd>
+</dl>
+
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Stars__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Stars</h4>
+<p>This tab provides the options for configuring how the stars are found in the image.</p>
+
+<div style="text-align:center;">
+<img src="images/stars.png" alt=""/>
+</div>
+<p>The star extraction process has additional parameters:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Margin</p>
+</dt>
+<dd>
+<p>This value sets a minimum distance in pixels of the stars to the borders. The stars that are too close to the image borders are not processed.</p>
+</dd>
+</dl>
+
+<div class="pidoc_subsection" id="__Usage_:_Stars_:_Stars_Catalog__">
+   <h5 class="pidoc_subsectionTitle">2.2.1&emsp;Stars Catalog</h5>
+<p>The <strong>Stars Catalog</strong> section configures the queries to the star catalog.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Catalog</p>
+</dt>
+<dd>
+<p>This options determine which catalog is going to be used for finding stars. The script will only process the stars in this catalog. The list shows all the available catalogs in <a href="../../scripts/AnnotateImage/AnnotateImage.html" title="../../scripts/AnnotateImage/AnnotateImage.html">AnnotateImage</a>. Since some of the catalogs don't store stars, the catalog must be chosen carefully.</p>
+</dd>
+<dt>
+<p>VizieR server</p>
+</dt>
+<dd>
+<p>This list shows the list of mirrors of VizieR. You should select the best server for your location.</p>
+</dd>
+<dt>
+<p>Maximum magnitude <a id="CatalogFilter"></a></p>
+</dt>
+<dd>
+<p>This option limits the magnitude of the extracted stars. This magnitude is the actual value in the catalog and not the effective magnitude in the image. You should select a suitable value for the images that are going to be processed. It is useless to select a too high magnitude limit for your image set because they will have a very low SNR.</p>
+<p>Since most of the catalogs store the magnitudes for different filters, you have to select the desired catalog filter.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Stars_:_User_defined_objects__">
+   <h5 class="pidoc_subsectionTitle">2.2.2&emsp;User defined objects</h5>
+<p>Sometimes it is necessary to measure the flux of objects that are not in the catalog (supernovas, faint stars, asteroids, comets, etc). This collapsible section allows to add objects to the list of objects that will be measured. This objects will be measured the same way as the objects read from the catalog.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>List of objects</p>
+</dt>
+<dd>
+<p>This list shows the objects defined by the user. For each object the list contains its name and equatorial coordinates.</p>
+</dd>
+<dt>
+<p>Add object</p>
+</dt>
+<dd>
+<p>This button opens a dialog for defining a new object. This dialog has two tabs: one for searching the coordinates in the service Sesame. The other has fields for writing the coordinates.</p>
+</dd>
+<dt>
+<p>Delete object</p>
+</dt>
+<dd>
+<p>Deletes the selected objects in the list.</p>
+</dd>
+<dt>
+<p>Modify object</p>
+</dt>
+<dd>
+<p>This button opens the configuration dialog of the selected object.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Stars_:_Source_for_star_extraction__">
+   <h5 class="pidoc_subsectionTitle">2.2.3&emsp;Source for star extraction</h5>
+<p>After querying the catalog for the J2000 coordinates of the stars, the script tries to map these coordinates to actual stars in the image. This collapsible section defines the method the script uses for finding the position of the stars in the image.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Extract stars from the catalog</p>
+</dt>
+<dd>
+<p>The position of the stars is calculated by projecting the catalog coordinates to image coordinates using the referentiation stored in the image.</p>
+<p>This option is only valid when the referentiation is very good. However, if the referentiation is good enough, it allows to predict the position in the image of stars with very low SNR.</p>
+</dd>
+<dt>
+<p>Extract stars from each image</p>
+</dt>
+<dd>
+<p>The stars are extracted from each image searching for the best position using the catalog coordinates as a starting point.</p>
+<p>The stars are searched applying <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> directly to each image. This is the best method when the image has good <em>SNR</em>.</p>
+</dd>
+<dt>
+<p>Extract stars from reference image</p>
+</dt>
+<dd>
+<p>The stars are not searched directly in each image but in a reference image. You have to select an image from the list that covers the same area as the images to be processed. After finding the exact position of the stars in the reference image, these positions are translated to pixel coordinates in the target images.</p>
+<p>This option is currently considered as <strong>experimental</strong>. The idea behind this capability is that if the reference image is the result of the integration of many frames, the SNR of the faintest stars should be much better. Therefore, <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a> should be able to get more precise positions for the fainter stars.</p>
+</dd>
+</dl>
+
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Star_Flux__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Star Flux</h4>
+<p>The parameters of this section configure how the star flux is calculated.</p>
+
+<div style="text-align:center;">
+<img src="images/flux.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Filter <a id="Filter"></a></p>
+</dt>
+<dd>
+<p>The filter used in the image can be defined by selecting it from a list, by writing its name in the <strong>Filter</strong> field or by choosing the FITS keyword that stores it. The name of the filter is not used anywhere in the calculation and it is used only when writing the results.</p>
+</dd>
+<dt>
+<p>Aperture shape <a id="ApertureShape"></a></p>
+</dt>
+<dd>
+<p>The aperture used for calculating the flux can be a square or a circle centered on the star position. For each star the script calculates the <em>raw flux</em> adding the value (in electrons) of each pixel inside the aperture. The pixels only partially inside the aperture are weighted proportionally to the area inside it.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img style="width:49%;height:auto;" src="images/ApertureSquare.svg" alt=""/>
+<img style="width:49%;height:auto;" src="images/ApertureCircular.svg" alt=""/>
+</div>
+</dd>
+<dt>
+<p>Aperture size <a id="ApertureSize"></a></p>
+</dt>
+<dd>
+<p>The script can calculate the flux for a range of aperture sizes spaced evenly. The field <strong>Minimum aperture</strong> defines the minimum aperture size in pixels. <strong>Aperture steps</strong> defines the number of different sizes to use. <strong>Aperture step size</strong> defines the separation between the steps.</p>
+<p>For square apertures, the size is the length in pixels of the <em>sides</em> of the square. For circular apertures, the size is the <em>diameter</em> in pixels of the circle.</p>
+</dd>
+<dt>
+<p>CCD gain</p>
+</dt>
+<dd>
+<p>This value is the gain of the camera expressed in <em>electrons/ADU</em>. It is used for converting the values of the pixels to electrons.</p>
+<p>If you press the arrow button, the script tries to get the gain value form the EGAIN keyword of the image.</p>
+</dd>
+<dt>
+<p>SNR threshold <a id="SNRthreshold"></a></p>
+</dt>
+<dd>
+<p>This parameter is used for flagging the stars which measured SNR is too low. The available flags are defined in the section <a href="#Flags">Image Table</a>.</p>
+</dd>
+<dt>
+<p>Saturation threshold <a id="SaturationThreshold"></a></p>
+</dt>
+<dd>
+<p>This parameter is used for flagging the stars that have at least one pixel with value greater than the threshold. The threshold is defined as a percent of the maximum value. The available flags are defined in the section <a href="#Flags">Image Table</a>.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Background__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Background</h4>
+<p>The script needs to calculate the background level at the position of each star. This level is subtracted from the raw flux to get the final flux.</p>
+
+<div style="text-align:center;">
+<img src="images/background.png" alt=""/>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Background_:_Background_aperture__">
+   <h5 class="pidoc_subsectionTitle">2.4.1&emsp;Background aperture</h5>
+<p>The flux can be calculated using one of two algorithms:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Square ring <a id="SquareRing"></a></p>
+</dt>
+<dd>
+<p>The script centers a square ring around each star. This ring's internal and external sizes can be defined. The script uses the pixels of the background model inside the ring for calculating the background level.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img src="images/background_ring.png" alt=""/>
+</div>
+</dd>
+<dt>
+<p>Photometric aperture <a id="BkgPhotometricWindow"></a></p>
+</dt>
+<dd>
+<p>The script gets the value of the background using the same aperture as used in the flux calculation (see <a href="#ApertureShape">Aperture shape</a> and <a href="#ApertureSize">Aperture size</a>). Since this aperture covers the star, this option needs to use a background model without the stars. It cannot be used when the background is extracted from the <a href="#SourceImage">Source Image</a>.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Background_:_Background_model__">
+   <h5 class="pidoc_subsectionTitle">2.4.2&emsp;Background model</h5>
+<p>The script can use three different background models:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Source image <a id="SourceImage"></a></p>
+</dt>
+<dd>
+<p>When this option is used the value of the background level is calculated directly from the pixels of the source image. The background level is estimated by calculating the <em>sigma-clipped, median</em> value of the pixels inside the background aperture. The values <em>Sigma low</em> and <em>Sigma high</em> configure the rejection of the SigmaClipping.</p>
+<p>This option can only be used with the option <a href="#SquareRing">Square ring</a>.</p>
+</dd>
+<dt>
+<p>Multiscale Median Transform <a id="MMT"></a></p>
+</dt>
+<dd>
+<p>The script generates a background model using <a href="../../tools/MultiscaleMedianTransform/MultiscaleMedianTransform.html" title="../../tools/MultiscaleMedianTransform/MultiscaleMedianTransform.html">MultiscaleMedianTransform</a> (MMT) for removing the smaller scale layers. You can choose the number of images that are removed. If enough layers are removed, the stars disappear from the image. The option <a href="#DebugBackground">Show background model</a> can be useful for deciding the number of layers to remove.</p>
+</dd>
+<dt>
+<p>Automatic Background Extraction <a id="ABE"></a></p>
+</dt>
+<dd>
+<p>The script generates a background model using <a href="../../tools/AutomaticBackgroundExtraction/AutomaticBackgroundExtraction.html" title="../../tools/AutomaticBackgroundExtraction/AutomaticBackgroundExtraction.html">AutomaticBackgroundExtraction</a> (ABE). This process tries to generate a background model placing samples in the background and then interpolating between them. The option <a href="#DebugBackground">Show background model</a> can be used to validate the background model.</p>
+</dd>
+</dl>
+
+</div>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;Output <a id="Output"></a></h4>
+<p>In the <strong>Output</strong> tab you can configure several options that determine what kind of values are written in the output files and some debugging options.</p>
+
+<div style="text-align:center;">
+<img src="images/output.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Output directory</p>
+</dt>
+<dd>
+<p>This field is the path of the directory where the script will write the results. If it is left empty the files will be created in the directory of the first file.</p>
+<p>Click in the down arrow to open the directory selection dialog.</p>
+</dd>
+</dl>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_:_Debug_Images__">
+   <h5 class="pidoc_subsectionTitle">2.5.1&emsp;Debug Images</h5>
+<p>The <strong>Output</strong> tab has several options to <em>debug</em> the process. They are useful for adjusting the parameters of the process. The best way to use them is to activate the debug options and try the process with only one image. When the parameters are set as desired the debug options can be deactivated before processing a large batch of images.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Generate image with detected stars <a id="ShowStars"></a></p>
+</dt>
+<dd>
+<p>Select this option to generate an annotated image where the detected stars are drawn. For each star the script draws the shape of the photometric apertures and the background ring (when the option <a href="#SquareRing">Square ring</a> is selected). This option helps to configure the star extraction process and to adjust the photometric apertures.</p>
+<p>The stars have different colors depending on the flags that the process has set on them. The colors have this meaning:</p>
+
+<ul class="pidoc_list">
+<li><strong>Red</strong>: The star has the flag <a href="#Flags">MULTIPLE</a>.</li>
+<li><strong>Yellow</strong>: The star has the flags <a href="#Flags">OVERLAPPED</a> or <a href="#Flags">BADPOS</a>.</li>
+<li><strong>Cyan</strong>: The star has the flag <a href="#Flags">LOWSNR</a>.</li>
+<li><strong>Pink</strong>: The star has the flag <a href="#Flags">SATURATED</a>.</li>
+<li><strong>Green</strong>: The star has no flags.</li>
+</ul>
+
+<p>The colors are assigned in this order. i.e. a star with the flags MULTIPLE and SATURATED is drawn red.</p>
+<p>The images are shown in new windows or saved in files depending on the value of the option <a href="#SaveDebug">Save debug images</a>.</p>
+</dd>
+<dt>
+<p>Show background model <a id="DebugBackground"></a></p>
+</dt>
+<dd>
+<p>When the option for using the <a href="#SourceImage">Source image</a> as background model is selected this option generates a synthetic background model. This is generated interpolating with <a href="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html" title="../../tools/DynamicBackgroundExtraction/DynamicBackgroundExtraction.html">DynamicBackgroundExtraction</a> the measured background values for every star. This option can be very slow if the number of stars is very high.</p>
+<p>If the background model is generated with <a href="#MMT">Multiscale Median Transform</a> or <a href="#ABE">Automatic Background Extraction</a>, this option shows the generated model.</p>
+<p>It is very important to check the background model before processing a batch of images in order to check that the model is correct.</p>
+<p>The images are shown in new windows or saved in files depending on the value of the option <a href="#SaveDebug">Save debug images</a>.</p>
+</dd>
+<dt>
+<p>Save debug images <a id="SaveDebug"></a></p>
+</dt>
+<dd>
+<p>When this option is activated the script saves the debug images (<a href="#ShowStars">Detected stars</a> and <a href="#DebugBackground">Background model</a>). These images are saved only when their corresponding options are selected.</p>
+<p>If this option is not selected the debug images are shown in new windows in the workspace.</p>
+<p>If this option is selected the debug images are saved in the output directory. In this last case the script <strong>do not</strong> show the images in new windows.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_:_Photometry_tables__">
+   <h5 class="pidoc_subsectionTitle">2.5.2&emsp;Photometry tables</h5>
+<p>The photometric process reads from the images and catalog and generates itself many different values. The section <strong>Photometry tables</strong> allows to configure what is written.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Table prefix <a id="TablePrefix"></a></p>
+</dt>
+<dd>
+<p>Prefix used as the first part of the filename of the generated tables. Its default value is 'Table_'.</p>
+</dd>
+<dt>
+<p>Generate a table for each image with its information <a id="GenImageTable"></a></p>
+</dt>
+<dd>
+<p>This option generates a <span class="pidoc_code">CSV</span> file for each image with the full information available about it. The files have the same name as the images but with <span class="pidoc_code">.csv</span> extension. The section <a href="#ImageTable">Image Table</a> describes the contents of theses files.</p>
+</dd>
+<dt>
+<p>Generate flux tables</p>
+</dt>
+<dd>
+<p>This option generates tables that summarize the measured fluxes for all the stars in all the images. The script generates a different table for each photometric aperture (see <a href="#ApertureSize">Aperture size</a>). The tables have the name '<span class="pidoc_code"><em><a href="#TablePrefix">Prefix</a></em>Flux_ApN.csv</span>' where N is the aperture size. The format of the table is described in the section <a href="#BatchTable">Batch Table</a>.</p>
+</dd>
+<dt>
+<p>Generate background table</p>
+</dt>
+<dd>
+<p>This option generates a table with the measured background for all the stars in all the images. When the option <a href="#BkgPhotometricWindow">Photometric window</a> is used and the script uses more than one aperture (see <a href="#ApertureSize">Aperture size</a>), the values written in the table are the backgrounds for the smaller aperture. The table has the name '<span class="pidoc_code"><em><a href="#TablePrefix">Prefix</a></em>Background.csv</span>'. The format of the table is described in the section <a href="#BatchTable">Batch Table</a>.</p>
+</dd>
+<dt>
+<p>Generate SNR table</p>
+</dt>
+<dd>
+<p>This option generates tables that summarize the measured <em>SNR</em> for all the stars in all the images. The script generates a different table for each photometric aperture (see <a href="#ApertureSize">Aperture size</a>). The tables have the name '<span class="pidoc_code"><em><a href="#TablePrefix">Prefix</a></em>SNR_ApN.csv</span>' where N is the aperture size. The format of the table is described in the section <a href="#BatchTable">Batch Table</a>.</p>
+</dd>
+<dt>
+<p>Generate flags table</p>
+</dt>
+<dd>
+<p>This option generates a table with the flags of all the stars in all the images. The table has the name '<span class="pidoc_code"><em><a href="#TablePrefix">Prefix</a></em>Flags.csv</span>'. The format of the table is described in the section <a href="#BatchTable">Batch Table</a>.</p>
+</dd>
+<dt>
+<p>Generate error file</p>
+</dt>
+<dd>
+<p>When an error occurs in an image, the application does not stop and jumps to the next image. When the script finishes it writes in the console the number of successful images and the number of errors.</p>
+<p>If this option is selected, a summary of the errors is written in a file. The name of the file is '<span class="pidoc_code"><em><a href="#TablePrefix">Prefix</a></em>Errors.csv</span>'.</p>
+</dd>
+</dl>
+
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Output_tables__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Output tables</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Output_tables', this );">[hide]</p>
+   <div id="Output_tables">
+<div class="pidoc_subsection" id="__Output_tables_:_Image_Table__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Image Table <a id="ImageTable"></a></h4>
+<p>The photometry script can generate a table for each image with all the information available of it. This table is generated when the user activates the option <a href="#GenImageTable">Generate a table for each image with its information</a> in the <a href="#Output">Output tab</a>. The information in this table is read from the catalog or the FITS keywords or it is calculated by the script.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+<img style="width:100%;height:auto;" src="images/image_table.png" alt=""/>
+</div>
+<p>The table has a header and, after it, one row for each star. The columns store the following information:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>DATE_OBS</p>
+</dt>
+<dd>
+<p>Value of the DATE_OBS keyword of the image. The value is stored as a julian date.</p>
+</dd>
+<dt>
+<p>NAME</p>
+</dt>
+<dd>
+<p>Name of the star as read from the catalog.</p>
+</dd>
+<dt>
+<p>FILTER</p>
+</dt>
+<dd>
+<p>Name of the filter chosen by the user in the option <a href="#Filter">Filter</a>. It can be obtained from a keyword of the image.</p>
+</dd>
+<dt>
+<p>CATRA, CATDEC</p>
+</dt>
+<dd>
+<p>Equatorial J2000 coordinates of the star as stored in the catalog. Both components are stored as degrees. Therefore the Right Ascension will be in the range [0,360).</p>
+</dd>
+<dt>
+<p>IMGRA, IMGDEC</p>
+</dt>
+<dd>
+<p>Equatorial J2000 coordinates of the star as measured in the image. This value is calculated unprojecting the measured pixel coordinates of the star. Both components are stored as degrees. Therefore the Right Ascension will be in the range [0,360).</p>
+</dd>
+<dt>
+<p>IMGX, IMGY</p>
+</dt>
+<dd>
+<p>Pixel coordinates of the star. This value is the returned by <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a>.</p>
+</dd>
+<dt>
+<p><em>CatalogMagnitude</em></p>
+</dt>
+<dd>
+<p>The name of this column is the name of the filter chosen in the section <a href="#CatalogFilter">Maximum magnitude</a>. It contains the catalog value of the magnitude of the star for this filter.</p>
+</dd>
+<dt>
+<p>BACKGROUND</p>
+</dt>
+<dd>
+<p>Background level used for the star expressed in electrons. The background flux is the product of the background level and the area of the photometric aperture.</p>
+</dd>
+<dt>
+<p>BGSTDDEV</p>
+</dt>
+<dd>
+<p>This column is the estimation of the noise of the background of the star.</p>
+<p>When the background is calculated from the <a href="#SourceImage">source image</a> this column contains the <em>standard deviation</em> of the result of the <em>Median/SigmaClipping</em> algorithm.</p>
+<p>When the background is calculated from a <a href="#MMT">MMT</a> or <a href="#ABE">ABE</a> model, this column contains the noise of the whole image.</p>
+</dd>
+<dt>
+<p>BGRJCT</p>
+</dt>
+<dd>
+<p>This column contains the fraction of pixels rejected in the noise calculation. The value is in the range [0,1], being 0 no pixels rejected.</p>
+</dd>
+<dt>
+<p>PSF_A, PSF_SIGMAX, PSF_SIGMAY, PSF_THETA, PSF_MAD</p>
+</dt>
+<dd>
+<p>Values of the PSF fitting for the star as calculated by <a href="../../tools/DynamicPSF/DynamicPSF.html" title="../../tools/DynamicPSF/DynamicPSF.html">DynamicPSF</a>.</p>
+</dd>
+<dt>
+<p>FLUX<img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/></p>
+</dt>
+<dd>
+<p>The table has a FLUX<img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> column for each <a href="#ApertureSize">aperture size</a>. These columns contain the value of the measured flux in electrons for each star and aperture. The index <img style="vertical-align:middle;" src="images/eqn_0002.svg" alt=""/> is the size of the aperture.</p>
+</dd>
+<dt>
+<p>SNR<img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/></p>
+</dt>
+<dd>
+<p>The table has a SNR<img style="vertical-align:middle;" src="images/eqn_0006.svg" alt=""/> column for each <a href="#ApertureSize">aperture size</a>. These columns contains the value of the <em>Signal to Noise Ratio</em> (SNR) for each star and aperture. The index <img style="vertical-align:middle;" src="images/eqn_0002.svg" alt=""/> is the size of the aperture.</p>
+</dd>
+<dt>
+<p>FLAG <a id="Flags"></a></p>
+</dt>
+<dd>
+<p>The script applies several validations for each star and generates a flag when when one of the validations fail.</p>
+<p>The value of the flags of a star is the logical <em>OR</em> of the individual flags. When a star has no flags, the value is 0. The available flags are:</p>
+
+<ul class="pidoc_list">
+<li><strong>MULTIPLE (1)</strong>: This flag is added to the stars that have another star less than one pixel away.</li>
+<li><strong>OVERLAPPED (2)</strong>: This flag is added to the stars that have another star inside the photometric window.</li>
+<li><strong>BADPOS (4)</strong>: This flag is used for the stars which predicted position from the catalog is too different to the actual position measured in the image. This usually happens when there is any problem in the star fitting process.</li>
+<li><strong>LOWSNR (8)</strong>: This flag is added to the stars with a SNR below the threshold defined in the field <a href="#SNRthreshold">SNR threshold</a>.</li>
+<li><strong>SATURATED (16)</strong>: This flag is added to the stars with at least one pixel with a value over the staturation threshold as defined in the field <a href="#SaturationThreshold">Saturation threshold</a>.</li>
+</ul>
+
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Output_tables_:_Batch_Table__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Batch Table <a id="BatchTable"></a></h4>
+<p>The photometry script can generate tables with the summary of the calculated values of several images. These tables are generated when the user activates the options <strong>Generate flux tables</strong>, <strong>Generate background table</strong>, <strong>Generate SNR tables</strong> and <strong>Generate flags table</strong> in the <a href="#Output">Output tab</a>. The script generates an individual table for each selected option (Flux<em>i</em>, Background, SNR<em>i</em> or Flags).</p>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+<img src="images/batch_table.png" alt=""/>
+</div>
+<p>This table has three sections. The screen capture has these sections highlighted with different colors.</p>
+<div class="pidoc_subsection" id="__Output_tables_:_Batch_Table_:_Image_section_Light_red__">
+   <h5 class="pidoc_subsectionTitle">3.2.1&emsp;Image section (<em>Light red</em>)</h5>
+<p>In this section there is a column for each image and rows for several fields:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>ImageId</p>
+</dt>
+<dd>
+<p>This row stores the name of the image.</p>
+</dd>
+<dt>
+<p>DATE_OBS</p>
+</dt>
+<dd>
+<p>Value of the DATE_OBS keyword of each image translated to julian date.</p>
+</dd>
+<dt>
+<p>FILTER</p>
+</dt>
+<dd>
+<p>Name of the filter chosen by the user in the option <a href="#Filter">Filter</a>. It can be obtained from a keyword of the image.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Output_tables_:_Batch_Table_:_Star_section_Light_blue__">
+   <h5 class="pidoc_subsectionTitle">3.2.2&emsp;Star section (<em>Light blue</em>)</h5>
+<p>This section has a row for each star. These columns have the values of several fields common to all the images.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>StarId</p>
+</dt>
+<dd>
+<p>Name of the star as read from the catalog.</p>
+</dd>
+<dt>
+<p>RA, Dec</p>
+</dt>
+<dd>
+<p>Equatorial J2000 coordinates of the star as stored in the catalog. Both components are stored as degrees. Therefore the Right Ascension will be in the range [0,360).</p>
+</dd>
+<dt>
+<p>Flags</p>
+</dt>
+<dd>
+<p>Combination using logical OR of the flags of all the images.</p>
+</dd>
+<dt>
+<p>Catalog_<em>filter</em></p>
+</dt>
+<dd>
+<p>Catalog value of the magnitude of the star for the filter chosen by the user for the parameter <a href="#CatalogFilter">Maximum magnitude</a>.</p>
+</dd>
+<dt>
+<p>MinSNR</p>
+</dt>
+<dd>
+<p>Minimum value for the SNR of the star in all the images.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Output_tables_:_Batch_Table_:_Values_section_Yellow__">
+   <h5 class="pidoc_subsectionTitle">3.2.3&emsp;Values section (<em>Yellow</em>)</h5>
+<p>This section is different depending on the summarized field of the table. It can contain the flux for an aperture, the background level, SNR or flags. Each row contains the value for a star and each column the value for an image.</p>
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> E. W. Greisen, M. R. Calabretta (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075</p>
+      <p id="__reference_2__"><strong>[2]</strong> M. R. Calabretta, E. W. Greisen (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122</p>
+      <p id="__reference_3__"><strong>[3]</strong> Wikipedia contributors, <em><a href="http://en.wikipedia.org/wiki/Photometry_%28astronomy%29" title="http://en.wikipedia.org/wiki/Photometry_%28astronomy%29">Photometry</a></em>, Wikipedia, The Free Encyclopedia</p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2013, Andrés del Pozo, Vicent Peris (OAUV)</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:35 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

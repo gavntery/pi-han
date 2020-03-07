@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | FastRotation</title>
+   <meta name="keywords" content="image rotation, image mirroring, fast rotations" />
+   <meta name="author" content="Javier Sanchis Muñoz, PTeam" />
+   <meta name="description" content="Rotates images by integer multiples of 90 degrees, or mirrors images horizontally or vertically." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>FastRotation</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Rotates images by integer multiples of 90 degrees, or mirrors images horizontally or vertically. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Geometry</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> image rotation, image mirroring, fast rotations</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Rotation_mode__">2.1&emsp;Rotation mode</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Mirror_mode__">2.2&emsp;Mirror mode</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/FastRotation.png" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>The FastRotation process implements orthogonal and specular geometric transformations: rotate 180 degrees, rotate 90 degrees clockwise, rotate 90 degrees counter-clockwise, horizontal mirror and vertical mirror. These operations are collectively knwown as <em>fast rotations</em> on the PixInsight/PCL platform.<br class="pidoc_clearfix"/></p>
+<p>The most important feature of all fast rotations is that these transformations don't interpolate pixel values; they copy and exchange pixels exclusively to generate the rotated or mirrored output image, and hence apply <em>lossless</em> transformations (also knwon as <em>nondestructive transformations</em>). As far as no pixel is cropped (which never happens with the FastRotation tool), you could apply an unlimited number of fast rotations to an image, and the original pixel values would be preserved in the final image (they would only change their positions with respect to the original).</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Rotation_mode__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Rotation mode</h4>
+<p>The table below exemplifies the three rotations available in the FastRotation tool.</p>
+
+<div style="text-align:center;">
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1<br/>
+Rotation Operation</span></caption>
+<tr>
+<th>
+<div style="text-align:center;">
+<p>Original Image</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Rotated Image</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Rotation</p>
+</div>
+</th>
+</tr>
+<tr>
+<td><img src="images/RotationExample_01.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_02.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_03.png" alt=""/>
+</td>
+</tr>
+<tr>
+<td><img src="images/RotationExample_01.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_04.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_05.png" alt=""/>
+</td>
+</tr>
+<tr>
+<td><img src="images/RotationExample_01.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_06.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_07.png" alt=""/>
+</td>
+</tr>
+</table>
+
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Mirror_mode__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Mirror mode</h4>
+<p>The following table shows the two mirroring operations available in the FastRotation tool.</p>
+
+<div style="text-align:center;">
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_2__"></a>
+<span class="pidoc_table_title">Table 2<br/>
+Mirroring Operation</span></caption>
+<tr>
+<th>
+<div style="text-align:center;">
+<p>Original Image</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Mirrored Image</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Rotation</p>
+</div>
+</th>
+</tr>
+<tr>
+<td><img src="images/RotationExample_01.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_08.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_09.png" alt=""/>
+</td>
+</tr>
+<tr>
+<td><img src="images/RotationExample_01.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_10.png" alt=""/>
+</td>
+<td><img src="images/RotationExample_11.png" alt=""/>
+</td>
+</tr>
+</table>
+
+</div>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/Rotation/Rotation.html" title="../../tools/Rotation/Rotation.html">Rotation</a>, <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:26 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

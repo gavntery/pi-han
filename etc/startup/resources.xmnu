@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmnu version="1.0">
+   <menu text="Learning">
+      <item text="Online Tutorials" icon=":/toolbar/resources-tutorials.png" url="https://pixinsight.com/tutorials/"/>
+      <item text="Online Processing Examples" icon=":/toolbar/resources-examples.png" url="https://pixinsight.com/examples/"/>
+      <item text="Online Video Tutorials" icon=":/toolbar/resources-video-tutorials.png" url="https://pixinsight.com/videos/"/>
+      <item text="PixInsight Resources" icon=":/toolbar/resources-pixinsight-resources.png" url="http://www.pixinsight.com.ar/en/"/>
+      <item text="PixInsight Studios" icon=":/toolbar/resources-pixinsight-studios.png" url="https://www.youtube.com/user/PixInsight"/>
+   </menu>
+   <menu text="Community">
+      <item text="PixInsight Website" icon=":/toolbar/resources-pixinsight-website.png" url="https://pixinsight.com/"/>
+      <item text="PixInsight Forum" icon=":/toolbar/resources-pixinsight-forum.png" url="https://pixinsight.com/forum/"/>
+      <item text="PixInsight Benchmark" icon=":/toolbar/resources-about-pixinsight.png" url="https://pixinsight.com/benchmark/"/>
+   </menu>
+   <menu text="Development">
+      <item text="PixInsight Open Source Repositories" icon=":/toolbar/resources-open-source-repositories.png" url="https://gitlab.com/pixinsight"/>
+      <item text="PCL Reference Documentation" icon=":/toolbar/resources-about-pixinsight.png" url="https://pixinsight.com/developer/pcl/doc/html/"/>
+      <item text="XISF Resources" icon=":/toolbar/resources-about-pixinsight.png" url="https://pixinsight.com/xisf/"/>
+   </menu>
+</xmnu>

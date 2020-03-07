@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | MureDenoiseDetectorSettings</title>
+   <meta name="keywords" content="MureDenoise, detector settings, image denoising" />
+   <meta name="author" content="Mike Schuster" />
+   <meta name="description" content="Script for estimating detector settings for use by the MureDenoise script." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.4" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>MureDenoiseDetectorSettings</h1>
+
+<div id="authors">
+<p>By Mike Schuster</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for estimating detector settings for use by the <a href="../../scripts/MureDenoise/MureDenoise.html" title="../../scripts/MureDenoise/MureDenoise.html">MureDenoise</a> script. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> MureDenoise, detector settings, image denoising</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Algorithm__">1.1&emsp;Algorithm</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Algorithm_:_Detector_gain__">1.1.1&emsp;Detector gain</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Algorithm_:_Detector_Gaussian_noise__">1.1.2&emsp;Detector Gaussian noise</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Algorithm_:_Detector_offset__">1.1.3&emsp;Detector offset</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoiseDetectorSettings__">2.1&emsp;MureDenoiseDetectorSettings</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoiseDetectorSettings_:_Calibration_frames__">2.1.1&emsp;Calibration frames</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoiseDetectorSettings_:_Detector_settings__">2.1.2&emsp;Detector settings</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_MureDenoiseDetectorSettings_:_Button_pane__">2.1.3&emsp;Button pane</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<p>MureDenoiseDetectorSettings estimates detector settings for use by the <a href="../../scripts/MureDenoise/MureDenoise.html" title="../../scripts/MureDenoise/MureDenoise.html">MureDenoise</a> script.</p>
+<p>The script requires as input two uncalibrated flat frames and two bias or two dark frames. The use of two dark frames rather than two bias frames allows the script to account for dark current noise.</p>
+<p>The medians of the two uncalibrated flat frames should be equal within 10%. The medians of the two bias or two dark frames should be equal within 10%.</p>
+<p>The script provides values for detector gain, detector Gaussian noise, and detector offset for use by the <a href="../../scripts/MureDenoise/MureDenoise.html" title="../../scripts/MureDenoise/MureDenoise.html">MureDenoise</a> script.</p>
+<p>The script also provides a measure of the median flat frame exposure, in the form of the median of the pixel-wise mean of the center cropped bias- or dark-subtracted flat frames. To provide sufficient signal-to-noise ratio and to avoid near saturation nonlinearity, this measure should be between roughly 30% and 70% of detector full-well.</p>
+<p>This document describes MureDenoiseDetectorSettings Version 1.2.</p>
+<div class="pidoc_subsection" id="__Description_:_Algorithm__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;Algorithm</h4>
+<div class="pidoc_subsection" id="__Description_:_Algorithm_:_Detector_gain__">
+   <h5 class="pidoc_subsectionTitle">1.1.1&emsp;Detector gain</h5>
+<p>Compute the bias- or dark-subtracted flat frames. Compute the pixel-wise sum and pixel-wise difference between the center cropped bias- or dark-subtracted flat frames. Frames are cropped to the central 50% frame area. Compute the median of the local means of the sum. Compute the median of the local standard deviations of the difference. Detector gain equals the normalized ratio between the median local mean and the square of the median local standard deviation.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Algorithm_:_Detector_Gaussian_noise__">
+   <h5 class="pidoc_subsectionTitle">1.1.2&emsp;Detector Gaussian noise</h5>
+<p>Compute the pixel-wise difference between the bias or dark frames. Compute the median of the local standard deviations of the difference. Detector Gaussian noise equals the normalized median local standard deviation.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Algorithm_:_Detector_offset__">
+   <h5 class="pidoc_subsectionTitle">1.1.3&emsp;Detector offset</h5>
+<p>Zero. Detector offset should be set to zero for denoising calibrated images with no pedestal.</p>
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_MureDenoiseDetectorSettings__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;MureDenoiseDetectorSettings</h4>
+<img style="margin-left:36pt;" src="images/dialog.png" alt=""/>
+<div class="pidoc_subsection" id="__Usage_:_MureDenoiseDetectorSettings_:_Calibration_frames__">
+   <h5 class="pidoc_subsectionTitle">2.1.1&emsp;Calibration frames</h5>
+<img style="margin-left:36pt;" src="images/calibration_frames_group.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>Uncalibrated flat frame 1</p>
+</dt>
+<dd>
+<p>Uncalibrated flat frame 1. The medians of the two uncalibrated flat frames should be equal within 10%.</p>
+</dd>
+<dt>
+<p>Uncalibrated flat frame 2</p>
+</dt>
+<dd>
+<p>Uncalibrated flat frame 2. The medians of the two uncalibrated flat frames should be equal within 10%.</p>
+</dd>
+<dt>
+<p>Bias or dark frame 1</p>
+</dt>
+<dd>
+<p>Bias or dark frame 1. The medians of the two bias or two dark frames should be equal within 10%.</p>
+</dd>
+<dt>
+<p>Bias or dark frame 2</p>
+</dt>
+<dd>
+<p>Bias or dark frame 2. The medians of the two bias or two dark frames should be equal within 10%.</p>
+</dd>
+<dt>
+<p>Flat frame exposure</p>
+</dt>
+<dd>
+<p>A measure of the median flat frame exposure, in the form of the median of the pixel-wise mean of the center cropped bias- or dark-subtracted flat frames. To provide sufficient signal-to-noise ratio and to avoid near saturation nonlinearity, this measure should be between roughly 30% and 70% of detector full-well.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_MureDenoiseDetectorSettings_:_Detector_settings__">
+   <h5 class="pidoc_subsectionTitle">2.1.2&emsp;Detector settings</h5>
+<img style="margin-left:36pt;" src="images/detector_settings_group.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>Gain</p>
+</dt>
+<dd>
+<p>Estimated detector gain.</p>
+</dd>
+<dt>
+<p>Gaussian noise</p>
+</dt>
+<dd>
+<p>Estimated detector Gaussian noise.</p>
+</dd>
+<dt>
+<p>Offset</p>
+</dt>
+<dd>
+<p>Estimated detector offset. Detector offset should be set to zero for denoising calibrated images with no pedestal.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_MureDenoiseDetectorSettings_:_Button_pane__">
+   <h5 class="pidoc_subsectionTitle">2.1.3&emsp;Button pane</h5>
+<img style="margin-left:36pt;" src="images/button_pane.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<img src="images/new_instance.png" alt=""/>
+</dt>
+<dd>
+<p>Create a new instance.</p>
+</dd>
+<dt>
+<img src="images/browse_documentation.png" alt=""/>
+</dt>
+<dd>
+<p>Open a browser to view documentation.</p>
+</dd>
+<dt>
+<img src="images/reset.png" alt=""/>
+</dt>
+<dd>
+<p>Reset all parameters.</p>
+</dd>
+<dt>
+<p>Estimate</p>
+</dt>
+<dd>
+<p>Estimate detector settings.</p>
+</dd>
+<dt>
+<p>Dismiss</p>
+</dt>
+<dd>
+<p>Dismiss the dialog or abort the estimation.</p>
+</dd>
+</dl>
+
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/MureDenoise/MureDenoise.html" title="../../scripts/MureDenoise/MureDenoise.html">MureDenoise</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012-2020 Mike Schuster. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.4 on 2020-01-23 10:15:42 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

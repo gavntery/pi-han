@@ -1,0 +1,5 @@
+This file is part of VaryParams script version 1.5
+
+The complete source code with test scripts is hosted at:
+   https://bitbucket.org/bitli/varyparams
+   

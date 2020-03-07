@@ -1,0 +1,100 @@
+===============================================================================
+PixInsight Standard Edition
+PixInsight software and documentation:
+Copyright (c) 2003-2019 Pleiades Astrophoto S.L. All Rights Reserved.
+
+===============================================================================
+
+END USER LICENSE AGREEMENT
+
+Please read this End User License Agreement carefully before using this
+software. Use of this software implies that you fully understand and accept the
+terms of this Agreement. If you do not agree, do not use this software.
+
+1. Pleiades Astrophoto S.L. grants an End User License to you for PixInsight
+version 1.x software, referred to as "Software" hereafter, under the terms and
+conditions set forth in this document.
+
+2. Pleiades Astrophoto S.L. expressly states that it is the sole owner of the
+Software, for which this End User License is granted. Therefore, any resulting
+intellectual property rights that may arise on the Software will belong
+exclusively to Pleiades Astrophoto S.L.
+
+3. This End User License comprises the Software and any documentation,
+instructions and user manuals accompanying the Software, which will be
+considered as part of the Software.
+
+4. This End User License will be strictly personal, non-transferable and
+non-exclusive, and does not under any circumstance confer ownership thereof. You
+may not rent, lease, lend, redistribute, transfer or sublicense the Software or
+its use.
+
+5. You can install and use the Software on any computer that you own. However,
+only you, the registered user, have the right to install and use the Software.
+You can not share your license with any third parties in any way.
+
+6. You can not share any copies of the Software with any third parties in any
+way, including without limitation, any data storage media and information
+transfer system.
+
+7. You can not store copies of the Software on any online file distribution
+system, or on any system that can work as such, without express prior written
+consent from Pleiades Astrophoto S.L. This includes, without limitation, any web
+or FTP server, as well as your personal web site, or the web sites of any other
+individuals or entities.
+
+8. You are authorized to make one backup copy of the Software for your exclusive
+personal use, but your backup copy will be subject to the terms and conditions
+stated in this document.
+
+9. Pleiades Astrophoto S.L. undertakes to respect the rights corresponding to
+you, and you undertake the following obligations:
+
+* Prevent third parties from using the Software without express prior written
+consent from Pleiades Astrophoto S.L.
+
+* You may not modify, adapt, translate or create derivative works based upon the
+Software.
+
+* You may not reverse engineer, decompile or disassemble the Software.
+
+10. No Warranty. PLEIADES ASTROPHOTO DISTRIBUTES THE SOFTWARE IN THE HOPE THAT
+IT WILL BE USEFUL, BUT IT IS PROVIDED "AS-IS" AND WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESS, IMPLIED OR OTHERWISE, INCLUDING WITHOUT LIMITATION, ANY WARRANTY
+OF MERCHANTABILITY, INTEGRATION, SATISFACTORY QUALITY, OR FITNESS FOR ANY
+PARTICULAR PURPOSE.
+
+11. No Returns. PLEIADES ASTROPHOTO WILL ACCEPT NO RETURNS ONCE A COPY OF THE
+SOFTWARE HAS BEEN DOWNLOADED. PLEIADES ASTROPHOTO PROVIDES SPECIAL TRIAL
+LICENSES THAT YOU CAN USE TO EVALUATE THE SOFTWARE PRIOR TO PURCHASE.
+
+12. Limitation of Liability. IN NO EVENT WILL PLEIADES ASTROPHOTO BE LIABLE FOR
+ANY DAMAGES, CLAIMS OR COSTS WHATSOEVER OR ANY CONSEQUENTIAL, INDIRECT,
+INCIDENTAL DAMAGES, OR ANY LOST PROFITS OR LOST SAVINGS ARISING OUT OF OR IN
+CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE, WHETHER OR NOT PLEIADES
+ASTROPHOTO OR A PLEIADES ASTROPHOTO REPRESENTATIVE HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH LOSS, DAMAGES, CLAIMS OR COSTS.
+
+13. Applicable Law and Jurisdiction. This Agreement will be governed and
+interpreted in accordance to Spanish laws. For any conflict arising from this
+Agreement, both parties agree to submit themselves to the exclusive jurisdiction
+of the courts and judges of the city of Valencia, Spain, with express
+resignation to any other jurisdiction that could be applicable.
+
+
+YOU ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD THE TERMS OF THIS END USER
+LICENSE AGREEMENT AND YOU AGREE TO ABIDE BY SUCH TERMS.
+
+===============================================================================
+
+CONTACT INFORMATION
+
+Pleiades Astrophoto S.L.
+Apartado Postal 204
+46185 Pobla de Vallbona (Valencia)
+Spain
+http://www.pixinsight.com/
+
+===============================================================================
+
+Copyright (c) 2003-2019 Pleiades Astrophoto S.L.

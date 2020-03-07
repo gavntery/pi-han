@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | GradientHDRComposition</title>
+   <meta name="keywords" content="HDR, gradient domain" />
+   <meta name="author" content="Georg Viehoever" />
+   <meta name="description" content="Implements a High Dynamic Range (HDR) composition of images with different exposures. Uses a gradient domain method." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>GradientHDRComposition</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Implements a High Dynamic Range (HDR) composition of images with different exposures. Uses a gradient domain method. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> GradientDomain, HDR</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> HDR, gradient domain</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_File_Selection__">2.1&emsp;File Selection</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Parameters__">2.2&emsp;Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Usage_Hints__">2.3&emsp;Usage Hints</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/GradientHDRComposition_GUI.png" alt=""/>
+<p>The GradientHDRComposition tool implements the combination of several registered images with different exposure lengths. It uses the information from those images that provide the most information for a specific pixel, thus composing an image that never uses data from over- or underexposed regions of the contributing images. The purpose of the tool is similar to the <a href="../../tools/HDRComposition/HDRComposition.html" title="../../tools/HDRComposition/HDRComposition.html">HDRComposition</a> tool, but the method used is entirely different.<sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+<a href='http://zurich.disneyresearch.com/~owang/data/gradienthdr-sig11poster.pdf' title='http://zurich.disneyresearch.com/~owang/data/gradienthdr-sig11poster.pdf'>Oliver Wang et. al., <em>Gradient Domain HDR Compositing</em></a>">[3]</a></sup></p>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_Result.png" alt=""/>
+</div>
+<p>The image above shows the result of a HDR composition of M42 (top left), and 3 of the 4 contributing images. Apart from doing the composition, we only applied STFs.</p>
+<p>Input images need to be aligned, and are expected to be linear, or more exactly: The gradients are supposed to be linear. The tool can handle images that have a bias/pedastal where all image pixels have a fixed constant added. Pixels with value 0 on all channels are always considered transparent background. The exposure time or f value of the images is not important. Input images can be combined in any order.</p>
+<p>If GradientHDRComposition is provided with linear input (after subtracting the bias), and the Keep Log Scale checkbox is unchecked, the result image is linear. The result image is rescaled to the [0,1] range.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_GUI.png" alt=""/>
+</div>
+<p>The GradientHdrComposition interface allows for selection of the contributing files and for tuning certain parameters.</p>
+<div class="pidoc_subsection" id="__Usage_:_File_Selection__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;File Selection</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Add Files...</p>
+</dt>
+<dd>
+<p>Use the Add Files.. button to add one or more files to the file list. It is possible to add several files in one step. Each file may contain several images (this is possible for example for FITS files).</p>
+</dd>
+<dt>
+<p>Select All, Invert Selection, Toggle Selected, Remove Selected, Clear</p>
+</dt>
+<dd>
+<p>These permit to manipulate the list of files.</p>
+</dd>
+<dt>
+<p>Full Paths</p>
+</dt>
+<dd>
+<p>Toggle to see the full file path names instead of only the last component.</p>
+</dd>
+<dt>
+<p>File List</p>
+</dt>
+<dd>
+<p>Displays the list of image files. You may double click on a file name to open the file. Double clicking on the check mark/cross allows to deactivate/activate a file without removing it from the list.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Parameters__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Parameters</h4>
+<p>The parameters allow to tune the operation of GradientHdrComposition.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Log10 Bias</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_Bias.png" alt=""/>
+</div>
+<p>If the images have a constant pedestal (i.e. black value &gt; 0), you can adjust the bias here. The value is scaled using log10(): For instance, a value of -3 means a bias of 0.001. Value -7 disables bias correction. A correct value also supports the linearity of the result image. Note: The correct value is <em>not</em> really critical.</p>
+<p>If the images have a bias, the combined image tends have too much contrast. However, if you use a bias value that is too large, the image looses faint details and ultimately shows strong artefacts. The data for the example shown above has a bias of 0.0001 (i.e. log10 bias of -4.0). From left to right and top to bottom, the screenshot shows HDR compositions with log10 bias -7 (=off), -5, -4, -3 without application of any STF. While the images show less contrast without loosing details until -4, faint details disappear at -3.</p>
+</dd>
+<dt>
+<p>Keep in Log Scale</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_KeepLog.png" alt=""/>
+</div>
+<p>When checked (default), the result is not converted into linear scale, but instead stays in a logarithmic scale. For the visualization of HDR image this is helpful. If you want to have images that a linear (useful for further processing), uncheck this.</p>
+<p>The screenshot above shows the result with checked (left) and unchecked value. The image for the unchecked values has a strong STF applied.</p>
+<p>Note: Linearizing is sometimes unreliable and considered experimental.</p>
+</dd>
+<dt>
+<p>Generate Mask</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_Mask.png" alt=""/>
+</div>
+<p>Toggle to get a visualization of the different image regions. Two images are displayed, one for the x-gradient, and one for the y-gradient. Each pixel in the images identifies the image from which the corresponding gradient was chosen. Images are numbered from 1, 0 means &quot;no image&quot;. The mask images are rescaled for visualization (i.e. if you have 2 images, pixel value 0.5 stands for image 1, and value 1.0 stands for image 2).</p>
+<p>The screenshot above shows that information for the core of M42 is mostly taken from image 2, while image 1 is chosen for the fainter regions of the nebula.</p>
+</dd>
+<dt>
+<p>Negative Bias</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_NegBias.png" alt=""/>
+</div>
+<p>Check this to apply a negative bias. Usally not necessary. Results with negative bias get more contrast</p>
+<p>The screenshot above shows from left to right the results with negative log10 bias -1, no bias and positive log10 bias -3.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Usage_Hints__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Usage Hints</h4>
+<p>GradientHDRComposition usually works well with its default settings. If you experience any issues, consider the hints below:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Look for nonlinear gradients</p>
+</dt>
+<dd>
+
+<div style="text-align:center;">
+<img src="images/GradientHDRComposition_Seams.png" alt=""/>
+</div>
+<p>Nonlinear gradients, such as those shown in the example, cause seams. This is because the algorithm cannot distinguish between gradients caused by real objects and gradients that are artifacts. It will use both. Workaround: Crop your images as necessary. The example shows the composition and the contributing image that is causing the seam.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> <a href="http://www.umiacs.umd.edu/~aagrawal/ICCV2007Course/index.html" title="http://www.umiacs.umd.edu/~aagrawal/ICCV2007Course/index.html">Amit Agrawal and Ramesh Raskar, <em>Gradient Domain Manipulation Techniques in Vision and Graphics</em></a></p>
+      <p id="__reference_2__"><strong>[2]</strong> <a href="http://pixinsight.com/forum/index.php?topic=3295.0" title="http://pixinsight.com/forum/index.php?topic=3295.0">Georg Viehoever et. al., <em>Gradient Domain Operations</em></a></p>
+      <p id="__reference_3__"><strong>[3]</strong> <a href="http://zurich.disneyresearch.com/~owang/data/gradienthdr-sig11poster.pdf" title="http://zurich.disneyresearch.com/~owang/data/gradienthdr-sig11poster.pdf">Oliver Wang et. al., <em>Gradient Domain HDR Compositing</em></a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/HDRComposition/HDRComposition.html" title="../../tools/HDRComposition/HDRComposition.html">HDRComposition</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Georg Viehoever, published under LGPL 2.1. With contributions in terms of code, tests, ideas, etc. by Carlos Milovic, Harry Page, Alejandro Tombolini, and others.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:20 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

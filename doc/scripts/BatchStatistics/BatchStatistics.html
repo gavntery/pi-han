@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | BatchStatistics</title>
+   <meta name="keywords" content="batch statistics, batch, statistics, noise evaluation, noise, spreadsheet, excel, csv, text, delimited, export" />
+   <meta name="author" content="Ian Lauwerys (www.blackwaterskies.co.uk)" />
+   <meta name="description" content="A script to measure statistics on batch of images and write them to a file." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>BatchStatistics</h1>
+
+<div id="authors">
+<p>By Ian Lauwerys (www.blackwaterskies.co.uk)</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>A script to measure statistics on batch of images and write them to a file. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> batch statistics, batch, statistics, noise evaluation, noise, spreadsheet, excel, csv, text, delimited, export</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Images_to_Analyse__">1.1&emsp;Images to Analyse</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Statistics_Options__">1.2&emsp;Statistics Options</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Metadata_and_Statistics_to_Output__">1.3&emsp;Metadata and Statistics to Output</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Output_Options__">1.4&emsp;Output Options</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Description_:_Control_Buttons__">1.5&emsp;Control Buttons</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img src="images/BatchStatistics.png" alt=""/>
+<p>The BatchStatistics script enables measurement of statistics on a batch of images. Results are output to the console and/or a text file in a variety of delimited formats such as CSV, suitable for import to spreadsheets and other external data analysis tools. All statistics and measures in the <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process and <a href="../../scripts/NoiseEvaluation/NoiseEvaluation.html" title="../../scripts/NoiseEvaluation/NoiseEvaluation.html">NoiseEvaluation</a> script are available for output.</p>
+<p>Batchstatistics supports multi-image file formats and any number of channels per image.</p>
+<div class="pidoc_subsection" id="__Description_:_Images_to_Analyse__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;<a id="images_to_analyse"></a>Images to Analyse</h4>
+
+<ul class="pidoc_list">
+<li>Click the <strong>Add</strong> button to choose image files to analyse. Any image file format supported by PixInsight should be suitable. The script will support images with multiple channels (RGB, etc.) and it should also support multi-image file formats such as FITS. (Please note that his latter feature is untested by me so please report any problems via this thread). Note that the dialog can be resized vertically to show more list entries and horizontally to show long file names by dragging its edges as required. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<em><strong>Important:</strong> When working with multi-channel images, it is best to try to work with sets of images that have the same number of channels and in the same order. BatchStatistics will process images with any number of channels, but will warn you via the PixInsight console if the current image contains a different number of channels than the previous one. Given that the objective is to output to a file format containing columns of data, changing the number of channels between images will mean that the column headers do not always correspond to the data rows. (Note that if you append results to an existing output file, BatchStatistics has no way to know how many columns of data it contains, so the operator is responsible for doing the right thing!)</em> 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ BatchStatistics does not currently support working with open image views, previews, etc.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Clear</strong>, <strong>Invert Selection</strong> and <strong>Remove Selected</strong> buttons function in the same manner as other PixInsight scripts and processes should you need to amend the list.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Statistics_Options__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;<a id="statistics_options"></a>Statistics Options</h4>
+
+<ul class="pidoc_list">
+<li>The <strong>Number Format</strong> combo box functions in the same manner as the existing <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process. You may output results using PixInsight's native Normalized Real format, or converted to Integer bit depth to match your camera's output format (typically 16 bit for CCD cameras or 12 / 14 bit for DSLR cameras).</li>
+<li>The <strong>Precision</strong> spin box allows you to choose the number of digits in Normalized Real and Scientific formats between 0 and 17 places.</li>
+<li>The <strong>Scientific Notation</strong> check box functions in the same manner as the existing <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process. It allows you to output Normalized Real format numbers in scientific notation.</li>
+<li>The <strong>Normalize</strong> check box functions in the same manner as the existing <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process. It makes all scale estimates consistent with the standard deviation of a normal distribution.</li>
+<li>The <strong>Unclipped</strong> check box functions in the same manner as the existing <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process. By default, statistics are computed by clipping (ignoring) pixels with values of 0 (&quot;black&quot;) and 1 (fully saturated) when this box is unchecked. If you change the <strong>Clipping Low</strong> and <strong>Clipping High</strong> controls, then pixels with values outside the chosen clipping range will be ignored instead. By checking the <strong>Unclipped</strong> check box, statistics are computed for all pixels in the image ignoring any clipping range.</li>
+<li><strong>Clipping Low</strong> and <strong>Clipping High</strong>: If the <strong>Unclipped</strong> check box is unchecked, any pixels with values less than <strong>Clipping Low</strong> or greater than <strong>Clipping High</strong> will be excluded from statistics calculations.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Metadata_and_Statistics_to_Output__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;<a id="metadata_and_statistics_to_output"></a>Metadata and Statistics to Output</h4>
+
+<ul class="pidoc_list">
+<li>Select the appropriate check boxes to choose which statistics to output. Except as noted below, all options should function in the same manner as the existing <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<em><strong>Important: Selecting all statistics may lead to long pauses between images. The script may appear to have hung but be patient as some options (such as Qn) are computationally expensive and may take some time to complete. The status bar and console messages will only update once all channels in an image have been fully processed.</strong></em> 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ The following options are output once per image. The corresponding column headers are also shown:
+<ul class="pidoc_list">
+<li><strong>File Path:</strong> <em>File_Path</em> The path of the image being analysed.</li>
+<li><strong>File Name:</strong> <em>File_Name</em> The file name of the image being analysed.</li>
+<li><strong>Full File Name:</strong> <em>File_Full_Name</em> The combined path and file name of the image being analysed.</li>
+<li><strong>Image Number:</strong> <em>Image_Number</em> The image number within the file (useful for multi-image file formats only).</li>
+<li> <strong>Clipping Low:</strong> <em>Clipping_Low</em> The low range clipping value for statistics calculations.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> If <strong>Unclipped</strong> is selected, this column will be null.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li> <strong>Clipping High:</strong> <em>Clipping_High</em> The high range clipping value for statistics calculations.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> If <strong>Unclipped</strong> is selected, this column will be null.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li><strong>Image Width:</strong> <em>Width</em> The width of the image in pixels.</li>
+<li><strong>Image Height:</strong> <em>Height</em> The height of the image in pixels.</li>
+<li> <strong>Number of Channels:</strong>
+<ul class="pidoc_list">
+<li><em>Channels_First_Analysed</em> First channel number analysed.</li>
+<li><em>Channels_Last_Analysed</em> Last channel number analysed.</li>
+<li><em>Channels_Analysed</em> Number of channels analysed.</li>
+</ul>
+
+<em><strong>Note:</strong> that monochrome images usually have one channel (0), and colour images have three, Red (0), Green (1) and Blue (2), but this may vary depending on the image format.</em></li>
+</ul>
+
+ The following options are output once per channel in the image. The corresponding column headers are also shown. Each column header will have the channel number to which it relates appended, e.g. <em>Mean_0</em>, <em>Mean_1</em>, <em>Mean_2</em>, etc.
+<ul class="pidoc_list">
+<li><strong>Count Percent:</strong> <em>Count_Pct_n</em> Pixels used for statistics calculations (i.e. not clipped) as a percentage of total pixels in image.</li>
+<li><strong>Count Pixels:</strong> <em>Count_Px_n</em> Number of pixels used for statistics calculations (i.e. not clipped).</li>
+<li><strong>Mean:</strong> <em>Mean_n</em> The arithmetic mean, i.e. the average of sample values.</li>
+<li><strong>Median:</strong> <em>Median_n</em> The median of sample values.</li>
+<li><strong>Modulus:</strong> <em>Modulus_n</em> The sum of absolute sample values.</li>
+<li><strong>Norm:</strong> <em>Norm_n</em> The sum of sample values.</li>
+<li><strong>Sum of Squares:</strong> <em>Sum_Of_Squares_n</em> The sum of the squares of sample values.</li>
+<li><strong>Mean of Squares:</strong> <em>Mean_Of_Squares_n</em> The mean of the squares of sample values.</li>
+<li><strong>Variance:</strong> <em>Variance_n</em> The variance from the mean of sample values.</li>
+<li><strong>Standard Deviation:</strong> <em>StdDev_n</em> The standard deviation from the mean of sample values.</li>
+<li><strong>Average Absolute Deviation:</strong> <em>AvgDev_n</em> The average absolute deviation from the median of sample values.</li>
+<li><strong>Median Absolute Deviation (MAD):</strong> <em>MAD_n</em> The median absolute deviation from the median (MAD) of sample values.</li>
+<li><strong>Biweight Midvariance (BWMV):</strong> <em>SQRT_BWMV_n</em> The square root of the biweight midvariance of sample values.</li>
+<li><strong>Percentage Bend Midvariance (PBMV):</strong> <em>SQRT_PBMV_n</em> The square root of the percentage bend midvariance of sample values.</li>
+<li><strong>Sn:</strong> <em>Sn_n</em> The Sn scale estimator of Rousseeuw and Croux of sample values.</li>
+<li><strong>Qn:</strong> <em>Qn_n</em> The Qn scale estimator of Rousseeuw and Croux of sample values.</li>
+<li><strong>Minimum:</strong> <em>Min_n</em> The minimum sample value.</li>
+<li><strong>Maximum:</strong> <em>Max_n</em> The maximum sample value.</li>
+<li> <strong>Minimum Position:</strong>
+<ul class="pidoc_list">
+<li><em>Min_Pos_X_n</em> The X coordinate of the first occurrence of the minimum sample value.</li>
+<li><em>Min_Pos_Y_n</em> The Y Coordinate of the first occurrence of the minimum sample value.</li>
+</ul>
+
+</li>
+<li> <strong>Maximum Position:</strong>
+<ul class="pidoc_list">
+<li><em>Max_Pos_X_n</em> The X coordinate of the first occurrence of the maximum sample value.</li>
+<li><em>Max_Pos_Y_n</em> The Y Coordinate of the first occurrence of the maximum sample value.</li>
+</ul>
+
+</li>
+</ul>
+
+The following additional measures are available over and above those in the existing <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process: 
+<ul class="pidoc_list">
+<li> <strong>Noise Evaluation:</strong>
+<ul class="pidoc_list">
+<li><em>Sigma_MRS_n</em> The noise standard deviation calculated using the Multi-resolution Support method.</li>
+<li><em>Count_MRS_n</em> The count of noise pixels calculated using the Multi-resolution Support method.</li>
+<li><em>Layers_MRS_n</em> The number of layers used by the Multi-resolution Support method. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> If the MRS method does not converge on a solution, these three columns will be null.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li><em>Sigma_K_Sigma_n</em> The noise standard deviation calculated using the K-Sigma method.</li>
+<li><em>Count_K_Sigma_n</em> The count of noise pixels calculated using the K-Sigma method. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+<em><strong>Note:</strong> Noise Evaluation will produce the same results as the existing <a href="../../scripts/NoiseEvaluation/NoiseEvaluation.html" title="../../scripts/NoiseEvaluation/NoiseEvaluation.html">NoiseEvaluation</a> script, except that the K-Sigma values will always be calculated regardless of whether the MRS method converges on a solution.</em></li>
+</ul>
+
+</li>
+<li>The <strong>Select All</strong> button checks all available statistics and metadata checkboxes. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Caution: Computing all statistics for a large number of images will take a significant amount of time, so only select those that you actually require.</strong></em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The  Select None button unchecks all available statistics and metadata checkboxes.</li>
+</ul>
+
+</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Output_Options__">
+   <h4 class="pidoc_subsectionTitle">1.4&emsp;<a id="output_options"></a>Output Options</h4>
+
+<ul class="pidoc_list">
+<li>The <strong>File Format</strong> combo box allows you to select various delimited output formats from Tab, Pipe, Colon, Space, Comma or CSV. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> Any data value which contains the delimiter value will be enclosed in double quotes (&quot; &quot;). In the case of the CSV format, the delimiter is the comma character and all data values are enclosed in double quotes. Line endings are the MS-DOS CR LF format as per RFC 4180.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>To Console</strong> checkbox outputs header and result rows to the PixInsight Console. Due to informational messages (e.g. loading of images) this is not as useful as it could be as it is not possible to cut and paste a block of results directly from the console to your application, but it may be of use for single images (vs. cutting and pasting individual data values from the <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> process). 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> MS Excel's <strong>Text to Columns</strong> option is your friend when cutting and pasting from the console.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>To File</strong> checkbox outputs header and result rows to a text file.</li>
+<li>The <strong>Overwrite</strong> checkbox overwrites any existing text file of the same name as that specified in <strong>Output File</strong>. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Important: No warning will be given when overwriting (this is by design for future developments in re-using script instances) so please be careful!</strong></em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Append</strong> checkbox appends results to any existing text file of the same name as that specified in <strong>Output File</strong> or creates a new file if one does not exist.</li>
+<li>The <strong>Include Header</strong> checkbox outputs a row of column headers appropriate to the first image in the file list. Please see the note above about working with images containing varying numbers of channels. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> Headers are not written to existing files when appending, only to new ones if created (this is by design to ensure that each output file only contains a single header row at the top).</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Output File...</strong> button allows you to select a folder and select/specify a file name for output of results. The chosen file name is displayed in the <strong>Output File</strong> text box.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Description_:_Control_Buttons__">
+   <h4 class="pidoc_subsectionTitle">1.5&emsp;<a id="control_buttons"></a>Control Buttons</h4>
+
+<ul class="pidoc_list">
+<li>The <strong>Analyse</strong> button analyses all images in the file list and produces the selected statistics and metadata.</li>
+<li>The <strong>Exit</strong> button exits the BatchStatistics script. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note</strong>: No warning is given upon exit so please take care to create a process icon if required.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The blue <strong>Process</strong> triangle can be dragged to the PixInsight workspace to create a process icon. All file entries in the list and the options are saved as part of the process icon. The process may be re-instantiated by right clicking the script icon, choosing <strong>Launch Script Instance</strong> and then clicking the round <strong>Apply Global</strong> icon at the bottom of the <strong>Script</strong> dialog. 
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ <em><strong>Note:</strong> Dragging the &quot;Process&quot; triangle on to an image window has no effect at present. It is planned to allow processing of image statistics from open images using this method in a future version.</em>
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+</li>
+<li>The <strong>Help</strong> button displays this help documentation, or hover over it for a brief summary in the tooltip.</li>
+</ul>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a>, <a href="../../tools/ImageIntegration/ImageIntegration.html" title="../../tools/ImageIntegration/ImageIntegration.html">ImageIntegration</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/SubframeSelector/SubframeSelector.html" title="../../scripts/SubframeSelector/SubframeSelector.html">SubframeSelector</a>, <a href="../../scripts/NoiseEvaluation/NoiseEvaluation.html" title="../../scripts/NoiseEvaluation/NoiseEvaluation.html">NoiseEvaluation</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright © 2014 Ian Lauwerys. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:27 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

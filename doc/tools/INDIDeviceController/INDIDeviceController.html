@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | INDIDeviceController</title>
+   <meta name="keywords" content="INDI, Device, Instrument, Automation, Control" />
+   <meta name="author" content="Klaus Kretzschmar" />
+   <meta name="description" content="Sends commands to an INDI server to control astronomical devices." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>INDIDeviceController</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Sends commands to an INDI server to control astronomical devices. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Automation, Control</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> INDI, Device, Instrument, Automation, Control</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;width:50%;height:50%;" src="images/INDIControllerClient.png" alt=""/>
+<p>The <em>INDI Device Controller</em> module is an INDI client which can be used to control astronomical devices like CCD cameras, telescope mounts, or filter wheels. The client sends device independent commands (INDI Device Properties) to an INDI server which translates the commands to devices specific commands by routing the commands to device hardware drivers (see <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+INDI library, <a href='http://indilib.org/about/discover-indi.html' title='http://indilib.org/about/discover-indi.html'>What is INDI? : An overview</a>">[1]</a></sup> for a more detailed description). The INDI client/server communication uses the INDI protocol which is an official IANA registered TCP/IP protocol.</p>
+<p>So the INDI controlling system can be set-up in two configurations:</p>
+
+<ul class="pidoc_list">
+<li><strong>Locally:</strong> Client and server run on the same machine as different processes.</li>
+<li class="pidoc_spaced_list_item"><strong>Distributed:</strong> Client and server run on different machines, and the client connects to the server over an existing LAN or WLAN network.</li>
+</ul>
+
+<p>For example, you can install the <em>INDI server</em> on your Linux or Mac computer <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+INDI library, <a href='http://www.indilib.org/download.html' title='http://www.indilib.org/download.html'>Linux and OS X: Download INDI software</a>">[2]</a></sup>, where all hardware devices are plugged-in, start the <em>INDI server</em> and connect the <em>INDI Device Controller</em> (use host <em>localhost</em>) to the server.</p>
+<p>Alternatively, you can use a remote (e.g. Windows) computer to remotely connect to the <em>INDI server</em> running on a Linux or Mac OS computer by specifying the remote host. There is no INDI server implementation for Windows, but there is an INDI wrapper for ASCOM available <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Cloudmakers, <a href='http://www.cloudmakers.eu/windi/' title='http://www.cloudmakers.eu/windi/'>Windows: An INDI wrapper for ASCOM</a>">[3]</a></sup>.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The <em>INDI Device Controller</em> module contains three sections</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>INDI Server Connection</p>
+</dt>
+<dd>
+<p>Specify the host and port number and connect to the INDI server.</p>
+
+<ul class="pidoc_list">
+<li><strong>Hostname:</strong> The name of the host where the <em>INDI server</em> processs is running on. Use <strong>localhost</strong> if <em>PixInsight</em> and <em>INDI server</em> run on the same computer.</li>
+<li class="pidoc_spaced_list_item"><strong>Port:</strong> The port number where the <em>INDI server</em> is listen to. The default port number of the <em>INDI server</em> is <em>7624.</em></li>
+</ul>
+
+<p>After successful connection, the server sends a list of device names which are displayed in the <a href="#indi_devices">INDI Devices</a> section. If the connection was not successful, a corresponding message is displayed in the section <a href="#server_message">Last server message</a>.</p>
+</dd>
+<dt>
+<p><a id="indi_devices"></a> INDI Devices</p>
+</dt>
+<dd>
+<p>Select and connect to the INDI devices which are available on the INDI server.</p>
+<p>To connect a hardware device with the <em>INDI server</em>, select the top level node in the <a href="#indi_devices">INDI Devices</a> tree-box and press the <em>Connect</em> button.</p>
+<img style="margin-right:1.25em;margin-bottom:0.5em;" src="images/INDIDeviceSelection_1.png" alt=""/>
+<p>After successful connection, the server sends a list of device properties which are displayed in the <a href="#indi_devices">INDI Devices</a> tree-box. Device properties are the control parameters of a hardware device, e.g. the property CCD_TEMPARATURE controls the chip temperature of a CCD camera.</p>
+</dd>
+<dt>
+<p>Edit and send new INDI property values to the INDI server</p>
+</dt>
+<dd>
+<p>All properties of a CCD device are listed as subnodes of the device in the <a href="#indi_devices">INDI Devices</a> tree-box. A property consists of one-or-many elements which are grouped in a property tree-node and its values can be displayed by expanding the node. There are three different types of property values</p>
+
+<ul class="pidoc_list">
+<li><strong>Switch:</strong> A switch property can contain several elements which can only have two values: ON or OFF</li>
+<li><strong>Number:</strong> A number property can contain several elements which have a number as value.</li>
+<li><strong>Text:</strong> A text property can contain everal elements which have a string as value.</li>
+</ul>
+
+<img style="margin-right:1.25em;margin-bottom:0.5em;" src="images/INDIPropertySelection.png" alt=""/>
+<p>It is possible to send a new target property value to the <em>INDI server</em> by selecting the <em>property element</em> and pressing the <em>Edit</em> button. A new dialog appears which enables to a enter a new value for the property.</p>
+<img style="margin-right:1.25em;margin-bottom:0.5em;" src="images/INDIPropertyEdit.png" alt=""/>
+</dd>
+<dt>
+<p><a id="server_message"></a> Server messages</p>
+</dt>
+<dd>
+<p>Messages from the <em>INDI</em> server are displayed at the bottom of this section.</p>
+<img style="margin-right:1.25em;margin-bottom:0.5em;" src="images/INDIPropertyMessage.png" alt=""/>
+</dd>
+</dl>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> INDI library, <a href="http://indilib.org/about/discover-indi.html" title="http://indilib.org/about/discover-indi.html">What is INDI? : An overview</a></p>
+      <p id="__reference_2__"><strong>[2]</strong> INDI library, <a href="http://www.indilib.org/download.html" title="http://www.indilib.org/download.html">Linux and OS X: Download INDI software</a></p>
+      <p id="__reference_3__"><strong>[3]</strong> Cloudmakers, <a href="http://www.cloudmakers.eu/windi/" title="http://www.cloudmakers.eu/windi/">Windows: An INDI wrapper for ASCOM</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/INDICCDFrame/INDICCDFrame.html" title="../../tools/INDICCDFrame/INDICCDFrame.html">INDICCDFrame</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2014-2018 Klaus Kretzschmar</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:20 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

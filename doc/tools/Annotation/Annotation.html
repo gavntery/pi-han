@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | Annotation</title>
+   <meta name="keywords" content="text rendering, dynamic process" />
+   <meta name="author" content="Zbynek Vrastil" />
+   <meta name="description" content="An interactive text rendering procedure implemented as a dynamic process." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>Annotation</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>An interactive text rendering procedure implemented as a dynamic process. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Painting</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> text rendering, dynamic process</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;Text</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;Show Leader</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;Font</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;Size</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter005__">2.5&emsp;Bold</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter006__">2.6&emsp;Italic</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter007__">2.7&emsp;Underline</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter008__">2.8&emsp;Shadow</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter009__">2.9&emsp;Color</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter010__">2.10&emsp;Opacity</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/Annotation.png" alt=""/>
+<p>Annotation is a text rendering tool and can be found under the Painting category. It can render a single line of text with specified font and color. You can also display a leader line from the text to an arbitrary point on the image. Annotation is a dynamic process that allows you to position the text and leader in the image with the mouse. The text is not rendered into image pixels until you apply the process. You can only execute Annotation on images, not on previews.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;Text</h4>
+<p>The text of the annotation. No escape sequences, commands or HTML tags are supported &mdash; the text will be rendered <em>as is</em>. You can enter only one line of text.</p>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;Show Leader</h4>
+<p>If checked, a leader line is displayed. It points from the text to an arbitrary point on the image.</p>
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;Font</h4>
+<p>The font used to render the text. You can choose from all fonts installed on your system.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;Size</h4>
+<p>The size of the font in typographical points.</p>
+</div>
+
+      </div>
+      <div id="__parameter005__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.5&emsp;Bold</h4>
+<p>Switches on or off the bold font style.</p>
+</div>
+
+      </div>
+      <div id="__parameter006__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.6&emsp;Italic</h4>
+<p>Switches on or off the italic font style.</p>
+</div>
+
+      </div>
+      <div id="__parameter007__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.7&emsp;Underline</h4>
+<p>Switches on or off the underlined font style.</p>
+</div>
+
+      </div>
+      <div id="__parameter008__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.8&emsp;Shadow</h4>
+<p>If selected, a one-pixel wide black shadow is rendered under the text and the leader line.</p>
+</div>
+
+      </div>
+      <div id="__parameter009__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.9&emsp;Color</h4>
+<p>The color of the rendered text and leader. This combo box provides a list of predefined colors. You can also define a custom color by clicking on the rectangle just beside the combo box. In such case, a simple color definition dialog is launched.</p>
+</div>
+
+      </div>
+      <div id="__parameter010__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.10&emsp;Opacity</h4>
+<p>The opacity of the rendered text and leader. Fully opaque text has an opacity of 255, while 0 means full transparency.</p>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>After you defined the parameters of your annotation (or before if you like), click somewhere in the image to show the dynamic preview of the annotation. The annotation is displayed in the image. Any change to the annotation parameters is immediately reflected on the image. The dashed rectangle around the text indicates the area where you can grab the text with a mouse and move it around the image. This is also indicated by a change in the shape of the mouse cursor.</p>
+<p>In case you checked the <em>Show Leader</em> checkbox, the leader line is also displayed. A small dashed square at the endpoint again indicates the area which can be used to position the leader with the mouse.</p>
+<p>The helper rectangles disappear when you execute the process and the annotation is rendered to the image. You can immediately start positioning of the next annotation with a single mouse click in the image.</p>
+<p>It usually does not make sense to combine text rendering with an image mask. If the Annotation process detects an enabled mask on the target image, it displays a message and offers you the option to temporarily switch off the mask during text rendering.</p>
+
+<div style="text-align:center;">
+<img src="images/AnnotationExample.jpg" alt=""/>
+</div>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011, Zbynek Vrastil</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:19 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

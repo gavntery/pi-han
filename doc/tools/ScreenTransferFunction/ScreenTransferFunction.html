@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ScreenTransferFunction</title>
+   <meta name="keywords" content="screen stretch, automatic screen stretch, screen transfer function" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Defines a set of histogram transformations applied to the screen rendition of an image, without modifying its pixel data." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ScreenTransferFunction</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Defines a set of histogram transformations applied to the screen rendition of an image, without modifying its pixel data. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> IntensityTransformations</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> screen stretch, automatic screen stretch, screen transfer function</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Working_Modes__">2.1&emsp;Working Modes</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Functions__">2.2&emsp;Functions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Interoperability_with_HistogramTransformation__">2.3&emsp;Interoperability with HistogramTransformation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Common_Pitfalls__">2.4&emsp;Common Pitfalls</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/ScreenTransferFunction.png" alt=""/>
+<p>A <em>screen transfer function</em> (STF) in PixInsight is used to improve the visibility of an image as it is represented on the screen, but without altering its pixel data in any way. This is useful to work with processes applied to linear, unstretched data. Such processes may include color calibration, deconvolution, wavelet transforms, and some noise reduction procedures, among many others. Unstretched raw images are often poorly represented on the screen. This is because most of their data are concentrated in small portions of the available dynamic range. This can be easily identified as a narrow peak near the left side of the histogram.</p>
+<p>A STF is a histogram transformation that PixInsight applies to the bitmap generated to render an image on the screen. STF parameters include per-channel midtones balance, shadows and highlights clipping values, just as any histogram transformation does. STF includes also dynamic range expansion parameters, but these are only available through the command-line and scripting interfaces of the ScreenTransferFunction process, not on its graphical interface.</p>
+<p>In PixInsight, each view can have its own STF, which can be adjusted independently for the red/gray, green and blue nominal channels, plus an additional <em>luminance STF</em> that applies only when the CIE L* and CIE Y* components are being rendered on the screen, in the corresponding display modes. This allows for very precise and fine-tuned adaptations of screen renditions to raw data. ScreenTransferFunction allows you to work with linear images, just as if they were nonlinear, in an easy and completely transparent way.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Working_Modes__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Working Modes</h4>
+
+<div style="text-align:center;">
+<img src="images/ScreenTransferFunctionAnnotated.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Edit STF</p>
+</dt>
+<dd>
+<p>Select this mode to modify the shadows clipping, midtones balance and highlights clipping parameters of the different channels by clicking and dragging on the STF editing area. If you hold the <kbd>Shift</kbd> key wile dragging, image screen updates will be blocked until the <kbd>Shift</kbd> key is released, which can be useful to improve performance whith very big color images.</p>
+</dd>
+<dt>
+<p><a id="zoom_in_mode"></a> Zoom In</p>
+</dt>
+<dd>
+<p>Once selected, clicking on an editing area will duplicate its width. This is useful to perform more detailed adjustments. When the <a href="#link_rgb_channels">Link RGB channels</a> option is enabled, the zoom in action is applied equally to the three RGB channels. Note that you can also increase or decrease magnification of the editing areas with the mouse wheel, irrespective of the current working mode, when the mouse cursor is over them.</p>
+</dd>
+<dt>
+<p><a id="zoom_out_mode"></a> Zoom Out</p>
+</dt>
+<dd>
+<p>Once selected, clicking on an editing area will reduce its width by a factor of two. This is the inverse operation to clicking in Zoom In mode.</p>
+</dd>
+<dt>
+<p>Scroll</p>
+</dt>
+<dd>
+<p>Select this mode to pan around the editing area. Only useful if you have previously zoomed-in. You can also pan the editing areas by clicking with the middle mouse button and dragging.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Functions__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Functions</h4>
+<p>Besides editing screen stretch transformations, ScreenTransferFunction implements additional features available by clicking several tool buttons which we describe below.</p>
+
+<div style="text-align:center;">
+<img src="images/LeftSideButtons.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p><a id="link_rgb_channels"></a> Link RGB channels</p>
+</dt>
+<dd>
+<p>Enabling this option will cause that any change in any of the RGB channels will affect equally all three RGB channels. When disabled, you can modify each channel separately. Along with that, when the <em>Link RGB channels</em> option is disabled, automatic screen stretch STFs will be computed separately for each individual RGB channel. This is useful to improve the color balance of screen representations.</p>
+</dd>
+<dt>
+<p>Zoom 1:1</p>
+</dt>
+<dd>
+<p>Resets the zoom to 1:1. You can increase or decrease the zoom level by clicking on the editing area in either <a href="#zoom_in_mode">Zoom In</a> or <a href="#zoom_out_mode">Zoom Out</a> working modes.</p>
+</dd>
+<dt>
+<p>Auto Stretch</p>
+</dt>
+<dd>
+<p>Click this button to perform an <em>automatic screen stretch</em>. <kbd>Ctrl-click</kbd> this button to open the STF Auto Stretch dialog. On this dialog, you can modify the two parameters that control calculation of automatic STFs:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Shadows clipping</p>
+</dt>
+<dd>
+<p>This controls the shadows clipping point of the computed STF. This parameter is expressed in sigma units, measured from the median of the target image. Recall that the median identifies the main histogram peak in deep sky images where the sky background strongly dominates their pixel value distributions. Hence, this parameter will normally have negative values, since we want to clip at the left side of the main histogram peak. The default value is &minus;1.25.</p>
+</dd>
+<dt>
+<p>Target background</p>
+</dt>
+<dd>
+<p>This is the desired mean background value in the normalized [0,1] range. ScreenTransferFunction will compute the required nonlinear midtones balance transformations to achieve this mean background level in the screen representation of the target image. The default value is 0.25.</p>
+</dd>
+</dl>
+
+<p>Automatic STFs are computed separately for individual RGB channels when the <a href="#link_rgb_channels">Link RGB channels</a> option is disabled; otherwise a unique STF is applied to the three RGB channels. By default, the Link RGB channels option is enabled. Separate STFs are useful to compensate for color balancing problems in raw data in most cases; however, always take into account that when separate STFs are being applied, you are not seeing, in general, a screen representation of the <em>actual</em> RGB color image that you have.</p>
+</dd>
+<dt>
+<p>Edit STF Parameters</p>
+</dt>
+<dd>
+<p>Click this button to open a dialog box where you can define STF parameters manually for the RGB and L channels.</p>
+</dd>
+</dl>
+
+
+<div style="text-align:center;">
+<img style="margin-top:1em;" src="images/RightSideButtons.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Reset Channel Parameters</p>
+</dt>
+<dd>
+<p>Click to bring the corresponding STF parameters to their default values: the shadows clipping point, midtones balance and highlights clipping point parameters are set to 0, 0.5 and 1, respectively, for the channel where the reset button has been clicked.</p>
+</dd>
+<dt>
+<p><a id="black_point_readout"></a> Black Point Readout</p>
+</dt>
+<dd>
+<p>STF readouts work by clicking on any view (main view or preview) of an image window in any of the readout modes (black, midtones, white point) to set the STF parameters accordingly. In this mode, while the mouse button is held down on an image, readout values are calculated for the cursor coordinates according to <a href="../../tools/ReadoutOptions/ReadoutOptions.html" title="../../tools/ReadoutOptions/ReadoutOptions.html">global readout options</a>, and sent to the STF interface window. In other words, after clicking on this icon, hover over an image and click on it &mdash; the black point of all channels will be set to the readout values computed from the pixels where you just clicked.</p>
+</dd>
+<dt>
+<p>Midtones Readout</p>
+</dt>
+<dd>
+<p>Same as <a href="#black_point_readout">Black Point Readout</a> but to set the midtones balance parameters.</p>
+</dd>
+<dt>
+<p>White Point Readout</p>
+</dt>
+<dd>
+<p>Same as <a href="#black_point_readout">Black Point Readout</a> but to set the highlights clipping point parameters.</p>
+</dd>
+<dt>
+<p>Enable/Disable STF</p>
+</dt>
+<dd>
+<p>This allows you to quickly tell the STF engine whether to apply the STF to the target image or not. When hovered, this tool button shows a tool tip text that informs you about the current enabled/disabled state and how it will change if you click the button. Note that the icon shown on this button is either a green check mark to indicate the enabled state, or a red cross mark when disabled. Note also that you can enable and disable the STF for the active view by selecting <span class="pidoc_menu">Image &gt; Screen Transfer Functions &gt; Enable</span>, also available from the view context menu. Finally, you can press <kbd>F12</kbd> to enable or disable the STF for the active view.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Interoperability_with_HistogramTransformation__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Interoperability with HistogramTransformation</h4>
+<p>The standard ScreenTransferFunction and <a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a> processes can share instances. This is possible because both tools actually work with very similar parameters: histogram transformations defined by two clipping points (shadows and highlights) and a midtones balance value.</p>
+<p>You can drag a STF instance to the control bar of the HistogramTransformation tool window, and the HistogramTransformation tool will import its histogram parameters from the STF instance. When the STF instance defines the same parameters for the three RGB channels, HistogramTransformation will import them in its RGB/K combined transformation. Otherwise each set of STF parameters is imported in its corresponding channel-specific transformation of HistogramTransformation. The reverse operation, that is importing a HistogramTransformation instance in ScreenTransferFunction, is also possible and works in a similar way.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Common_Pitfalls__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Common Pitfalls</h4>
+
+<ul class="pidoc_list">
+<li>Use the <strong>Track View</strong> function of the ScreenTransferFunction interface to synchronize STF parameters with the active view. When Track View is enabled, any changes made on the STF interface will be visible in the active image. When disabled, the active image will <em>not</em> display any adjustments you make. Note that if you have already made changes to the STF, disabling Track View will <em>not</em> reset or disable the STF used by the image.</li>
+<li class="pidoc_spaced_list_item">To <strong>reset the STF</strong> of a given image, you must actually <em>reset</em> the STF, not just disable it. The reset button is the button on the bottom right corner of the STF window.</li>
+<li class="pidoc_spaced_list_item">Always bear in mind that a STF modifies <em>exclusively</em> the screen representation of an image, but <strong>STF does not change actual pixel values</strong> in any way. So don't be surprised if after saving to disk a nice-looking image to which you have applied an automatic STF, it is nearly black when you load it again: what you saved is the unchanged raw linear image, since STF didn't modify it.</li>
+</ul>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/HistogramTransformation/HistogramTransformation.html" title="../../tools/HistogramTransformation/HistogramTransformation.html">HistogramTransformation</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:19 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

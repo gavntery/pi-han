@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | DefectMap</title>
+   <meta name="keywords" content="image calibration, hot pixels, cool pixels, defects, bad pixels, bad columns, noise" />
+   <meta name="author" content="Carlos Milovic F., PTeam." />
+   <meta name="description" content="Replace pixel values using a defect map image." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>DefectMap</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Replace pixel values using a defect map image. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> ImageCalibration</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> image calibration, hot pixels, cool pixels, defects, bad pixels, bad columns, noise</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Parameters__">2&emsp;Parameters</a></li>
+
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__parameter001__">2.1&emsp;Defect map</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter002__">2.2&emsp;Operation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter003__">2.3&emsp;Structure</a></li>
+<li class="pidoc_tocSubitem"><a href="#__parameter004__">2.4&emsp;Is CFA</a></li>
+</ul>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Defect_Map__">3.1&emsp;Defect Map</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Operation__">3.2&emsp;Operation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Structure__">3.3&emsp;Structure</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/DefectMap.png" alt=""/>
+<p>Noise in images can be the result of several phenomena. From photonic noise due the low amount of incoming light, to thermal and electronic noise. Thermal and electronic noise are commonly handled by <em>bias</em> and <em>darks</em>, frames that modelate the signal from both sources. Due the nonlinear nature of extremelly bright or dark pixels, they are not corrected with this procedure, and remain after calibration. Hot pixels, dead pixels, defective columns, and others, do not contain valid information, and must be replaced with data from their neighbors.</p>
+<p>DefectMap is a process that uses an image as a map indicating those defective pixels that need to be replaced. For each bad pixel, a neighbourhood is defined, and a user defined operation is performed to calculate the value that will stored at that location.</p>
+<p>This process may handle normal grayscale or composed color images, as well as bayered (CFA matrix) one shot images (either grayscale or sepparated in color channels).</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Parameters__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Parameters</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Parameters', this );">[hide]</p>
+   <div id="Parameters">
+      <div id="__parameter001__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.1&emsp;Defect map</h4>
+<p>This is the identifier of a main view that holds the information of the pixels that are going to be replaced by the DefectMap process. This image may be grayscale or color. As convention, black pixels are considered as defective pixels, and thus will be replaced. Other pixel values are incorporated in different ways, depending on the Operation parameter.</p>
+</div>
+
+      </div>
+      <div id="__parameter002__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.2&emsp;Operation</h4>
+<p>Select the algorithm that is used to calculate the new pixel values. Avalaible operations are:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Mean</p>
+</dt>
+<dd>
+<p>This operation takes the average value of the neighbor pixels. Pixel values on the defect map are used as weighting values. White pixels (with value of 1.0) are fully incorporated in the averaging operation.</p>
+</dd>
+<dt>
+<p>Gaussian</p>
+</dt>
+<dd>
+<p>This operation is similar to the previous. Pixels are averaged following a gaussian distribution. Pixel values on the defect map are used as an extra weight, multiplied to the gaussian distribution value.</p>
+</dd>
+<dt>
+<p>Minimum</p>
+</dt>
+<dd>
+<p>This operation replaces pixels with the minimum value of its neighbors. Black pixels are replaced, and white or gray pixels in the neighbourhood are included in the operation.</p>
+</dd>
+<dt>
+<p>Maximum</p>
+</dt>
+<dd>
+<p>This operation replaces pixels with the maximum value of its neighbors. Black pixels are replaced, and white or gray pixels in the neighbourhood are included in the operation.</p>
+</dd>
+<dt>
+<p>Median</p>
+</dt>
+<dd>
+<p>This operation replaces pixels with the median value of its neighbors. Black pixels are replaced, and white or gray pixels in the neighbourhood are included in the operation. If an even number of pixels is used as neighbors, the mean value of the central couple in the distribution is used.</p>
+</dd>
+</dl>
+
+</div>
+
+      </div>
+      <div id="__parameter003__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.3&emsp;Structure</h4>
+<p>This parameter defines the neighbourhood of pixels that are included in the calculation of the new value. A:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Square</p>
+</dt>
+<dd>
+<p>Pixels in a square neighbourhood are selected.</p>
+</dd>
+<dt>
+<p>Circular</p>
+</dt>
+<dd>
+<p>Only pixels whose eucludic distance is less or equal than a certain value are selected (inside a defined radius).</p>
+</dd>
+<dt>
+<p>Horizontal</p>
+</dt>
+<dd>
+<p>Only pixels in the same row are selected.</p>
+</dd>
+<dt>
+<p>Vertical</p>
+</dt>
+<dd>
+<p>Only pixels in the same column are selected.</p>
+</dd>
+</dl>
+
+<p>The size of the structure is automatically determined by NotchFilter to provide enough amount of samples to be statistically representative.</p>
+</div>
+
+      </div>
+      <div id="__parameter004__">
+<div class="pidoc_parameter">
+   <h4 class="pidoc_parameterTitle">2.4&emsp;Is CFA</h4>
+<p>Use this parameter to force DefectMap to use only pixels that contains the same color information only. In grayscale bayered images, DefectMap will skip neighbors containing information of other channels. In RGB channel decomposed bayered images, this will help the algorithm to avoid zero values to contaminate the statistics or calculations.</p>
+</div>
+
+      </div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Defect_Map__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;Defect Map</h4>
+<p>Building the correct defect map to be used by this process is often possible with the aid of master calibration frames. Darks are ussually the most important source to propperlly segment bad pixels.</p>
+<p>Several methods may be used to create a propper Defect Map:</p>
+
+<ul class="pidoc_list">
+<li>Use the <a href="../../tools/Binarize/Binarize.html" title="../../tools/Binarize/Binarize.html">Binarize</a> process to apply a threshold to the master dark frame. Since hot pixels are usually much brighter than the dark current, this will isolate these kind of defective pixels. To use the binarized image as a defect map, invert the result to follow the convention used in this process (zero values mean defective pixels).</li>
+<li>Use a photo editing software like <em>The Gimp</em> to paint black over the desired pixels. A threshold slighty over zero should isolate them and leave the other pixels white. Before exporting to another program, may be a good idea to add a small pedestal, to avoid spurious data in the thresholding process.</li>
+<li>Use <a href="../../tools/PixelMath/PixelMath.html" title="../../tools/PixelMath/PixelMath.html">PixelMath</a> to create black lines or single black pixels over a white image of the same dimensions as the target image. See the <em>XValue(), YValue() and iif()</em> functions, and <a href="../../tools/PixelMath/PixelMath.html" title="../../tools/PixelMath/PixelMath.html">PixelMath's</a> documentation for more information.</li>
+</ul>
+
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<div class="pidoc_mouseover">
+<div class="pidoc_image_right"><img src="images/raw.png" id="R2FYDoQ0BHiZ3658" alt="" /></div>
+<ul>
+<li><span class="pidoc_indicator_default" id="R2FYDoQ0BHiZ3658_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('R2FYDoQ0BHiZ3658', 'images/raw.png'); pidoc_hideGroup('R2FYDoQ0BHiZ3658', 4); pidoc_setOpacity('R2FYDoQ0BHiZ3658_1', 1.0);">Original RAW image, debayered.</a></li>
+<li><span class="pidoc_indicator" id="R2FYDoQ0BHiZ3658_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('R2FYDoQ0BHiZ3658', 'images/calibrated.png'); pidoc_hideGroup('R2FYDoQ0BHiZ3658', 4); pidoc_setOpacity('R2FYDoQ0BHiZ3658_2', 1.0);">Result of Bias and Darks calibration.</a></li>
+<li><span class="pidoc_indicator" id="R2FYDoQ0BHiZ3658_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('R2FYDoQ0BHiZ3658', 'images/corrected.png'); pidoc_hideGroup('R2FYDoQ0BHiZ3658', 4); pidoc_setOpacity('R2FYDoQ0BHiZ3658_3', 1.0);">Removal of defects.</a></li>
+<li><span class="pidoc_indicator" id="R2FYDoQ0BHiZ3658_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('R2FYDoQ0BHiZ3658', 'images/dm.png'); pidoc_hideGroup('R2FYDoQ0BHiZ3658', 4); pidoc_setOpacity('R2FYDoQ0BHiZ3658_4', 1.0);">Defect map used, Is CFA enabled.</a></li>
+</ul>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+<p><strong>This is crop section of a image taken with a Canon 300D camera. As seeing in the RAW image, it contains a lot of noise, at this level of stretching. Subtraction of Bias and Dark frames cleans significantly the image, but some hot pixels were overcorrected, creating dark holes in the image. Build of a <strong>defect map</strong> was done using the master dark frame as starting point, and thresholding with the Binarize process at a level were all of the hot pixels were selected. It is shown the result of applying DefectMap with default <strong>Operation</strong> and <strong>Structure</strong> parameters, and the <strong>Is CFA</strong> option enabled. At last, is the <strong>defect map</strong> used. Image courtesy of Carlos Milovic (PTeam).</strong></p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Operation__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;Operation</h4>
+<p>Usually, Mean and Median operators yield similar results. Gaussian weighting adds more weights to pixels closer to the selected ones, so it may be usefull if the neighbourhood of the pixels will contain several black pixels (not included in the calculation), and thus, the automatic growth of the structure has to incorporate pixels far from the current location.</p>
+<p>Minimum and maximum operations are included for completitude. For normal applications, the previous operation methods are suggested.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Structure__">
+   <h4 class="pidoc_subsectionTitle">3.3&emsp;Structure</h4>
+<p>The structure selection should correspond to the information in the defect map. If several pixels are selected in the same row, a vertical structure is suggested. Circular structures are more restrictive than square ones, and thus the automatic growth may use larger structures to find sufficient pixel samples.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/NotchFilter/NotchFilter.html" title="../../tools/NotchFilter/NotchFilter.html">NotchFilter</a>, <a href="../../tools/ImageCalibration/ImageCalibration.html" title="../../tools/ImageCalibration/ImageCalibration.html">ImageCalibration</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2012 Pleiades Astrophoto S.L. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:17 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

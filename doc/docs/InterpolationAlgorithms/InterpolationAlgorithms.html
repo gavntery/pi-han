@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | Interpolation Algorithms in PixInsight</title>
+   <meta name="keywords" content="interpolation, pixel interpolation, interpolation algorithms, nearest neighbor interpolation, bilinear interpolation, bicubic spline interpolation, bicubic B-spline interpolation, Lanczos interpolation, Mitchell-Netravali cubic filter interpolation, image rescaling" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="A description of the pixel interpolation algorithms currently implemented on the PixInsight platform." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-generic.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>Interpolation Algorithms in PixInsight</h1>
+<div id="authors">
+<p>By Juan Conejero, PTeam</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>A description of the pixel interpolation algorithms currently implemented on the PixInsight platform. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> interpolation, pixel interpolation, interpolation algorithms, nearest neighbor interpolation, bilinear interpolation, bicubic spline interpolation, bicubic B-spline interpolation, Lanczos interpolation, Mitchell-Netravali cubic filter interpolation, image rescaling</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Pixel_Interpolation_Algorithms__">2&emsp;Pixel Interpolation Algorithms</a></li>
+<li class="pidoc_tocItem"><a href="#__Downsampling_Examples__">3&emsp;Downsampling Examples</a></li>
+<li class="pidoc_tocItem"><a href="#__Upsampling_Examples__">4&emsp;Upsampling Examples</a></li>
+<li class="pidoc_tocItem"><a href="#__Rotation_Examples__">5&emsp;Rotation Examples</a></li>
+<li class="pidoc_tocItem"><a href="#__Quantitative_Analysis__">6&emsp;Quantitative Analysis</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>Pixel interpolation algorithms are crucial for processes involving geometric transformations, with the exception of non-interpolating procedures such as <a href="../../tools/IntegerResample/IntegerResample.html" title="../../tools/IntegerResample/IntegerResample.html">IntegerResample</a> (pixel binning) and <a href="../../tools/FastRotation/FastRotation.html" title="../../tools/FastRotation/FastRotation.html">FastRotation</a> (rotate &plusmn;90&deg;, 180&deg; and specular transformations). The available pixel interpolation algorithms are directly selectable by the user in standard tools such as <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample,</a> <a href="../../tools/Rotation/Rotation.html" title="../../tools/Rotation/Rotation.html">Rotation,</a> <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a> and <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment.</a> They are also used internally by the PixInsight Core application and many tools and processes.</p>
+<p>The pixel interpolation problem is quite simple conceptually. A digital image is a discrete representation composed by samples distributed on a uniform, rectangular lattice. Each sample, or vector of samples in multichannel or color images, is what we call a <em>pixel.</em> Pixel interpolation is necessary to obtain new pixel values at arbitrary&mdash;not necessarily integer&mdash;coordinates from existing data.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img style="float:left;margin-right:2em;" src="images/InterpolationScheme.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:3em;"></div>
+<p>In this figure, big circles represent existing image pixels. A new pixel value is desired at the location represented by the small dot, defined by offsets <var>dx</var> and <var>dy</var> measured from the nearest pixel by coordinate truncation. Black big circles are the <em>interpolation boundary</em> in this example, from which a new value will be computed at the specified coordinates. This problem arises in a wide variety of geometric transformations; for example, to resize an image by arbitrary scaling ratios, new pixel values must be obtained from existing image data in this way.</p>
+</div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Pixel_Interpolation_Algorithms__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Pixel Interpolation Algorithms</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Pixel_Interpolation_Algorithms', this );">[hide]</p>
+   <div id="Pixel_Interpolation_Algorithms">
+<p>The PixInsight/PCL platform provides several pixel interpolation algorithms, ranging from relatively simple procedures (nearest neighbor, bilinear) to more sophisticated algorithms such as Lanczos and bicubic spline, as well as algorithms specifically designed to address the downsampling and smooth interpolation tasks in an efficient and versatile way, such as the Mitchell-Netravali family of cubic filters. We offer now a brief description of these interpolation algorithms.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Nearest Neighbor</p>
+</dt>
+<dd>
+<p>This is the simplest possible interpolation algorithm. Nearest neighbor selects the value of the nearest pixel by rounding the coordinates of the desired interpolation point <var>x</var> &ge; 0:</p>
+
+<div style="text-align:center;">
+<img src="images/NearestNeighborFunction.svg" alt=""/>
+</div>
+<p>with an obvious extension to the two-dimensional case. In the above equation, &lfloor;&middot;&rfloor; is the floor operator: the largest integer less than or equal to the argument. As a result of this simplistic interpolation scheme, nearest neighbor doesn't have subpixel accuracy and generates strong discontinuities, especially when arbitrary rotations and scale changes are involved. The only interesting property of this algorithm is the fact that it preserves the original noise distribution in the transformed image, which can be useful in some image analysis applications.</p>
+</dd>
+<dt>
+<p>Bilinear</p>
+</dt>
+<dd>
+<p>A slightly more sophisticated interpolation method. The bilinear algorithm interpolates from the nearest four mapped source pixels. It builds and evaluates two linear interpolation functions, one for each plane direction. If <var>f</var> is a two-dimensional image, the bilinear interpolation equations for an arbitrary point (<var>x</var>,<var>y</var>) are the following:</p>
+
+<div style="text-align:center;">
+<img src="images/BilinearFunction_1.svg" alt=""/>
+</div>
+<p>with:</p>
+
+<div style="text-align:center;">
+<img src="images/BilinearFunction_2.svg" alt=""/>
+</div>
+<p>The main drawbacks of bilinear interpolation are poor preservation of image detail and generation of strong aliasing artifacts for rotated images. In practice it is only used as an intermediate transformation in some analysis tasks, mainly due to the fact that it does not generate undershoot (ringing) artifacts.</p>
+</dd>
+<dt>
+<p><a id="bicubic_spline_interpolation"></a> Bicubic Spline</p>
+</dt>
+<dd>
+<p>This is a high-performance implementation of cubic pixel interpolation that usually provides excellent results, both in calculation speed and in the quality of the transformed images. Bicubic spline is usually one of the best choices when not too radical downsampling operations are involved in geometric transformations. The other choice for quality interpolation is the Lanczos algorithm, which we'll describe later.</p>
+<p>Bicubic interpolation algorithms interpolate from the nearest sixteen mapped source pixels. Our implementation uses the following cubic spline function as a separable filter to perform a convolution interpolation: <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Keys, R. G. (1981), <em>Cubic Convolution Interpolation for Digital Image Processing</em>, IEEE Trans. Acoustics, Speech &amp; Signal Proc., Vol. 29, pp. 1153&ndash;1160.">[1]</a></sup></p>
+
+<div style="text-align:center;">
+<img src="images/BicubicSplineFunction.svg" alt=""/>
+</div>
+<p>The <var>a</var> constant parameter of the cubic spline controls the depth of the negative lobes of the interpolation function. In our implementation we have set a fixed value <var>a</var> = &ndash;1/2. <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+Parker, J. Anthony, et al. (1983), <em>Comparison of Interpolating Methods for Image Resampling</em>, IEEE Trans. Medical Imaging, Vol. 2, No. 1.">[2]</a></sup> The resulting function profile can be seen on the graph below.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="float:left;margin-right:2em;" src="images/BicubicSplineFunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p><strong>Bicubic spline interpolation function</strong> for <var>a</var> = &ndash;1/2.</p>
+</div>
+<p>Due to the negative lobes of the bicubic spline interpolation function, this algorithm generates <em>undershoot</em> artifacts (ringing). To fix these problems we have implemented a <a href="#interpolation_clamping">clamping mechanism</a>, which we describe in a separate section.</p>
+</dd>
+<dt>
+<p>Bicubic B-Spline</p>
+</dt>
+<dd>
+<p>As bicubic spline interpolation, the bicubic B-spline interpolation algorithm also interpolates from the nearest sixteen source pixels. However, this algorithm uses B-spline interpolating functions instead of cubic splines, which in general yield quite smooth results.</p>
+<p>This implementation is based on an algorithm described by Paul Bourke. <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Paul Bourke (2001), <a href='http://paulbourke.net/texture_colour/imageprocess/' title='http://paulbourke.net/texture_colour/imageprocess/'><em>Bicubic Interpolation for Image Scaling</em></a>">[3]</a></sup> It performs a convolution with a nonseparable two-dimensional filter, so its complexity is O(N&times;n<sup>2</sup>). In contrast, bicubic spline interpolation uses a convolution with a separable filter, and hence its complexity is O(N&times;n). Despite this performance difference, bicubic B-spline has interesting characteristics of smoothness that make it a good option in some cases.</p>
+</dd>
+<dt>
+<p><a id="lanczos_inerpolation"></a> Lanczos Interpolation</p>
+</dt>
+<dd>
+<p>Lanczos interpolation has the best properties in terms of detail preservation and minimal generation of aliasing artifacts for geometric transformations not involving strong downsampling. The <a href="http://en.wikipedia.org/wiki/Lanczos_resampling" title="http://en.wikipedia.org/wiki/Lanczos_resampling">Lanczos interpolation</a> function of order <var>n</var> in one dimension is given by</p>
+
+<div style="text-align:center;">
+<img src="images/LanczosFunction.svg" alt=""/>
+</div>
+<p>where the normalized <a href="http://mathworld.wolfram.com/SincFunction.html" title="http://mathworld.wolfram.com/SincFunction.html">sinc function</a> is:</p>
+
+<div style="text-align:center;">
+<img src="images/SincFunction.svg" alt=""/>
+</div>
+<p>Interpolation of a two-dimensional image <var>f</var> with a Lanczos filter of order <var>n</var> is performed with the following algorithm:</p>
+
+<div style="text-align:center;">
+<img src="images/Lanczos2DInterpolationFunction.svg" alt=""/>
+</div>
+<p>where (<var>x</var>,<var>y</var>) are the coordinates of the interpolation point and &lfloor;&middot;&rfloor; is, as before, the floor operator (the largest integer less than or equal to the argument). The filter weight <var>w</var> is applied by division to preserve flux:</p>
+
+<div style="text-align:center;">
+<img src="images/Lanczos2DInterpolationWeight.svg" alt=""/>
+</div>
+<p>Lanczos interpolation uses a neighborhood of the 2<var>n</var>&times;2<var>n</var> nearest mapped pixels. A two-dimensional Lanczos filter is nonseparable, so the complexity of Lanczos interpolation is O(<var>N</var>&times;4<var>n</var><sup>2</sup>).</p>
+<p>The standard geometry tools in PixInsight provide Lanczos interpolation functions of order 3, 4 and 5, called Lanczos-3, Lanczos-4 and Lanczos-5, respectively. The corresponding function profiles can be seen in the graphs of the figure below.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+<p><strong>Lanczos interpolation functions</strong> of orders 3, 4 and 5. Contrarily to other interpolation functions, the Lanczos function has infinite support with alternating positive and negative <em>lobes</em> around the origin. The order corresponds to the number of lobes kept in the interpolation function window: Order 3 keeps the first positive lobe around the origin, the second negative lobe, and the third positive lobe; order 4 adds the fourth negative lobe, and so on.</p>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<img style="float:left;margin-right:2em;" src="images/Lanczos3FunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Lanczos-3<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:2em;" src="images/Lanczos4FunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Lanczos-4<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:2em;" src="images/Lanczos5FunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Lanczos-5<br class="pidoc_clearfix"/></p>
+</div>
+<p>For 32-bit and 64-bit pixel data types, the above algorithm is used by directly evaluating the Lanczos function at each neighborhood point. For 8-bit and 16-bit integer images, special LUT-based Lanczos interpolation algorithms have been implemented, based on precalculated tables of function values. These algorithms provide an accuracy of 1/2<sup>16</sup> and are about three times faster than their function evaluation counterparts.</p>
+<p>As happens with bicubic spline interpolation, the main drawback of Lanczos interpolation is <em>undershoot</em>&mdash;see the section on <a href="#interpolation_clamping">interpolation clamping</a> for a description of this problem and the solution we have implemented.</p>
+</dd>
+<dt>
+<p>Interpolation by Mitchell-Netravali parameterized cubic filters</p>
+</dt>
+<dd>
+<p>This category comprises different interpolations by convolution with two-parameter, separable cubic filters as described by Mitchell and Netravali: <sup><a href="#__reference_4__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 4]<br/>
+Don P. Mitchell, Arun N. Netravali (1988), <em>Reconstruction Filters in Computer Graphics</em>, Computer Graphics, Vol. 22, No. 4, pp. 221&ndash;228.">[4]</a></sup></p>
+
+<div style="text-align:center;">
+<img src="images/MitchellNetravaliFilterFunction.svg" alt=""/>
+</div>
+<p>where three particular combinations of the <var>B</var> and <var>C</var> constants have been used to implement the following interpolation filters:</p>
+
+<ul class="pidoc_list">
+<li>B=1, C=0 &mdash; Cubic B-spline</li>
+<li>B=0, C=1/2 &mdash; Catmull-Rom spline</li>
+<li>B=C=1/3 &mdash; Mitchell-Netravali cubic filter.</li>
+</ul>
+
+<p>These interpolations are particularly good to downsample images, as we'll see in an interesting comparison later on this document. The Mitchell-Netravali cubic filter has the parameters recommended by the authors in the original paper (<var>B</var>=<var>C</var>=1/3). This filter has really excellent characteristics in our opinion; when correctly applied, it yields a very good equilibrium between detail preservation (sharpness) and smoothness. Compared to Mitchell-Netravali:</p>
+
+<ul class="pidoc_list">
+<li>The Catmull-Rom spline filter yields sharper results.</li>
+<li>The cubic B-spline filter yields smoother results.</li>
+</ul>
+
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+<p><strong>The Mitchell-Netravali family of cubic interpolation functions.</strong></p>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<img style="float:left;margin-right:2em;" src="images/MitchellNetravaliFunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Mitchell-Netravali<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:2em;" src="images/CatmullRomFunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Catmull-Rom<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:2em;" src="images/CubicBSplineFunctionGraph.svg" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Cubic B-Spline<br class="pidoc_clearfix"/></p>
+</div>
+</dd>
+<dt>
+<p><em>Auto</em> Interpolation Mode</p>
+</dt>
+<dd>
+<p>This mode is applicable to processes that can scale or resize images. The Mitchell-Netravali and Lanczos-3 interpolation algorithms are automatically selected as a function of the scaling ratio, independently for each axis:</p>
+
+<ul class="pidoc_list">
+<li>Lanczos-3 is always used for transformations that involve upsampling or no scaling.</li>
+<li>Lanczos-3 is also used for slight downsampling ratios, where Mitchell-Netravali cubic filters cannot be properly sampled (i.e., when the filter kernels become smaller than 5&times;5 elements).</li>
+<li>Mitchell-Netravali cubic filters are used for the rest of downsampling operations.</li>
+</ul>
+
+<p>We think that this automatic selection mode is appropriate for most geometric transformations. However, achieving the best results usually requires some testing work and experimentation to assess the best interpolation algorithm for each particular task.</p>
+</dd>
+<dt>
+<p><a id="interpolation_clamping"></a> Interpolation Clamping</p>
+</dt>
+<dd>
+<p><a href="http://en.wikipedia.org/wiki/Overshoot_%28signal%29" title="http://en.wikipedia.org/wiki/Overshoot_%28signal%29">Undershoot</a> artifacts, more commonly known as <em>ringing,</em> are caused by negative lobes of the interpolation functions falling over bright isolated pixels or high-contrast edges. This is a drawback of the <a href="#lanczos_inerpolation">Lanczos</a> and <a href="#bicubic_spline_interpolation">bicubic spline</a> interpolation algorithms.</p>
+<p>On linear images, typical undershoot artifacts are composed of one or a few very dark pixels around bright structures such as stars, cosmic rays, and hot pixels. On nonlinear stretched images, including diurnal images, the undershoot and overshoot effects are in general desirable since they increase <em>accutance,</em> or the visual perception of sharpness. In interpolated deep-sky linear images, undershoot can be seen as a price to pay for the superior performance of the Lanczos and bicubic spline algorithms. The counterpart to undershoot is <em>aliasing,</em> especially when geometric transformations involve small rotations, as frequently happens in image registration tasks. Aliasing is problematic in these cases because it acts like a low-pass filter causing a loss of detail on areas distributed regularly over the image.</p>
+<p>The PixInsight/PCL implementations of the Lanczos and bicubic spline interpolation algorithms include a special <em>clamping</em> mechanism to prevent generation of visible undershoot artifacts. The clamping feature can be controlled with a <em>clamping threshold</em> parameter that can be varied in the [0,1] range. Lower values cause a more aggressive deringing effect. In the current versions of all geometric and image registration PixInsight tools, the default clamping threshold value is 0.3, which is appropriate to fix undershoot problems in most cases.</p>
+</dd>
+<dt>
+<p>Smoothness</p>
+</dt>
+<dd>
+<p>This parameter is only available for Mitchell-Netravali cubic filter interpolations, and only applies when images are <em>downsampled</em> (reduced in size). Our implementation of these interpolation algorithms includes a user-adjustable <em>smoothness</em> parameter. This parameter allows you to fine-tune the degree of smoothness in the downsampled result. The default value is 1.5, but you can vary this parameter in the range from 1 to 5.</p>
+</dd>
+</dl>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Downsampling_Examples__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Downsampling Examples</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Downsampling_Examples', this );">[hide]</p>
+   <div id="Downsampling_Examples">
+<p>The best way to test the performance and features of different pixel interpolation algorithms is to compare their results for actual image processing tasks. The downsampling and upsampling tasks have specific requirements and pose different challenges for image interpolation. The following examples are based on a difficult target which you can see in the figure below.</p>
+<img src="images/Downsample.jpg" alt=""/>
+<p>The set of examples consist of downsampling the original image to 400 pixels tall, using the different interpolation algorithms available. This is roughly a 1:11 scaling factor. This photograph of the <a href="http://en.wikipedia.org/wiki/Flatiron_Building" title="http://en.wikipedia.org/wiki/Flatiron_Building">Flatiron</a> Building in New York City is a difficult test case because the image has many high-contrast, small-scale structures, as the tree branches projected over the sky. These structures may easily lead to pixellation due to inappropriate or inappropriately applied pixel interpolation algorithms.</p>
+<p>Below you can see the results of this test. The resulting images have been upsampled 2:1 without interpolation with the <a href="../../tools/IntegerResample/IntegerResample.html" title="../../tools/IntegerResample/IntegerResample.html">IntegerResample</a> tool in order to facilitate visual comparisons.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<div class="pidoc_mouseover">
+<div class="pidoc_image_right"><img src="images/Downsample_MN.png" id="2ZBZC36x5t4nsMCz" alt="" /></div>
+<ul>
+<li><span class="pidoc_indicator_default" id="2ZBZC36x5t4nsMCz_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_MN.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_1', 1.0);">Mitchell-Netravali Cubic Filter</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_CR.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_2', 1.0);">Catmull-Rom Cubic Spline Filter</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_CBS.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_3', 1.0);">Cubic B-Spline Filter</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_NN.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_4', 1.0);">Nearest Neighbor</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_BL.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_5', 1.0);">Bilinear</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_6"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_BS.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_6', 1.0);">Bicubic Spline</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_7"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_BBS.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_7', 1.0);">Bicubic B-Spline (Bourke)</a></li>
+<li><span class="pidoc_indicator" id="2ZBZC36x5t4nsMCz_8"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('2ZBZC36x5t4nsMCz', 'images/Downsample_L3.png'); pidoc_hideGroup('2ZBZC36x5t4nsMCz', 8); pidoc_setOpacity('2ZBZC36x5t4nsMCz_8', 1.0);">Lanczos-3</a></li>
+</ul>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+<p><strong>An image downsampling experiment</strong> where the whole set of pixel interpolation algorithms has been tested with a difficult target.</p>
+</div>
+<p>From the above results, it is evident that the filter interpolation algorithms (particularly Mitchell-Netravali and Catmull-Rom) can be extremely efficient for downsampling images. Cubic B-spline filter interpolation is probably too smooth.</p>
+<p>The bicubic spline, bicubic B-spline and Lanczos algorithms give nearly the same poor results as nearest neighbor and bilinear. This doesn't mean that bicubic spline or Lanczos are bad interpolation algorithms; they are actually high-performance, high-quality interpolations. It is just that bicubic spline and Lanczos are not well suited for so radical downsampling operations (1:11 in this case), as happens with all algorithms that interpolate from a fixed-size pixel boundary. Mitchell-Netravali is in our opinion the best option for this task.</p>
+<p>A comparison of results achieved with different values of the <em>smoothness</em> parameter is shown below.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_6__"></a>
+<p class="pidoc_figure_title">Figure 6</p>
+<div class="pidoc_mouseover">
+<div class="pidoc_image_right"><img src="images/Downsample_MN_10.png" id="X5QwUH8qMtchpQiC" alt="" /></div>
+<ul>
+<li><span class="pidoc_indicator_default" id="X5QwUH8qMtchpQiC_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('X5QwUH8qMtchpQiC', 'images/Downsample_MN_10.png'); pidoc_hideGroup('X5QwUH8qMtchpQiC', 4); pidoc_setOpacity('X5QwUH8qMtchpQiC_1', 1.0);">Mitchell-Netravali, smoothness = 1.0</a></li>
+<li><span class="pidoc_indicator" id="X5QwUH8qMtchpQiC_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('X5QwUH8qMtchpQiC', 'images/Downsample_MN_15.png'); pidoc_hideGroup('X5QwUH8qMtchpQiC', 4); pidoc_setOpacity('X5QwUH8qMtchpQiC_2', 1.0);">Mitchell-Netravali, smoothness = 1.5</a></li>
+<li><span class="pidoc_indicator" id="X5QwUH8qMtchpQiC_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('X5QwUH8qMtchpQiC', 'images/Downsample_MN_20.png'); pidoc_hideGroup('X5QwUH8qMtchpQiC', 4); pidoc_setOpacity('X5QwUH8qMtchpQiC_3', 1.0);">Mitchell-Netravali, smoothness = 2.0</a></li>
+<li><span class="pidoc_indicator" id="X5QwUH8qMtchpQiC_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('X5QwUH8qMtchpQiC', 'images/Downsample_MN_30.png'); pidoc_hideGroup('X5QwUH8qMtchpQiC', 4); pidoc_setOpacity('X5QwUH8qMtchpQiC_4', 1.0);">Mitchell-Netravali, smoothness = 3.0</a></li>
+</ul>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+<p><strong>The <em>smoothness</em> parameter</strong> allows for adjustable downsampling smoothness with the Mitchell-Netravali family of cubic filter interpolation algorithms. Note the aliasing artifacts generated on the fence near the bottom of the image with smoothness=1. These artifacts get fixed with the default smoothness value of 1.5.</p>
+</div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Upsampling_Examples__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Upsampling Examples</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Upsampling_Examples', this );">[hide]</p>
+   <div id="Upsampling_Examples">
+<p>As happens with the image downsampling task, image upsampling has some particular requirements that challenge pixel interpolation algorithms. As you'll see, both tasks are complementary: in general, good algorithms for downsampling perform poorly for upsampling, and vice-versa. In this case we have taken a small crop of 100x100 pixels from the original image, which we have upsampled to 630x630 pixels with <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample.</a> Below are the most relevant results.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_7__"></a>
+<p class="pidoc_figure_title">Figure 7</p>
+<div class="pidoc_mouseover">
+<div class="pidoc_image_right"><img src="images/Upsample_Original.png" id="gKJ5gdtJ7OUnbXt6" alt="" /></div>
+<ul>
+<li><span class="pidoc_indicator_default" id="gKJ5gdtJ7OUnbXt6_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_Original.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_1', 1.0);">Original, enlarged 6:1</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_L3.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_2', 1.0);">Lanczos-3</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_BS.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_3', 1.0);">Bicubic Spline</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_NN.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_4', 1.0);">Nearest Neighbor</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_BL.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_5', 1.0);">Bilinear</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_6"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_BBS.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_6', 1.0);">Bicubic B-Spline (Bourke)</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_7"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_MN.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_7', 1.0);">Mitchell-Netravali</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_8"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_CR.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_8', 1.0);">Catmull-Rom</a></li>
+<li><span class="pidoc_indicator" id="gKJ5gdtJ7OUnbXt6_9"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('gKJ5gdtJ7OUnbXt6', 'images/Upsample_CBS.png'); pidoc_hideGroup('gKJ5gdtJ7OUnbXt6', 9); pidoc_setOpacity('gKJ5gdtJ7OUnbXt6_9', 1.0);">Cubic B-Spline</a></li>
+</ul>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+<p><strong>Image upsampling comparison (1).</strong> A small crop of 100&times;100 pixels has been interpolated to 630&times;630 pixels with the standard <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a> tool using all pixel interpolation algorithms available. The original has been upsampled 6:1 without interpolation with the <a href="../../tools/IntegerResample/IntegerResample.html" title="../../tools/IntegerResample/IntegerResample.html">IntegerResample</a> tool.</p>
+
+<div class="pidoc_vspacer" style="margin-top:1.5em;"></div>
+<div class="pidoc_mouseover">
+<div class="pidoc_image_right"><img src="images/Upsample_L3_Crop.png" id="HX1i0Dx6UPqSG2QW" alt="" /></div>
+<ul>
+<li><span class="pidoc_indicator_default" id="HX1i0Dx6UPqSG2QW_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('HX1i0Dx6UPqSG2QW', 'images/Upsample_L3_Crop.png'); pidoc_hideGroup('HX1i0Dx6UPqSG2QW', 4); pidoc_setOpacity('HX1i0Dx6UPqSG2QW_1', 1.0);">Lanczos-3</a></li>
+<li><span class="pidoc_indicator" id="HX1i0Dx6UPqSG2QW_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('HX1i0Dx6UPqSG2QW', 'images/Upsample_BS_Crop.png'); pidoc_hideGroup('HX1i0Dx6UPqSG2QW', 4); pidoc_setOpacity('HX1i0Dx6UPqSG2QW_2', 1.0);">Bicubic Spline</a></li>
+<li><span class="pidoc_indicator" id="HX1i0Dx6UPqSG2QW_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('HX1i0Dx6UPqSG2QW', 'images/Upsample_BL_Crop.png'); pidoc_hideGroup('HX1i0Dx6UPqSG2QW', 4); pidoc_setOpacity('HX1i0Dx6UPqSG2QW_3', 1.0);">Bilinear</a></li>
+<li><span class="pidoc_indicator" id="HX1i0Dx6UPqSG2QW_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('HX1i0Dx6UPqSG2QW', 'images/Upsample_CR_Crop.png'); pidoc_hideGroup('HX1i0Dx6UPqSG2QW', 4); pidoc_setOpacity('HX1i0Dx6UPqSG2QW_4', 1.0);">Catmull-Rom</a></li>
+</ul>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+<p><strong>Image upsampling comparison (2).</strong> A crop of 120&times;120 pixels has been extracted from the interpolated results above and enlarged 4:1 without interpolation (effective scaling ratio of 25:1). At this scale, the comparison shows the actual differences between these four pixel interpolation algorithms:</p>
+
+<ul class="pidoc_list">
+<li>Lanczos-3 interpolation clearly provides the best result. It is the default algorithm used in all our standard tools for image upsampling tasks.</li>
+<li>Bicubic spline interpolation is acceptable, but less accurate than Lanczos and leads to significant dispersion of small-scale bright structures.</li>
+<li>Bilinear interpolation is definitely too inaccurate for image upsampling.</li>
+<li>Catmull-Rom cubic filter interpolation yields a uniform but too smooth result with loss of small-scale detail. Other cubic filter algorithms are even smoother and hence useless.</li>
+</ul>
+
+</div>
+<p>This example clearly shows that the Lanczos-3 interpolation algorithm provides the best results for image upsampling, with bicubic spline interpolation an acceptable alternative, especially due to its high computation speed. The results of Lanczos-3 and Lanczos-4 are indistinguisable. The Mitchell-Netravali family of interpolation filters can be used to achieve higher smoothness in the upsampled result, which may be desirable in some applications.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Rotation_Examples__">
+   <h3 class="pidoc_sectionTitle">5&emsp;Rotation Examples</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Rotation_Examples', this );">[hide]</p>
+   <div id="Rotation_Examples">
+<p>The rotation task poses two main problems for pixel interpolation: subpixel accuracy and <a href="http://en.wikipedia.org/wiki/Aliasing" title="http://en.wikipedia.org/wiki/Aliasing">aliasing.</a> In this test we are interested in comparing the aliasing artifacts generated by the different pixel interpolation algorithms available in PixInsight. To this purpose we have created a 1024&times;1024 pixels grayscale image, on which we have generated uniformly distributed noise with the standard <a href="../../tools/NoiseGenerator/NoiseGenerator.html" title="../../tools/NoiseGenerator/NoiseGenerator.html">NoiseGenerator</a> tool. Then we have applied a rotation of 1.5 degrees in the counter-clockwise direction with the <a href="../../tools/Rotation/Rotation.html" title="../../tools/Rotation/Rotation.html">Rotation</a> tool. The figure below shows the results for a small crop of about 200&times;200 pixels near the center of the image.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_8__"></a>
+<p class="pidoc_figure_title">Figure 8</p>
+<div class="pidoc_mouseover">
+<div class="pidoc_image_right"><img src="images/Rotation_L3.png" id="RjoFeOfH3OsMPR0u" alt="" /></div>
+<ul>
+<li><span class="pidoc_indicator_default" id="RjoFeOfH3OsMPR0u_1"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_L3.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_1', 1.0);">Lanczos-3</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_2"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_BS.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_2', 1.0);">Bicubic Spline</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_3"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_BL.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_3', 1.0);">Bilinear</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_4"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_NN.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_4', 1.0);">Nearest Neighbor</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_5"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_BBS.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_5', 1.0);">Bicubic B-Spline (Bourke)</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_6"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_MN.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_6', 1.0);">Mitchell-Netravali</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_7"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_CR.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_7', 1.0);">Catmull-Rom</a></li>
+<li><span class="pidoc_indicator" id="RjoFeOfH3OsMPR0u_8"></span><a href="javascript:void(0);" onmouseover="pidoc_setImgSrc('RjoFeOfH3OsMPR0u', 'images/Rotation_CBS.png'); pidoc_hideGroup('RjoFeOfH3OsMPR0u', 8); pidoc_setOpacity('RjoFeOfH3OsMPR0u_8', 1.0);">Cubic B-Spline</a></li>
+</ul>
+</div>
+
+<div class="pidoc_vspacer" style="margin-top:0.5em;"></div>
+<p><strong>Image rotation comparison.</strong> Small rotations, as those frequently applied in image registration tasks, are particularly sensitive to aliasing. Lanczos-3 interpolation generates less aliasing than the bicubic spline and bilinear algorithms. Nearest neighbor preserves the original noise distribution, but does not provide subpixel accuracy, as becomes evident from the 'circulant blocks' it generates. Other interpolations are too smooth for most practical applications involving rotation without scaling.</p>
+</div>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Quantitative_Analysis__">
+   <h3 class="pidoc_sectionTitle">6&emsp;Quantitative Analysis</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Quantitative_Analysis', this );">[hide]</p>
+   <div id="Quantitative_Analysis">
+<p>So far we have carried out qualitative comparisons&mdash;that is, comparisons by visual inspection&mdash;of the results achieved with different interpolation algorithms for critical geometric transformations. In this final section we are going to complete this document with a quantitative analysis where we'll try to evaluate the performance of each interpolation algorithm in terms of preservation of small-scale structures after small rotations. This criterion is of crucial importance for image registration of deep-sky astronomical images.</p>
+<p>The data used in this analysis are similar to the preceding rotation example: a 1024&times;1024 pixels grayscale image with normally distributed synthetic noise (Gaussian noise) generated with the <a href="../../tools/NoiseGenerator/NoiseGenerator.html" title="../../tools/NoiseGenerator/NoiseGenerator.html">NoiseGenerator</a> tool, which we have rotated by 1.5 degrees with the <a href="../../tools/Rotation/Rotation.html" title="../../tools/Rotation/Rotation.html">Rotation</a> tool using all the interpolation algorithms available. Since the image contains noise exclusively, we can evaluate the noise in the rotated images to assess preservation of small-scale structures after interpolation. The results have been summarized in the following table.</p>
+
+<div style="text-align:center;">
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1<br/>
+Quantitative Interpolation Analysis - Small Rotations</span></caption>
+<tr>
+<th>
+<div style="text-align:center;">
+<p>Algorithm</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Noise standard deviation</p>
+</div>
+</th>
+<th>
+<div style="text-align:center;">
+<p>Percentage of noise pixels</p>
+</div>
+</th>
+</tr>
+<tr>
+<td><p>Original image</p>
+</td>
+<td><p>0.09775</p>
+</td>
+<td><p>98.64</p>
+</td>
+</tr>
+<tr>
+<td><p>Nearest Neighbor</p>
+</td>
+<td><p>0.09775</p>
+</td>
+<td><p>98.66</p>
+</td>
+</tr>
+<tr>
+<td><p>Lanczos-4</p>
+</td>
+<td><p>0.08870</p>
+</td>
+<td><p>97.50</p>
+</td>
+</tr>
+<tr>
+<td><p>Lanczos-3</p>
+</td>
+<td><p>0.08630</p>
+</td>
+<td><p>96.92</p>
+</td>
+</tr>
+<tr>
+<td><p>Bicubic Spline</p>
+</td>
+<td><p>0.07738</p>
+</td>
+<td><p>94.36</p>
+</td>
+</tr>
+<tr>
+<td><p>Bilinear</p>
+</td>
+<td><p>0.06035</p>
+</td>
+<td><p>84.91</p>
+</td>
+</tr>
+<tr>
+<td><p>Catmull-Rom</p>
+</td>
+<td><p>0.05804</p>
+</td>
+<td><p>81.02</p>
+</td>
+</tr>
+<tr>
+<td><p>Mitchell-Netravali</p>
+</td>
+<td><p>0.04502</p>
+</td>
+<td><p>65.12</p>
+</td>
+</tr>
+<tr>
+<td><p>Bicubic B-Spline (Bourke)</p>
+</td>
+<td><p>0.03713</p>
+</td>
+<td><p>52.39</p>
+</td>
+</tr>
+<tr>
+<td><p>Cubic B-Spline</p>
+</td>
+<td><p>0.02269</p>
+</td>
+<td><p>22.88</p>
+</td>
+</tr>
+</table>
+
+</div>
+<p>The most reliable item in this table is the percentage of noise pixels. We know that in theory the 100% of pixels should be identified as noise in these images. However, since interpolation for small rotations generates aliasing, the interpolated images contain false structures where the original noise distribution has been smoothed. For this reason we cannot simply evaluate the standard deviation of the rotated images, since doing so would lead to unreliable results. Instead, we have applied a multiscale noise evaluation algorithm that separates noise and signal at small dimensional scales. The algorithm applied <sup><a href="#__reference_5__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 5]<br/>
+Jean-Luc Starck and Fionn Murtagh, <em>Automatic Noise Estimation from the Multiresolution Support</em>, Publications of the Royal Astronomical Society of the Pacific, vol. 110, February 1998, pp. 193-199">[5]</a></sup> has been implemented as the NoiseEvaluation JavaScript script in PixInsight. This algorithm isolates the noise from significant image structures in a number of small-scale wavelet layers (the first four layers in our implementation), assuming a Gaussian noise distribution.</p>
+<p>As expected, nearest neighbor preserves the original noise distribution at the cost of no subpixel accuracy. The rest of the values in the table explain why we have selected Lanczos as the default pixel interpolation in the <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a> tool: it is the best interpolation by far in terms of detail preservation and minimal aliasing. Bicubic spline is still a rather decent option, but the rest of algorithms are unusable for geometric transformations involving arbitrary rotations without scaling, especially for image registration.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Keys, R. G. (1981), <em>Cubic Convolution Interpolation for Digital Image Processing</em>, IEEE Trans. Acoustics, Speech &amp; Signal Proc., Vol. 29, pp. 1153&ndash;1160.</p>
+      <p id="__reference_2__"><strong>[2]</strong> Parker, J. Anthony, et al. (1983), <em>Comparison of Interpolating Methods for Image Resampling</em>, IEEE Trans. Medical Imaging, Vol. 2, No. 1.</p>
+      <p id="__reference_3__"><strong>[3]</strong> Paul Bourke (2001), <a href="http://paulbourke.net/texture_colour/imageprocess/" title="http://paulbourke.net/texture_colour/imageprocess/"><em>Bicubic Interpolation for Image Scaling</em></a></p>
+      <p id="__reference_4__"><strong>[4]</strong> Don P. Mitchell, Arun N. Netravali (1988), <em>Reconstruction Filters in Computer Graphics</em>, Computer Graphics, Vol. 22, No. 4, pp. 221&ndash;228.</p>
+      <p id="__reference_5__"><strong>[5]</strong> Jean-Luc Starck and Fionn Murtagh, <em>Automatic Noise Estimation from the Multiresolution Support</em>, Publications of the Royal Astronomical Society of the Pacific, vol. 110, February 1998, pp. 193-199</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a>, <a href="../../tools/Rotation/Rotation.html" title="../../tools/Rotation/Rotation.html">Rotation</a>, <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a>, <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:37 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

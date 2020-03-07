@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | ChannelExtraction</title>
+   <meta name="keywords" content="color spaces, pixel channels, color components, channel extraction, color component extraction" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Extracts one or more pixel channels or color space components from a RGB color image." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>ChannelExtraction</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Extracts one or more pixel channels or color space components from a RGB color image. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> ColorSpaces, ChannelManagement</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> color spaces, pixel channels, color components, channel extraction, color component extraction</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Color_Space__">2.1&emsp;Color Space</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Channels__Target_Images__">2.2&emsp;Channels / Target Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Sample_Format__">2.3&emsp;Sample Format</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/ChannelExtraction.png" alt=""/>
+<p>The ChannelExtraction tool allows you to obtain individual RGB pixel channels or color space components as newly generated grayscale images. ChannelExtraction does not modify the image to which it is applied, and it can only be applied to color images.<br class="pidoc_clearfix"/></p>
+<p>ChannelExtraction supports the same color spaces as its cousin tool <a href="../../tools/ChannelCombination/ChannelCombination.html" title="../../tools/ChannelCombination/ChannelCombination.html">ChannelCombination:</a></p>
+
+<ul class="pidoc_list">
+<li>The RGB color space. The red (R), green (G) and blue (B) pixel channels are always the first, second and third nominal channels of a RGB color image, respectively.</li>
+<li class="pidoc_spaced_list_item">The CIE XYZ linear color space. CIE Y is the linear <em>luminance,</em> while CIE X and CIE Z are two linear chrominance components.</li>
+<li class="pidoc_spaced_list_item">The <a href="http://en.wikipedia.org/wiki/CIE_L*a*b*" title="http://en.wikipedia.org/wiki/CIE_L*a*b*">CIE L*a*b*</a> color space. CIE L*, or <em>lightness,</em> is a nonlinear function of the luminance (or CIE Y), while CIE a* and CIE b* are two nonlinear chrominance components. The CIE *a component represents the ratio between red and green for each pixel, and CIE b* represents the ratio between yellow and blue.</li>
+<li class="pidoc_spaced_list_item">The CIE L*c*h* color space. CIE L* is, as above, the <em>lightness</em> component. <a href="http://en.wikipedia.org/wiki/Colorfulness" title="http://en.wikipedia.org/wiki/Colorfulness">CIE *c</a>, or <em>colorfulness,</em> represents color saturation, and <a href="http://en.wikipedia.org/wiki/Hue" title="http://en.wikipedia.org/wiki/Hue">CIE h*</a> is the color <em>hue.</em></li>
+<li class="pidoc_spaced_list_item">The HSV color ordering system, or <em>hue,</em> <em>saturation</em> and <em>value.</em></li>
+<li class="pidoc_spaced_list_item">The HSI color ordering system, or <em>hue,</em> <em>saturation</em> and <em>intensity.</em></li>
+</ul>
+
+<p>Luminance/chrominance separations performed using the CIE XYZ, CIE L*a*b* and CIE L*c*h* color spaces are computed in the current <a href="http://brucelindbloom.com/index.html?WorkingSpaceInfo.html" title="http://brucelindbloom.com/index.html?WorkingSpaceInfo.html">RGB working space</a> of the target image. RGB working spaces can be defined with the standard <a href="../../tools/RGBWorkingSpace/RGBWorkingSpace.html" title="../../tools/RGBWorkingSpace/RGBWorkingSpace.html">RGBWorkingSpace</a> tool.</p>
+<p>In the HSV and HSI color ordering systems (they are not true color spaces in the colorimetric sense), note that the S component represents different color saturation functions, which we often denote as S<sub>v</sub> and S<sub>i,</sub> respectively, to differentiate them. For a formal description of the PixInsight implementation of HSV and HSI, see the documentation for the <a href="../../tools/ChannelCombination/ChannelCombination.html" title="../../tools/ChannelCombination/ChannelCombination.html">ChannelCombination tool</a>.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Color_Space__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Color Space</h4>
+<p>Select a color space to extract one or more channels or components. When you select a particular color space in this section, the names of the three <em>target images</em> (see the next section) are updated to reflect the corresponding channels or color components. By default, the RGB color space is selected.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Channels__Target_Images__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Channels / Target Images</h4>
+<p>This section provides three <em>target image</em> slots where you can specify the identifiers of the image(s) that will be generated with the extracted channels or components, according to the selected color space. Newly generated target images will be grayscale monochrome images with the same width and height in pixels as the image to which the process is applied. You normally will leave these fields with their default <em>&lt;Auto&gt;</em> value (actually, <em>&lt;Auto&gt;</em> is a special symbol used to signify an empty identifier).</p>
+<p>You can disable one or two target images by simply unchecking the associated check boxes. In this way you can extract three, two or one channels or components. When a target image is enabled (checked) and left with its default <em>&lt;Auto&gt;</em> identifier, ChannelExtraction automatically assigns an identifier consisting of the identifier of the image to which the process is being applied plus a suffix corresponding to the selected channel or color space component. Employed suffixes are as follows:</p>
+
+<ul class="pidoc_list">
+<li>_R, _G, _B for target RGB channels.</li>
+<li>_X, _Y, _Z for target CIE XYZ components.</li>
+<li>_L, _a, _b for target CIE L*a*b* components.</li>
+<li>_L, _c, _h for target CIE L*c*h* components.</li>
+<li>_H, _Sv, _V for target HSV components.</li>
+<li>_H, _Si, _I for target HSI components.</li>
+</ul>
+
+<p>Note that the applied suffixes are exactly the same that the <a href="../../tools/ChannelCombination/ChannelCombination.html" title="../../tools/ChannelCombination/ChannelCombination.html">ChannelCombination tool</a> expects when its source images are also left with their default <em>&lt;Auto&gt;</em> identifiers. In this way channels and components can be easily extracted and combined using both tools.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Sample_Format__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Sample Format</h4>
+<p>Select the default <em>Same as source</em> option to generate extracted channels and components as images with the same data type as the image to which the process is applied, or select one of the rest of options to cause ChannelExtraction to generate images with the specified data type:</p>
+
+<ul class="pidoc_list">
+<li>8-bit unsigned integer (byte rage: [0,255]).</li>
+<li>16-bit unsigned integer (word rage: [0,65535]).</li>
+<li>32-bit unsigned integer (double word rage: [0,4294967295]).</li>
+<li>32-bit <a href="http://en.wikipedia.org/wiki/IEEE_754" title="http://en.wikipedia.org/wiki/IEEE_754">IEEE 754</a> floating point (single precision, approximately 10<sup>7</sup> discrete values).</li>
+<li>64-bit IEEE 754 floating point (double precision, approximately 10<sup>15</sup> discrete values).</li>
+</ul>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/ChannelCombination/ChannelCombination.html" title="../../tools/ChannelCombination/ChannelCombination.html">ChannelCombination</a>, <a href="../../tools/RGBWorkingSpace/RGBWorkingSpace.html" title="../../tools/RGBWorkingSpace/RGBWorkingSpace.html">RGBWorkingSpace</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:17 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

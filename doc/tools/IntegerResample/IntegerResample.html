@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | IntegerResample</title>
+   <meta name="keywords" content="binning, resample, resize, integer resample" />
+   <meta name="author" content="Javier Sanchis Muñoz, PTeam" />
+   <meta name="description" content="Image rescaling by integer factors." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>IntegerResample</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Image rescaling by integer factors. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Geometry</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> binning, resample, resize, integer resample</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Integer_Resample__">2.1&emsp;Integer Resample</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Dimensions__">2.2&emsp;Dimensions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Resolution__">2.3&emsp;Resolution</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Downsampling_Examples__">2.4&emsp;Downsampling Examples</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Upsampling_Example__">2.5&emsp;Upsampling Example</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/IntegerResample.png" alt=""/>
+<p>The IntegerResample process is a basic geometry tool that allows resizing an image by an integer resampling factor. Downsampling is applied by using average, median, maximum or minimum pixel binning operations, and upsampling is a nondestructive process that performs a simple pixel replication without any interpolation. The tool can also modify the target image's resolution in pixels per inch or pixels per centimeter.</p>
+<p>For arbitrary image resizing using pixel interpolation algorithms, refer to the <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a> tool.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The first element in the IntegerResample interface is the <em>view selector</em>, which can be used to copy geometrical properties from an image to the <a href="#dimensions_section">Dimensions</a> section of the interface. Selecting a view is optional and has no effect at all on the selected view. Changes can be applied to the active view by clicking the <em>Apply</em> button (or by pressing F5), or by direct application of an instance of the process to a view, as part of the usual procedures to execute a process in PixInsight.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/DimensionsDefault.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/DimensionsFromView.png" alt=""/>
+<p><br class="pidoc_clearfix"/></p>
+</div>
+<p>The left picture above shows the default <a href="#dimensions_section">Dimensions</a> section. In the right image the Dimensions section has acquired the geometrical properties of the image specified by the view selector. Note the disabled <em>Original px Width</em> and <em>Heigth</em> edit boxes. When a view is selected, both fields are no longer modifiable since the <em>Original px</em> dimensions correspond to those of the selected view.</p>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Integer_Resample__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;<a id="integer_resample_section"></a>Integer Resample</h4>
+<img style="border:1px solid black;" src="images/Resample.png" alt=""/>
+<p>This section allows you to downsample or upsample a target image by an integer <em>resample factor</em>. Downsampling is done by a process known as <em>pixel binning</em>, and upsampling is achieved by <em>pixel replication</em>. For arbitrary image resizing using pixel interpolation algorithms, please refer to the <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a> tool.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Resample Factor</p>
+</dt>
+<dd>
+<p>Use this parameter to specify the integer upsampling or downsampling factor. The original image dimensions are multiplied by this value when using the <em>Upsample</em> option, and by its inverse when the <em>Downsample</em> mode is active.</p>
+</dd>
+<dt>
+<p>Downsample mode</p>
+</dt>
+<dd>
+<p>When the downsample mode is selected, the target image is rescaled by <em>pixel binning</em>.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="float:left;margin-right:2em;" src="images/PixelBinning.png" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Pixel binning refers to the combination of an n&times;n pixel matrix from an original image to create a single pixel in the target image. The original image is scanned horizontally and vertically applying this technique to generate each pixel in the output image. The combination of source pixels can be done using several mathematical operations, as explained below. Binning increases the signal to noise ratio at the cost of reducing the sampling density, and therefore the spatial resolution.</p>
+</div>
+<p>These are the available pixel binning modes:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Average</p>
+</dt>
+<dd>
+<p>Each output pixel is the average value of the corresponding n&times;n pixel matrix from the original image. Average binning is a linear operation that acts like a low-pass convolution filter.</p>
+</dd>
+<dt>
+<p>Median</p>
+</dt>
+<dd>
+<p>Each output pixel is the median value of the corresponding n&times;n pixel matrix from the original image. To compute the median, the n&times;n original values are sorted and the central element in the sorted list (at index (n &times; n)/2) is taken as the output value. Median binning is a nonlinear operation that acts in a similar way to a morphological median filter.</p>
+</dd>
+<dt>
+<p>Maximum</p>
+</dt>
+<dd>
+<p>Each output pixel is the maximum value of the corresponding n&times;n pixel matrix from the original image. To compute the maximum, the n&times;n original values are sorted and the last element in the sorted list (at index n&times;n-1) is taken as the output value. Images downsampled using this operation are always brighter than the original. Maximum binning is a nonlinear operation that acts in a similar way to a dilation morphological filter.</p>
+</dd>
+<dt>
+<p>Minimum</p>
+</dt>
+<dd>
+<p>Each output pixel is the minimum value of the corresponding n&times;n pixel matrix from the original image. To compute the minimum, the n&times;n original values are sorted and the first element in the sorted list (at index 0) is taken as the output value. Images downsampled using this operation are always darker than the original. Minimum binning is a nonlinear operation that acts in a similar way to an erosion morphological filter.</p>
+</dd>
+</dl>
+
+</dd>
+<dt>
+<p>Upsample</p>
+</dt>
+<dd>
+<p>In this mode the input image is rescaled by a simple <em>pixel replication</em> process, without any interpolation.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_3__"></a>
+<p class="pidoc_figure_title">Figure 3</p>
+<img style="float:left;margin-right:2em;" src="images/PixelReplication.png" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>Pixel replication consists of generating multiple copies of each pixel to produce an n&times;n pixel matrix in the upsampled image, where n is the upsampling factor.</p>
+</div>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Dimensions__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;<a id="dimensions_section"></a>Dimensions</h4>
+<img style="border:1px solid black;" src="images/Dimensions.png" alt=""/>
+<p>Unlike other modules such as <a href="../../tools/Crop/Crop.html" title="../../tools/Crop/Crop.html">Crop</a> or <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample,</a> this section of the IntegerResample tool is only an informative area, as far as the output size is calculated from the downsampling or upsampling ratio specified in the <a href="#integer_resample_section">Integer resample</a> section.</p>
+<p>This section shows the size in pixels of the original image on the <em>Original px</em> column, and gives the size of the output image either in pixels (<em>Target px</em>), centimeters and inches. The values in the <em>cm</em> and <em>inch</em> columns depend on the resolution of the image, which can be changed in the <a href="#resolution_section">Resolution</a> section. The text area below the edit fields provides an estimate of the final memory size of the resulting image.</p>
+<p>When a view is selected in the view selector combo box, this section acquires its dimensions and uses them as the <em>Original px</em> width and height values, which cannot be modified in this case, and computes the output memory size based on these dimensions and on the pixel data type of the image. When no view is selected, the input width and height can be changed arbitrarily (a default size of 1000&times;1000 pixels is used the first time IntegerResample is launched) and a 32-bit pixel format is considered for calculation of the output size.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Resolution__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;<a id="resolution_section"></a>Resolution</h4>
+<img style="border:1px solid black;" src="images/Resolution.png" alt=""/>
+<p>The resolution of an image is used to specify its final dimensions, in inches or centimeters, when the image is to be <em>printed.</em> The resolution is relevant when the image is imported in a page layout application, such as a word processor or a desktop edition application. It is important to point out that <em>changing the resolution of an image does not change its dimensions in pixels</em>. It is just <em>the dimensions of a printed pixel</em> what image resolution specifies. A default resolution of 72x72 pixels/inch is predefined.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Horizontal and Vertical</p>
+</dt>
+<dd>
+<p>The user can specify the horizontal and vertical resolution either in centimeters or inches. The physical width and heigth of the pinted image depend on the resolution and the dimensions in pixels; for instance, a 1000x1000 pixels image with a resolution of 100 pixels per inch in both axes would be printed over a square of 10x10 inches.</p>
+</dd>
+<dt>
+<p>Force resolution</p>
+</dt>
+<dd>
+<p>When this checkbox is checked the resolution of the target image is effectively modified when the process is executed. Otherwise, when this chekbox is unchecked, resolution values are used <em>for informative purposes exclusively</em>, but they won't change the current resolution of the target image. In both cases, the specified horizontal and vertical resolutions are used to calculate the <em>cm</em> and <em>inch</em> fields of the <a href="#dimensions_section">Dimensions</a> section.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Downsampling_Examples__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;<a id="downsampling_examples_section"></a>Downsampling Examples</h4>
+<p>In the following examples we have downsampled the original image by a factor of 3 with the IntegerResample tool, using the different binning operations available. For better evaluation of the results, we have upsampled 3:1 the downsampled results.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p class="pidoc_figure_title">Figure 4</p>
+<img style="float:left;margin-right:1em;margin-bottom:8px;" src="images/DownsamplingExample_1.jpg" alt=""/>
+<p>Original image, actual size.<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:1em;margin-bottom:8px;" src="images/DownsamplingExample_2.jpg" alt=""/>
+<p>Downsample mode = Average<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:1em;margin-bottom:8px;" src="images/DownsamplingExample_3.jpg" alt=""/>
+<p>Downsample mode = Median<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:1em;margin-bottom:8px;" src="images/DownsamplingExample_4.jpg" alt=""/>
+<p>Downsample mode = Maximum<br class="pidoc_clearfix"/></p>
+<img style="float:left;margin-right:1em;margin-bottom:8px;" src="images/DownsamplingExample_5.jpg" alt=""/>
+<p>Downsample mode = Minimum<br class="pidoc_clearfix"/></p>
+</div>
+<p>The maximum binning mode tends to remove dark image structures. The minimum mode has the opposite effect: dark image features are made darker and larger, while bright features are diminished. Median binning is half way between the minimum and maximum operators and can be used to preserve high-contrast structures in the downsampled (binned) image, although it tends to wipe out small-scale structures. Average binning acts like a low-pass filtering process, providing a smooth result.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Upsampling_Example__">
+   <h4 class="pidoc_subsectionTitle">2.5&emsp;<a id="upsampling_examples_section"></a>Upsampling Example</h4>
+<p>In this example we have taken a small crop of 200&times;200 pixels from the original image, which we have upsampled 4:1 with the IntegerResample tool. For comparison, we have included also an upsampled image using the Catmull-Rom cubic spline filter interpolation algorithm.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_5__"></a>
+<p class="pidoc_figure_title">Figure 5</p>
+<img style="float:left;margin-right:1em;" src="images/UpsamplingExample_1.jpg" alt=""/>
+<p>Original crop, actual size.<br class="pidoc_clearfix"/></p>
+<img style="margin-top:8px;" src="images/UpsamplingExample_2.jpg" alt=""/>
+<p>Upsampled 4:1 with IntegerResample.</p>
+<img style="margin-top:8px;" src="images/UpsamplingExample_3.jpg" alt=""/>
+<p>Upsampled 4:1 with the <a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a> tool using Catmull-Rom cubic spline filter interpolation.</p>
+</div>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/Resample/Resample.html" title="../../tools/Resample/Resample.html">Resample</a>, <a href="../../tools/Crop/Crop.html" title="../../tools/Crop/Crop.html">Crop</a>, <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:17 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

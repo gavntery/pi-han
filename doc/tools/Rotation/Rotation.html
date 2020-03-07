@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | Rotation</title>
+   <meta name="keywords" content="image rotation, pixel interpolation" />
+   <meta name="author" content="Javier Sanchis Muñoz, PTeam" />
+   <meta name="description" content="Rotates images by arbitrary angles." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>Rotation</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Rotates images by arbitrary angles. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Geometry</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> image rotation, pixel interpolation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Rotation_Angle__">2.1&emsp;Rotation Angle</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Interpolation__">2.2&emsp;Interpolation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Fill_Color__">2.3&emsp;Fill Color</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Fill_Color_:_Setting_the_fill_color_through_pixel_readouts__">2.3.1&emsp;Setting the fill color through pixel readouts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedDocuments__">Related Documents</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/Rotation.png" alt=""/>
+
+<div class="pidoc_vspacer" style="margin-top:2em;"></div>
+<p>The Rotation tool allows you to rotate an image by arbitrary angles. The process uses pixel interpolation algorithms to generate rotated output images, except for &plusmn;90&deg; and 180&deg; rotation angles when the <em>Optimize fast rotations</em> option is active (see below). The empty areas that fall outside the original image on the output rotated image are filled with user specified color and opacity.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<div class="pidoc_subsection" id="__Usage_:_Rotation_Angle__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;<a id="rotation_section"></a>Rotation Angle</h4>
+<img style="border:1px solid black;margin-bottom:0.5em;" src="images/RotationAngle.png" alt=""/>
+
+<dl class="pidoc_list">
+<dt>
+<p>Angle</p>
+</dt>
+<dd>
+<p>The rotation angle ranges from 0&deg; to 180&deg;. Instead of using negative and positive angles, we talk of <em>clockwise</em> and <em>counter clockwise</em> angles, respectively. You can define the rotation angle in a rapid and coarse way by clicking and dragging on the <em>rotation angle diagram</em>, which is a square graph at the right side of the Rotation section. You can also enter a rotation angle in degrees directly using the corresponding edit field.</p>
+</dd>
+<dt>
+<p>Clockwise</p>
+</dt>
+<dd>
+<p>Uncheck this check box to specify a positive rotation angle (counter clockwise direction). Activate this option to rotate by a negative angle (clockwise direction). When dragging and moving around the rotation angle diagram, the <em>Clockwise</em> checkbox is checked or unchecked automatically, depending on wether the angle defined is negative or positive, respectively.</p>
+</dd>
+<dt>
+<p>Use fast rotations</p>
+</dt>
+<dd>
+<p>Rotations by 90&deg; clockwise or counter clockwise and 180&deg; can be applied through <em>fast rotation</em> operations. When this option is selected, only pixel copy and exchange operations are used to perform fast rotations, instead of making use of interpolation algorithms, to generate the output image. Copying and exchanging pixels are <em>nondestructive</em> operations: as long as no parts of the image are cropped, an unlimited number of these operations could be applied without modifying the original pixel values (they would only change their positions in the output image). However, interpolated pixel values cannot be used to recover the original values, so we say that interpolation is a <em>destructive</em> operation.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Interpolation__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;<a id="interpolation_section"></a>Interpolation</h4>
+<img style="border:1px solid black;float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/Interpolation.png" alt=""/>
+<p>Pixel interpolation algorithms are necessary to compute output image pixels when the process rotates an image. The exception is when the image is being rotated by &plusmn;90&deg; or 180&deg; and the <em>Use fast rotations</em> option is enabled (see the <a href="#rotation_section">Rotation section</a> above).<br class="pidoc_clearfix"/></p>
+<p>For detailed information on interpolation algorithms, refer to the <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms documentation</a>.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Fill_Color__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;<a id="fill_color_section"></a>Fill Color</h4>
+<img style="border:1px solid black;float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/FillColor.png" alt=""/>
+<p>In this section you can define the color and opacity of the pixels used to fill the empty areas that fall outside the original image on the output rotated image. You can adjust three slider controls, corresponding to the individual RGB components, plus one slider for the alpha (opacity) channel. For grayscale monochrome images, only the first slider (R) applies. A rectangular control below the sliders shows a sample of the custom color and its opacity.<br class="pidoc_clearfix"/></p>
+<div class="pidoc_subsection" id="__Usage_:_Fill_Color_:_Setting_the_fill_color_through_pixel_readouts__">
+   <h5 class="pidoc_subsectionTitle">2.3.1&emsp;Setting the fill color through pixel readouts</h5>
+<p>You can read the fill color directly from any image by clicking on it in <em>readout mode</em>. This only works when the Fill Color section of the Rotation interface is expanded.</p>
+</div>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/FastRotation/FastRotation.html" title="../../tools/FastRotation/FastRotation.html">FastRotation</a>, <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_documents__">
+   <h3 class="pidoc_sectionTitle">Related Documents</h3>
+   <div id="related_documents">
+<p><a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms in PixInsight</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:17 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

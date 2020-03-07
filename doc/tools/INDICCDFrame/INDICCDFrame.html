@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | INDICCDFrame</title>
+   <meta name="keywords" content="INDI, Device, CCD, Automation, Control" />
+   <meta name="author" content="Klaus Kretzschmar" />
+   <meta name="description" content="Controls any CCD device of an INDI server." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>INDICCDFrame</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Controls any CCD device of an INDI server. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Automation, Control, CCD</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> INDI, Device, CCD, Automation, Control</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;width:50%;height:50%;" src="images/INDICCDController.png" alt=""/>
+<p>With the <em>INDI CCD Frame Controller</em> module the PixInsight user will be able to aquire CCD frames locally or remotely from CCD devices which are connected to a running <em>INDI server</em>. So prerequisite for this module to work is a correctly configured INDI system with an <em>INDI server</em> running on a hardware where the astronomical devices are connected to (see <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+INDIDeviceController, <a href='../../tools/INDIDeviceController/INDIDeviceController.html' title='../../tools/INDIDeviceController/INDIDeviceController.html'>Doc for the INDIDeviceController module.</a>">[1]</a></sup> ).</p>
+<p>The module allows to change CCD parameters like chip temperature, or binning mode by sending the corresponding control commands to the <em>INDI server</em> which delegates the request further to the connected devices. All devices which implement the INDI CCD device interface can be controlled by this module.</p>
+<p>For example, there is an INDI CCD device driver for DSLR. Parameters which are typically not supported by DSLRs like chip temperature are disabled and cannot be changed. Parameters which are not supported by the INDI CCD interface like ISO cannot be changed by this module. To change those parameters use the <em>INDI Device Controller Client</em> (see <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+INDIDeviceController, <a href='../../tools/INDIDeviceController/INDIDeviceController.html' title='../../tools/INDIDeviceController/INDIDeviceController.html'>Doc for the INDIDeviceController module.</a>">[1]</a></sup> ) directly.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The <em>INDI CCD Frame Controller</em> module contains three sections</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Device Properties</p>
+</dt>
+<dd>
+
+<ul class="pidoc_list">
+<li><strong>INDI CCD device</strong>: Specify the name of the device which correpond the CCD device to be controlled. The combo box contains all devices which have been selected while starting the <em>INDI server</em>. Before selecting the CCD device make sure that the <em>INDI Device Controller Client</em> has successfully connected to that device.</li>
+<li class="pidoc_spaced_list_item"><strong>Temperature:</strong> Specify the target chip temperature in degrees Celsius. Press the <em>Arrow</em> tool button to send the target chip temperature to the CCD device. This parameter is disabled if the CCD device does not support chip cooling.</li>
+<li class="pidoc_spaced_list_item"><strong>Binning X/Y</strong>: Specify the binning factor in X and Y direction. These parameter is disabled if the CCD device does not support binning.</li>
+<li class="pidoc_spaced_list_item"><strong>Filter:</strong> Specify a filter of an internal or external filter wheel. This parameter is disabled if the CCD camera does not have an internal filter wheel or no external filter wheel is selected <a href="#external-filter-wheel">(more info)</a>. Press the tool button to configure the filter names.</li>
+<li class="pidoc_spaced_list_item"><strong>Frame type</strong>: Specify the frame type. Frame types can be <em>Light frame</em>, <em>Dark frame</em>, or <em>Flat frame</em>. The frame type will be stored as FITS keword in the FITS header.</li>
+<li class="pidoc_spaced_list_item"> <strong>Upload mode</strong>: The upload mode specifies how the acquired CCD frame will be handled by the client. There are three different upload modes:
+<ul class="pidoc_list">
+<li><em>Upload to client only</em>: The frame will be uploaded to the client and displayed in a separate image window. The frame will not be stored to the file system.</li>
+<li class="pidoc_spaced_list_item"><em>Upload to INDI server only</em>: The frame will be stored on the file system of the INDI server. The directory and filename can be set separately. The frame will not be uploaded to the client.</li>
+<li class="pidoc_spaced_list_item"><em>Upload both: client and server</em>: The frame will be uploaded to the client and displayed and stored on the file system of the server.</li>
+</ul>
+
+</li>
+<li class="pidoc_spaced_list_item"><strong>Server upload directory</strong>: The directory where newly acquired CCD frames are stored on the <em>INDI server</em>.</li>
+<li class="pidoc_spaced_list_item"> <strong>Server file name template</strong>: A template to build the file names that are stored on the <em>INDI server</em>. <a id="name-template-table"></a>
+<table class="pidoc_table">
+<tr>
+<th><p>Template specifier</p>
+</th>
+<th><p>will be replaced by</p>
+</th>
+</tr>
+<tr>
+<td><p>%f</p>
+</td>
+<td><p>Frame type (light, flat, dark, bias).</p>
+</td>
+</tr>
+<tr>
+<td><p>%F</p>
+</td>
+<td><p>Filter name.</p>
+</td>
+</tr>
+<tr>
+<td><p>%b</p>
+</td>
+<td><p>CCD binning with the format HxV, where H and V are, respectively, the horizontal and vertical binning factors.</p>
+</td>
+</tr>
+<tr>
+<td><p>%e</p>
+</td>
+<td><p>Exposure time in seconds.</p>
+</td>
+</tr>
+<tr>
+<td><p>%t</p>
+</td>
+<td><p>Acquisition date and time in the UTC time scale, ISO 8601 format.</p>
+</td>
+</tr>
+<tr>
+<td><p>%T</p>
+</td>
+<td><p>CCD temperature in degrees Celsius.</p>
+</td>
+</tr>
+<tr>
+<td><p>%d</p>
+</td>
+<td><p>Acquisition date in the UTC time scale, yyyy-mm-dd format.</p>
+</td>
+</tr>
+<tr>
+<td><p>%n</p>
+</td>
+<td><p>The frame number starting from one, with three digits and left-padded with zeros.</p>
+</td>
+</tr>
+<tr>
+<td><p>%u</p>
+</td>
+<td><p>A universally unique identifier (UUID) in canonical form (36 characters).</p>
+</td>
+</tr>
+</table>
+
+For example, the default template <strong>%f_B%b_E%e_%n</strong> would produce the following file name: <strong>LIGHT_B2x2_E300.00_002.fits</strong> for the second light frame of a series with exposure time of 300 seconds at binning 2x2.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Client Frames</p>
+</dt>
+<dd>
+
+<ul class="pidoc_list">
+<li><strong>Open client frames</strong>: Select to open the newly acquired CCD frame after it was downloaded from the <em>INDI server</em>. This option is disabled if the <em>Upload mode</em> is set to <em>Upload to INDI server only</em>.</li>
+<li class="pidoc_spaced_list_item"><strong>Reuse image window</strong>: Load newly acquired client frames on the same image window, if available.</li>
+<li class="pidoc_spaced_list_item"><strong>AutoStretch</strong>: Compute and apply adaptive screen transfer functions (STF) on newly acquired client frames.</li>
+<li class="pidoc_spaced_list_item"><strong>Linked AutoStretch</strong>: If enabled, compute and apply a single adaptive STF for all nominal channels of each acquired color image. If disabled, compute a separate adaptive STF for each nominal color channel.</li>
+<li class="pidoc_spaced_list_item"><strong>Save client frames</strong>: Save newly acquired frames to local image files in XISF format. This option is disabled if the <em>Upload mode</em> is set to <em>Upload to INDI server only</em>.</li>
+<li class="pidoc_spaced_list_item"><strong>Overwrite existing files</strong>: If this option is selected, INDICCDFrame will overwrite existing files with the same names as generated output files. This can be dangerous because the original contents of overwritten files will be lost. <strong>Enable this option at your own risk.</strong></li>
+<li class="pidoc_spaced_list_item"><strong>Synchronize server files</strong>: If this option is selected, INDICCDFrame will synchronize the newly acquired frames stored on the INDI server in the server side upload directory with the client download directory on the client side. The download of the files from the server is done asynchronously ,i.e. does not block the acquisition of the next frame during the download. This feature can only be used if the rsync tool is installed on the server and the client.</li>
+<li class="pidoc_spaced_list_item"><strong>Client download directory</strong>: The directory where newly acquired frames will be stored on the local filesystem. If you leave this parameter empty, new files will be created on the current downloads directory, as defined by global settings.</li>
+<li class="pidoc_spaced_list_item"><strong>Client file name template</strong>: A template to build the file names of newly acquired frames stored on the INDI client. See <a href="#name-template-table">name template documenation</a> for more details.</li>
+<li class="pidoc_spaced_list_item"><strong>Output format hints</strong>: <em>Format hints</em> allow you to override global file format settings for image files used by specific processes. In INDICCDFrame, output hints allow you to control the way newly acquired image files are generated on the INDI client. For example, you can use the <em>compression-codec zlib</em> hint to force the XISF format support module to compress images using the Zlib data compression algorithm. To gain more control on compression, you can use the <em>compression-level</em> <strong>n</strong> hint to specify a compression level <strong>n</strong> in the range from 0 (default compression) to 100 (maximum compression). See the XISF format documentation for detailed information on supported XISF format hints <sup><a href="#__reference_5__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 5]<br/>
+XISF format specification, <a href='http://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html' title='http://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html'>Specification of the XISF format</a>">[5]</a></sup>.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Frame Acquisition</p>
+</dt>
+<dd>
+<p>Set the exposure duration and the number of frames to be acquired in one session run.</p>
+
+<ul class="pidoc_list">
+<li><strong>Exposure Time</strong>: Exposure time in seconds.. Shortest exposure duration is 0.001 seconds, longest duration is 60000 seconds.</li>
+<li class="pidoc_spaced_list_item"><strong>Exposure Delay</strong>: Waiting time between exposures in seconds..</li>
+<li class="pidoc_spaced_list_item"><strong>Number of frames</strong>: Number of frames to be acquired.</li>
+<li class="pidoc_spaced_list_item"><strong>Object name</strong>: Name of the main astronomical object or subject in the acquired images. The specified text will be the value of Observation:Object:Name standard XISF properties and OBJECT FITS keywords in newly created light frames.</li>
+<li class="pidoc_spaced_list_item"><strong>Telescope device</strong>: This parameter tells INDICCDFrame how to select the telescope used for acquisition of light frames 
+<ul class="pidoc_list">
+<li><strong>No telescope</strong> Newly acquired light frames won't have any property or keyword related to accurate observation coordinates. The OBJCTRA and OBJCDEC FITS keywords provided by INDI will be left intact. This option is <em>not recommended</em> unless you are acquiring test frames with a camera on a table, for example.</li>
+<li class="pidoc_spaced_list_item"><strong>Active telescope</strong>: Select the device specified as the ACTIVE_DEVICES/ACTIVE_TELESCOPE property of the INDI CCD device being used. You must define this property manually with the INDI Device Controller <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+INDIDeviceController, <a href='../../tools/INDIDeviceController/INDIDeviceController.html' title='../../tools/INDIDeviceController/INDIDeviceController.html'>Doc for the INDIDeviceController module.</a>">[1]</a></sup> with the name of the appropriate telescope device.</li>
+<li class="pidoc_spaced_list_item"><strong>Mount controller telescope</strong>: Use the device currently selected in the INDI Mount Controller interface.</li>
+<li class="pidoc_spaced_list_item"><strong>Mount controller or active telescope</strong>: Use the INDI Mount Controller device if available, or the ACTIVE_DEVICES/ACTIVE_TELESCOPE device otherwise. This is the default option.</li>
+</ul>
+
+When a telescope device is available, it is used to retrieve its current EOD (epoch of date) coordinates, just before starting each light frame exposure. These are apparent coordinates, which are reduced to mean positions referred to the mean equinox and equator of J2000.0 (ICRS) by an accurate inverse transformation, including corrections for precession, nutation and stellar aberration. The computed coordinates are directly comparable to standard catalog positions, irrespective of the date of acquisition. Once these coordinates are computed for each acquired image, they are stored as standard XISF properties (Observation:Center:RA and Observation:Center:Dec). For compatibility with legacy applications, the same coordinates replace the OBJCTRA and OBJCTDEC FITS keywords provided by the INDI server. Note that these properties simplify the plate solving process, since e.g. the Image Solver script <sup><a href="#__reference_6__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 6]<br/>
+ImageSolver, <a href='../../scripts/ImageSolver/ImageSolver.html' title='../../scripts/ImageSolver/ImageSolver.html'>A script to determin the true coordinates of a frame.</a>">[6]</a></sup>, automatically determines necessary parameters from the frame.</li>
+<li class="pidoc_spaced_list_item"><a id="external-filter-wheel"></a> <strong>External filter wheel device</strong>: Specify the device name of an external filter wheel here, if the CCD device does not have an integrated filter wheel.</li>
+</ul>
+
+<p>A running exposure session can be canceld by pressing the <em>Cancel</em> push button. This will send an abort event to the <em>INDI server</em> to abort the remote exposure process.</p>
+</dd>
+</dl>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> INDIDeviceController, <a href="../../tools/INDIDeviceController/INDIDeviceController.html" title="../../tools/INDIDeviceController/INDIDeviceController.html">Doc for the INDIDeviceController module.</a></p>
+      <p id="__reference_2__"><strong>[2]</strong> INDI library, <a href="http://indilib.org/about/discover-indi.html" title="http://indilib.org/about/discover-indi.html">What is INDI? : An overview</a></p>
+      <p id="__reference_3__"><strong>[3]</strong> INDI library, <a href="http://www.indilib.org/download.html" title="http://www.indilib.org/download.html">Linux and OS X: Download INDI software</a></p>
+      <p id="__reference_4__"><strong>[4]</strong> Cloudmakers, <a href="http://www.cloudmakers.eu/windi/" title="http://www.cloudmakers.eu/windi/">Windows: An INDI wrapper for ASCOM</a></p>
+      <p id="__reference_5__"><strong>[5]</strong> XISF format specification, <a href="http://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html" title="http://pixinsight.com/doc/docs/XISF-1.0-spec/XISF-1.0-spec.html">Specification of the XISF format</a></p>
+      <p id="__reference_6__"><strong>[6]</strong> ImageSolver, <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">A script to determin the true coordinates of a frame.</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/INDIDeviceController/INDIDeviceController.html" title="../../tools/INDIDeviceController/INDIDeviceController.html">INDIDeviceController</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2014-2018 Klaus Kretzschmar</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:20 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

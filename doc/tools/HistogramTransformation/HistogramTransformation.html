@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | HistogramTransformation</title>
+   <meta name="keywords" content="histogram, histogram transformation, intensity transformation, pixel readouts" />
+   <meta name="author" content="Juan Conejero, PTeam" />
+   <meta name="description" content="Implements pixel intensity transformations defined by histogram clipping, midtones balance and dynamic range expansion points." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>HistogramTransformation</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Implements pixel intensity transformations defined by histogram clipping, midtones balance and dynamic range expansion points. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> IntensityTransformations</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> histogram, histogram transformation, intensity transformation, pixel readouts</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Introduction_:_Histogram_Generation__">1.1&emsp;Histogram Generation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Introduction_:_Histogram_Transformations__">1.2&emsp;Histogram Transformations</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Introduction_:_Identity_Histogram_Transformations__">1.3&emsp;Identity Histogram Transformations</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Description__">2&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">3&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Input_and_Output_Histograms__">3.1&emsp;Input and Output Histograms</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Understanding_Independence_on_Selected_Views__">3.2&emsp;Understanding Independence on Selected Views</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Histogram_Editing_Modes__">3.3&emsp;Histogram Editing Modes</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Information_Panel__">3.4&emsp;Information Panel</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Display_Options__">3.5&emsp;Display Options</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_View_Selection_List__">3.6&emsp;View Selection List</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Channel_Selection__">3.7&emsp;Channel Selection</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Histogram_Transformation_Parameters__">3.8&emsp;Histogram Transformation Parameters</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Clipped_Pixel_Counts__">3.9&emsp;Clipped Pixel Counts</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_AutoClip_Functions__">3.10&emsp;AutoClip Functions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Histogram_Readout_Modes__">3.11&emsp;Histogram Readout Modes</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Interoperability_with_ScreenTransferFunction__">3.12&emsp;Interoperability with ScreenTransferFunction</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Working_with_the_RealTime_Preview_Virtual_View__">3.13&emsp;Working with the Real-Time Preview Virtual View</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>A <a href="http://en.wikipedia.org/wiki/Histogram" title="http://en.wikipedia.org/wiki/Histogram">histogram</a> is a discrete representation of the distribution of values in a data set. <a href="http://mathworld.wolfram.com/Histogram.html" title="http://mathworld.wolfram.com/Histogram.html">More graphically</a>, a histogram divides the whole set of data points into a number of intervals and counts the number of data points pertaining to each interval. Histograms are discrete functions usually represented in the form of <a href="http://en.wikipedia.org/wiki/Bar_chart" title="http://en.wikipedia.org/wiki/Bar_chart">bar charts</a>.</p>
+<p>Applied to digital images, histograms are generated by remapping all possible pixel values into a (usually smaller) range of discrete values, for example 256 values in an 8-bit histogram. Each element in the histogram is an integer counter initialized to zero. Then for each pixel in the image, its value is mapped to the histogram range and the corresponding counter is incremented by one unit. The result of this operation, after applying it iteratively for all pixels, is a list of integers representing the total number of existing pixels for each histogram interval.</p>
+<p>A histogram provides a wealth of information about an image and how its pixels are distributed throughout the available numeric range. Histograms are powerful tools for statistical image analysis, and the basis for many essential image processing techniques. We strongly recommend reading about histograms and their applications to image processing in the available literature, <sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+Rafael C González &amp; Richard E. Woods (2008), <em>Digital Image Processing, Third Edition</em>, Pearson Prentice Hall, &sect; 3.3.">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+John C. Russ (2007), <em>The Image Processing Handbook, Fifth Edition</em>, CRC Press, Chapter 5.">[2]</a></sup> including many resources and <a href="http://www.cambridgeincolour.com/tutorials/histograms1.htm" title="http://www.cambridgeincolour.com/tutorials/histograms1.htm">tutorials</a> available on the Internet.</p>
+<div class="pidoc_subsection" id="__Introduction_:_Histogram_Generation__">
+   <h4 class="pidoc_subsectionTitle">1.1&emsp;Histogram Generation</h4>
+<p>In PixInsight, histograms and image statistics are <em>dynamic objects:</em> they are calculated and updated automatically by the PixInsight Core application when necessary for all views. Calculation of histogram and image statistics are highly optimized tasks implemented as multithreaded routines. Histograms and statistics are stored as temporary objects and reused when image changes are undone and redone, or when the processing histories of images are traversed in random order.</p>
+<p>In the current versions of PixInsight, histograms are always generated with 16-bit precision (65,536 discrete values) for all image data types supported. This will change in future versions, where histograms will be generated with 20-bit resolution (1,048,576 discrete values) as an option. Histogram elements &mdash;the counts of pixels for each histogram interval&mdash; are 64-bit integers. Finally, histograms are represented, as is standard in PixInsight, in the normalized real range [0,1] where 0 corresponds to black and 1 to white for all supported data types.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Introduction_:_Histogram_Transformations__">
+   <h4 class="pidoc_subsectionTitle">1.2&emsp;<a id="histogram_transformations"></a>Histogram Transformations</h4>
+<p>A <em>histogram transformation</em> is a pixel-by-pixel intensity transformation defined by five parameters in PixInsight:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Clipping points</p>
+</dt>
+<dd>
+<p>There are two clipping points, namely the <em>shadows clipping point</em> and the <em>highlights clipping point.</em> Both clipping points can take values in the whole range [0,1], with the only condition that the shadows clipping point must be less than or equal to the highlights clipping point.</p>
+<p>The <em>pixel clipping</em> procedure is as follows. The set of pixels in the image whose values lie in the range defined by both clipping points are rescaled linearly to the [0,1] range, and all pixels that were initially below the shadows clipping point or above the highlights clipping point are then set to zero (black) and one (white), respectively.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_1__"></a>
+
+<div class="pidoc_group" style="margin-bottom:16px;">
+<p><span class="pidoc_figure_title">Figure 1 &mdash;</span>  <strong>Pixel Clipping Example</strong></p>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/ClippingExample_1.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/ClippingExample_2.png" alt=""/>
+</div>
+<p><strong>Original image</strong> and its histogram. Note the unused portion of the available numeric range at the shadows (left side of the histogram), causing a shift of the main histogram peak toward the highlights, which results in a relatively bright background.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/ClippingExample_3.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/ClippingExample_4.png" alt=""/>
+<p><br/>
+ shadows clipping = 0.1</p>
+</div>
+<p><strong>Shadows clipping</strong> applied to remove the unused values at the shadows, and the resulting histogram. The background is now darker and the overall contrast of the image is higher, as a result of a better usage of the available numeric range. However, note that <em>no pixel has been clipped</em> by carefully adjusting the shadows clipping point. Histogram clipping must always be applied with great care to prevent destruction of significant data in the shadows, where we have the most valuable &mdash;and the most difficult to acquire&mdash; part of the image in astrophotography.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/ClippingExample_5.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/ClippingExample_6.png" alt=""/>
+<p><br/>
+ shadows clipping = 0.1, highlights clipping = 0.72</p>
+</div>
+<p>An example of <strong>wrong highlights clipping</strong> causing a severe data loss. A large portion of bright pixels have been <em>clipped</em> to pure white. The clipped pixels can be identified as the prominent peak at the right side of the histogram. In general, you should <em>never</em> clip a single pixel at the highlights of an astronomical image; there's no valid reason to do so in astrophotography.</p>
+</div>
+</dd>
+<dt>
+<p>Midtones balance</p>
+</dt>
+<dd>
+<p>This parameter defines a nonlinear function known as <em>midtones transfer function</em> (MTF) in PixInsight. MTF is a smooth, continuous function passing through three points: (0,0), (<var>m</var>,1/2) and (1,1), where <var>m</var> is the <em>midtones balance</em> parameter. A midtones balance of 0.5 defines a linear function. A midtones balance value below 0.5 increases the midtones, while a value above 0.5 darkens the midtones in the image. MTF curves are implemented as <a href="http://mathworld.wolfram.com/RationalFunction.html" title="http://mathworld.wolfram.com/RationalFunction.html">rational functions</a> in the PixInsight/PCL framework. The formal definition of an MTF function with midtones balance parameter <img style="vertical-align:middle;" src="images/eqn_0001.svg" alt=""/> is given by</p>
+<a id="__equation_1__"></a><div class="pidoc_equation"><img src="images/eqn_0002.svg" alt=""/><span class="pidoc_equation_number">[1]</span></div>
+<p>The above equation can be derived from the Bulirsch-Stoer algorithm <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+R. Bulirsch, J. Stoer et al. (2010), <em>Introduction to Numerical Analysis, Third Edition</em>, Springer, &sect; 2.2">[3]</a></sup> for evaluation of the diagonal rational function, given the three fixed data points of the MTF function. A common misunderstanding is the assumption that MTFs are <em>gamma curves</em> in PixInsight. Actually, rational interpolation allows for much more flexible, accurate and controllable MTF curves in PixInsight than gamma curves are in other applications.</p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_2__"></a>
+
+<div class="pidoc_group" style="margin-bottom:16px;">
+<p><span class="pidoc_figure_title">Figure 2 &mdash;</span>  <strong>Midtones Balance Example</strong></p>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/MidtonesBalanceExample_1.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/MidtonesBalanceExample_2.png" alt=""/>
+</div>
+<p><strong>Original image</strong> and its histogram.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/MidtonesBalanceExample_3.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/MidtonesBalanceExample_4.png" alt=""/>
+<p><br/>
+ midtones balance = 0.25</p>
+</div>
+<p><strong>Raising the midtones</strong> by applying a midtones balance adjustment below 0.5, and the resulting histogram with the nonlinear MTF curve applied. Note how the distribution of pixel values makes now better use of the available range, denoting an increase in the pixel population on the midtones.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/MidtonesBalanceExample_5.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/MidtonesBalanceExample_6.png" alt=""/>
+<p><br/>
+ midtones balance = 0.75</p>
+</div>
+<p><strong>Lowering the midtones</strong> by applying a midtones balance adjustment above 0.5, and the resulting histogram with the nonlinear MTF curve applied. This is the inverse to the preceding example.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/MidtonesBalanceExample_7.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/MidtonesBalanceExample_8.png" alt=""/>
+<p><br/>
+ shadows clipping = 0.04, midtones balance = 0.20</p>
+</div>
+<p><strong>Shadows clipping and midtones balance</strong> applied by a single transformation, and the resulting histogram with the nonlinear MTF curve applied. The midtones have been raised and the initial unused interval at the shadows has been removed in a single operation.</p>
+</div>
+</dd>
+<dt>
+<p>Dynamic range expansion</p>
+</dt>
+<dd>
+<p>The dynamic range expansion lower bound parameter can vary from &minus;10 to 0 in the standard HistogramTransformation tool, while the dynamic range expansion upper bound ranges from 1 to +11 (actually, these bounds can range from &minus;&infin; to zero and from 1 to +&infin;, respectively). These two parameters actually allow expansion of the <em>unused</em> dynamic range at both ends of the histogram. This can be probably better understood as a two-step procedure: first, the dynamic range is <em>expanded</em> to occupy the entire interval defined by the lower and upper bound expansion parameters, but actual pixel values are not changed. The second step is to <em>rescale</em> linearly both the dynamic range and all pixel values back to the normalized [0,1] range. The result of this process is that all pixel data are constrained to a smaller effective interval, and free unused portions appear at the corresponding histogram ends. This is used as a previous step for some image processing techniques, with the purpose of preserving actual pixel data from losses due to excessive contrast gains or <em>clippings.</em></p>
+
+<div class="pidoc_figure" style="margin-top:2em;margin-bottom:2em;">
+<a id="__figure_3__"></a>
+
+<div class="pidoc_group" style="margin-bottom:16px;">
+<p><span class="pidoc_figure_title">Figure 3 &mdash;</span>  <strong>Dynamic Range Expansion Example</strong></p>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/DynamicRangeExpansionExample_1.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/DynamicRangeExpansionExample_2.png" alt=""/>
+</div>
+<p><strong>The original image</strong> and its histogram.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/DynamicRangeExpansionExample_3.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/DynamicRangeExpansionExample_4.png" alt=""/>
+<p><br/>
+ expansion lower bound = &minus;1.0</p>
+</div>
+<p><strong>Expanding the dynamic range at the shadows</strong> by applying a negative dynamic range expansion lower bound value.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/DynamicRangeExpansionExample_5.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/DynamicRangeExpansionExample_6.png" alt=""/>
+<p><br/>
+ expansion upper bound = +2.0</p>
+</div>
+<p><strong>Expanding the dynamic range at the highlights</strong> by applying a dynamic range expansion upper bound value greater than one.</p>
+
+<div class="pidoc_group" style="margin-top:16px;margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/DynamicRangeExpansionExample_7.jpg" alt=""/>
+<img style="border:1px solid black;" src="images/DynamicRangeExpansionExample_8.png" alt=""/>
+<p><br/>
+ expansion lower bound = &minus;1.0, upper bound = +2.0</p>
+</div>
+<p><strong>Simultaneous expansion at both bounds</strong> by combining the two preceding range expansions in a single histogram transformation.</p>
+</div>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Introduction_:_Identity_Histogram_Transformations__">
+   <h4 class="pidoc_subsectionTitle">1.3&emsp;<a id="identity_histogram_transformations"></a>Identity Histogram Transformations</h4>
+<p>A histogram transformation that does not modify its target image is called an <em>identity histogram transformation.</em> The parameters of an identity histogram transformation are the following ones:</p>
+
+<ul class="pidoc_list">
+<li>Shadows clipping point = 0</li>
+<li>Midtones balance = 0.5</li>
+<li>Highlights clipping point = 1</li>
+<li>Dynamic range expansion lower bound = 0</li>
+<li>Dynamic range expansion upper bound = 1</li>
+</ul>
+
+<p>The default parameters of the HistogramTransformation process are those of an identity histogram transformation.</p>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/HistogramTransformation.png" alt=""/>
+<p>The standard histogram manipulation tool in PixInsight is HistogramTransformation. Despite a histogram is a rather simple data structure (it's only a list of integers after all), HistogramTransformation provides one of the most sophisticated user interface resources available in the set of standard PixInsight tools, reflecting the key importance of histograms in image processing.</p>
+<p>The HistogramTransformation interface is divided into three main sections that we'll describe shortly in this document. From top to bottom, these sections are: the <em>output histograms,</em> the <em>input histograms,</em> and the <em>parameters section.</em> Briefly, the parameters allow you to define a <a href="#histogram_transformations">histogram transformation</a>, then you can select an image to load and inspect its current histograms on the input histograms section, and the output histograms automatically predict how the histograms of the resulting image will be after applying the transformation.</p>
+<p>There are five sets of identical parameters available on the HistogramTransformation interface:</p>
+
+<ul class="pidoc_list">
+<li>Three parameter sets for the red, green and blue channels of RGB color images.</li>
+<li>A <em>combined RGB/K</em> set that applies equally to the nominal R, G and B channels of color images, and to the nominal gray channel (K) of grayscale images.</li>
+<li>A specific set of parameters for the <em>active alpha channel</em> (A), which defines image transparency.</li>
+</ul>
+
+<p>HistogramTransformation is a high-precision tool for histogram inspection and manipulation. It is the tool of choice for all nonlinear image stretching tasks in PixInsight.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+
+<div style="text-align:center;">
+<img src="images/HistogramTransformationAnnotated.png" alt=""/>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Input_and_Output_Histograms__">
+   <h4 class="pidoc_subsectionTitle">3.1&emsp;<a id="histogram_panels"></a>Input and Output Histograms</h4>
+<p>The input histogram panel corresponds to the current histogram functions of the <em>target image</em>, or the image to which the process will (or could) be applied. When a view is selected in the <a href="#view_selection_list">view selection list</a>, its histogram functions are plotted on the input histogram panel. If histogram data are not available for the currently selected view, they are automatically calculated by the PixInsight Core application.</p>
+<p>For RGB color images, when the <a href="#combined_rgbk_channel">combined RGB/K channel</a> is selected and the <a href="#show_raw_rgb_histograms">Show Raw RGB Histograms</a> display option is disabled, input histograms will reflect variations if changes have been made to parameters for individual RGB channels. If the <em>raw RGB histograms</em> option is enabled (as happens by default), input histograms don't take into account possible changes made to parameters of individual RGB channels, and the input histograms are the actual histogram functions of the selected view.</p>
+<p>To the bottom of the input histograms panel, there is a horizontal rectangular area whose background is drawn as a gradient, ranging from pure black to pure red, green, blue or white, depending on the currently selected channel. This gradient represents the full available numeric range, and is oriented as pixel values vary for histogram functions, MTF curves, and pixel readouts.</p>
+
+<div style="text-align:center;">
+<img src="images/HistogramSliders.png" alt=""/>
+</div>
+<p>Three small triangular controls, known as <em>sliders,</em> are shown ordered on this area and are associated with their respective histogram manipulation parameters, namely, from left to right: <em>shadows clipping point,</em> <em>midtones balance,</em> and <em>highlights clipping point.</em> You can click on any slider and drag it horizontally to change its associated parameter. Both clipping sliders can vary within the whole normalized range (from 0 to 1), with the condition that the shadows clipping point must always be less than or equal to the highlights clipping point. The midtones balance slider is limited to the interval defined by both clipping points, and can take <em>relative</em> values in the range from 0 to 1.</p>
+<p>Each slider is associated to its edit control counterpart. The numeric values shown on these edit controls and the relative slider positions are mutually linked and automatically updated to ensure coherence between graphical elements and process parameter values. Clipped pixel counts and output histograms, if visible, are also automatically recalculated and updated when you move any of the three sliders.</p>
+
+<div style="text-align:center;">
+<img src="images/LinkedSlidersAndControls.png" alt=""/>
+</div>
+<p>Output histogram functions are automatically <em>predicted</em> for the input histogram functions, if a view is currently selected, according to the current set of histogram transformation parameters. Since output histogram functions are necessarily predicted from interpolated histogram data, in rare occasions you may find small differences between predicted values and the resulting histogram values after applying or previewing the histogram transformation.</p>
+<p>The output histograms panel is a standard <em>collapsible section</em> PixInsight control. However, due to space limitations (the HistogramTransformation interface is already complex and large enough), it has no associated <em>section bar</em> control. You can show or hide the output histogram panel by clicking the corresponding tool button, as shown on the figure below.</p>
+
+<div style="text-align:center;">
+<img src="images/ShowOutputHistogramSection.png" alt=""/>
+</div>
+<p>The <em>Show MTF</em> and <em>Show Grid</em> display options control visibility of the MTF curve and coordinate grids, respectively. These options are covered later on this document.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Understanding_Independence_on_Selected_Views__">
+   <h4 class="pidoc_subsectionTitle">3.2&emsp;<a id="independence_on_views"></a>Understanding Independence on Selected Views</h4>
+<p>As we have said in the preceding paragraphs, you can select an existing view to load and inspect its histograms with HistogramTransformation. However, remember that PixInsight is an object-oriented system where processes and images are self-contained, mutually independent objects, and HistogramTransformation, despite what it may seem at first sight, is no exception to this rule (there are really <em>no exceptions</em> to this rule in PixInsight). This means that the histogram functions plotted on the input and output histogram panels, as well as the clipped pixel counts, are just <em>informative data</em>, but they actually have nothing to do with the instance of HistogramTransformation being defined, nor they will change its behavior in any way.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Histogram_Editing_Modes__">
+   <h4 class="pidoc_subsectionTitle">3.3&emsp;Histogram Editing Modes</h4>
+
+<div style="text-align:center;">
+<img style="margin-top:1em;" src="images/HistogramEditingModes.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Readout Mode</p>
+</dt>
+<dd>
+<p>This is the default working mode of the HistogramTransformation interface. What you can do in this mode depends on the currently selected <a href="#histogram_readout_modes">histogram readout mode</a>. In the default <em>normal histogram readout mode</em> you can just obtain information at the current histogram cursor position on the <a href="#information_panel">information panel</a>.</p>
+</dd>
+<dt>
+<p>Zoom In Mode</p>
+</dt>
+<dd>
+<p>HistogramTransformation allows you to inspect and navigate histogram functions with the help of <em>magnified views.</em> This is often necessary because histogram functions can be quite complex and intricate. Zoom factors can be selected independently for the input and output histogram panels, and also independently for the horizontal and vertical axes, from 1:1 up to 999:1. High magnification allows you to define histogram clipping points and evaluate histogram features with surgical precision.</p>
+<p>In <em>Zoom In</em> mode, each time you click on a histogram panel the zoom factor is increased by one unit: 2:1, 3:1, 4:1, and so on up to 999:1, uniformly for the X and Y axes. When the zoom ratio is greater than 1:1 for a histogram panel, standard scroll bars appear automatically around it. Note that you can also zoom in/out the histograms with the mouse wheel, irrespective of the current histogram editing mode.</p>
+</dd>
+<dt>
+<p>Zoom Out Mode</p>
+</dt>
+<dd>
+<p>This mode works in the opposite way to Zoom In: In <em>Zoom Out</em> mode, each time you click on a histogram panel the zoom factor is decreased by one unit uniformly for the X and Y axes. Note that you can also zoom in/out the histograms with the mouse wheel, irrespective of the current histogram editing mode.</p>
+</dd>
+<dt>
+<p>Pan Mode</p>
+</dt>
+<dd>
+<p>When you are working on a zoomed histogram, the <em>Pan</em> mode allows you to scroll the editing area by clicking and dragging the cursor. Note that you can also use the two standard scroll bar controls that appear at the right and bottom edges of each histogram panel, when the zoom ratio is larger than 1:1. Note also that you can pan around the zoomed histograms by clicking with the middle mouse button and dragging, irrespective of the current histogram editing mode.</p>
+</dd>
+<dt>
+<p>Zoom Factors, Input/Output Histograms</p>
+</dt>
+<dd>
+<p>These are four spin box controls that allow you to directly enter the desired zoom factors separately for the input and output histograms, and independently for the X and Y axes. Zoom factors can range from 1:1 to 999:1.</p>
+</dd>
+<dt>
+<p>Zoom 1:1</p>
+</dt>
+<dd>
+<p>Click this button to reset the histogram zoom factors to the default 1:1 value, for both the input and output histograms.</p>
+</dd>
+<dt>
+<p>Show/Hide Output Histograms</p>
+</dt>
+<dd>
+<p>The output histogram panel is a <em>collapsible section</em> PixInsight control; click this button to toggle its collapsed state in order to show or hide it. The HistogramTransformation interface is much smaller with the output histogram hidden, which can be preferable when you only want to inspect the histograms of an image.</p>
+</dd>
+</dl>
+
+<p>Along with the above tool buttons, when the HistogramTransformation window has the keyboard focus you can use the following keyboard commands to temporarily select a histogram editing mode:</p>
+
+<table class="pidoc_table" style="width:100%;">
+<caption><a id="__table_1__"></a>
+<span class="pidoc_table_title">Table 1 &mdash;  HistogramTransformation Temporary Mode Selection Keyboard Commands</span></caption>
+<tr>
+<th><p>Press these keys on UNIX/Windows</p>
+</th>
+<th><p>Press these keys on Mac OS X</p>
+</th>
+<th><p>To select this histogram editing mode</p>
+</th>
+</tr>
+<tr>
+<td><p><kbd>Ctrl+SpaceBar</kbd></p>
+</td>
+<td><p><kbd>Alt+SpaceBar</kbd></p>
+</td>
+<td><p>Zoom In</p>
+</td>
+</tr>
+<tr>
+<td><p><kbd>Alt+Ctrl+SpaceBar</kbd></p>
+</td>
+<td><p><kbd>Alt+Shift+SpaceBar</kbd></p>
+</td>
+<td><p>Zoom Out</p>
+</td>
+</tr>
+<tr>
+<td><p><kbd>SpaceBar</kbd></p>
+</td>
+<td><p><kbd>SpaceBar</kbd></p>
+</td>
+<td><p>Pan</p>
+</td>
+</tr>
+</table>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Information_Panel__">
+   <h4 class="pidoc_subsectionTitle">3.4&emsp;<a id="information_panel"></a>Information Panel</h4>
+
+<div style="text-align:center;">
+<img src="images/InformationPanel.png" alt=""/>
+</div>
+<p>The information panel is a read-only control that shows some information related to the current cursor position, when the cursor is over one of the histogram panels. The information given is necessarily 'compressed' to maximize usage of the available screen space, and is better understood through an example. Suppose we have the following text shown on the information panel:</p>
+
+<div style="text-align:center;">
+<span class="pidoc_code">x = 0.162921 (10677-&gt;10860): 94981, %0.7866 | y = 0.455497</span></div>
+<p>The above text provides the following information:</p>
+
+<ul class="pidoc_list">
+<li>The current normalized horizontal (X axis) cursor position is 0.162921 in the [0,1] range.</li>
+<li>The current horizontal coordinate averages histogram values from 10677 to 10860 in the currently selected plot resolution (16-bit resolution in this example, or from 0 to 65535). Histogram values are necessarily averaged when the histogram graph has less horizontal pixels than the current histogram resolution, taking into account the current horizontal zoom factor.</li>
+<li>There are 94981 pixels in the averaging interval [10677,10860], which correspond to a 0.7866 percent of the total pixels in the image.</li>
+<li>Finally, the current normalized vertical (Y axis) cursor position is 0.455497 in the [0,1] range.</li>
+</ul>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Display_Options__">
+   <h4 class="pidoc_subsectionTitle">3.5&emsp;Display Options</h4>
+
+<div style="text-align:center;">
+<img src="images/DisplayOptions.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Plot Resolution</p>
+</dt>
+<dd>
+<p>Although histograms are always generated with 16-bit resolution by the PixInsight Core application for all supported pixel data types, the HistogramTransformation tool allows you to represent histogram functions at various interpolated resolutions, including the standard binary resolutions (6, 7, 8, 9, 10, 12, 14 and 16 bits for 64, 128, 256, 512, 1024, 4096, 16384 and 65536 discrete levels, respectively) as well as some decimal resolutions (100, 1000 and 10000 discrete levels).</p>
+<p>On one hand, by selecting the appropriate resolution you can inspect histogram functions tightly adapted to the native bit depth of the image. On the other hand, reduced resolutions allow you to inspect simplified histogram functions that can better represent overall trends and shapes without focusing on local features. For general inspection of histogram shapes we recommend working with the default 8-bit resolution. However, to apply accurate histogram transformations, such as the initial nonlinear stretch applied to a linear raw CCD image, working at the native 16-bit histogram resolution is an absolute must.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_4__"></a>
+<p><span class="pidoc_figure_title">Figure 4 &mdash;</span>  <strong>Histogram Plot Resolution</strong></p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="border:1px solid black;float:left;margin-right:8px;" src="images/HistogramPlotResolution_1.png" alt=""/>
+<img style="border:1px solid black;" src="images/HistogramPlotResolution_2.png" alt=""/>
+</div>
+<p>To the left, the histogram of a 32-bit floating point image, plotted with 8-bit resolution (256 levels). To the right, the same histogram plotted at the native 16-bit histogram resolution. The difference in detail representation is self-evident, especially in the zoomed view. This level of detail representation is necessary to carry out high-precision histogram manipulations, but it may be counterproductive for evaluation of the histogram's general shape and properties, where simplified representations are often desirable.</p>
+</div>
+</dd>
+<dt>
+<p>Graph Style</p>
+</dt>
+<dd>
+<p>You can select one of the four graph styles available for plotting histogram functions, namely: <em>lines,</em> <em>area,</em> <em>bars</em> and <em>dots.</em> In the <em>lines</em> plotting style, histogram values are connected with solid lines. This is the default style. The <em>area</em> style is the same as <em>lines,</em> but the area below the histogram up to the X axis is filled with a solid color and drawn with a combination of logical bitmap operations to maximize visibility when several histogram areas overlap. The <em>bars</em> style plots vertical bars for each histogram level. The <em>dots</em> style draws a single dot for each histogram level. The <em>bars</em> and <em>dots</em> styles are potentially the most accurate, as they represent strictly the existing histogram values without any addition. On the other hand, <em>lines</em> and <em>area</em> are usually the most practical and visually appealing modes for histogram inspection.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_5__"></a>
+<p><span class="pidoc_figure_title">Figure 5 &mdash;</span>  <strong>Histogram Graph Styles</strong></p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:8px;" src="images/HistogramGraphStyles_1.png" alt=""/>
+<img src="images/HistogramGraphStyles_2.png" alt=""/>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:8px;" src="images/HistogramGraphStyles_3.png" alt=""/>
+<img src="images/HistogramGraphStyles_4.png" alt=""/>
+</div>
+<p>From top to bottom, from left to right: <em>lines,</em> <em>area,</em> <em>bars</em> and <em>dots.</em></p>
+</div>
+</dd>
+<dt>
+<p><a id="show_raw_rgb_histograms"></a> Show Raw RGB Histograms</p>
+</dt>
+<dd>
+<p>When this option is enabled, the input histogram panel will plot the true histogram functions of the <a href="#view_selection_list">selected view</a> when the <a href="#channel_selection">currently selected channel</a> is RGB/K, irrespective of the transformations applied to individual RGB channels. When this option is disabled, the histograms plotted for the RGB/K combined channel reflect changes made by individual RGB transformations. By default, this option is enabled.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_6__"></a>
+<p><span class="pidoc_figure_title">Figure 6 &mdash;</span>  <strong>Show Raw RGB Histograms Option</strong></p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:8px;" src="images/ShowRawRGBHistograms_1.png" alt=""/>
+<img src="images/ShowRawRGBHistograms_4.png" alt=""/>
+</div>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:8px;" src="images/ShowRawRGBHistograms_2.png" alt=""/>
+<img src="images/ShowRawRGBHistograms_5.png" alt=""/>
+</div>
+<img style="float:left;margin-right:8px;margin-bottom:8px;" src="images/ShowRawRGBHistograms_3.png" alt=""/>
+<p>Left column: individual RGB histogram functions with <a href="#autoclip_functions">Autozero clipping points</a> applied. Right column: with the <em>Show Raw RGB</em> option enabled (top) and disabled (bottom).</p>
+</div>
+</dd>
+<dt>
+<p>Lock Output Histogram Channel</p>
+</dt>
+<dd>
+<p>When this option is enabled, the output histogram panel will always plot the combined RGB output histogram functions, irrespective of the current <a href="#channel_selection">channel selection</a>. When this option is disabled, the output histogram will adopt the current channel selection. This option is enabled by default.</p>
+</dd>
+<dt>
+<p>Show MTF Curve</p>
+</dt>
+<dd>
+<p>When this option is enabled, the current midtones transfer function curve (MTF) is drawn on the input histogram. This option is enabled by default.</p>
+</dd>
+<dt>
+<p>Show Histogram Grids</p>
+</dt>
+<dd>
+<p>When this option is enabled, both histogram panels draw rectangular grids at regular intervals. This option is enabled by default.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_View_Selection_List__">
+   <h4 class="pidoc_subsectionTitle">3.6&emsp;<a id="view_selection_list"></a>View Selection List</h4>
+
+<div style="text-align:center;">
+<img src="images/ViewSelectionList.png" alt=""/>
+</div>
+<p>This is a standard <em>view list</em> PixInsight control that you can use to load the histograms of any view and inspect and work with them on the input and output histogram panels. The HistogramTransformation interface is a <em>virtual view client</em> able to <a href="#working_with_virtual_views">work with the histograms of the real-time preview</a>.</p>
+<p>You must always keep in mind that the currently selected view is for informative purposes exclusively, and has actually <a href="#independence_on_views">nothing to do</a> with the HistogramTransformation instance being defined.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Channel_Selection__">
+   <h4 class="pidoc_subsectionTitle">3.7&emsp;<a id="channel_selection"></a>Channel Selection</h4>
+<p>The channel selection buttons allow you to select one of the five available histogram transformations for edition, as described below.</p>
+
+<div style="text-align:center;">
+<img src="images/ChannelSelection.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Red Channel (R)</p>
+</dt>
+<dd>
+<p>Applied to the red channel. The red channel is the first nominal channel in RGB color images.</p>
+</dd>
+<dt>
+<p>Green Channel (G)</p>
+</dt>
+<dd>
+<p>Applied to the green channel. The green channel is the second nominal channel in RGB color images.</p>
+</dd>
+<dt>
+<p>Blue Channel (B)</p>
+</dt>
+<dd>
+<p>Applied to the blue channel. The blue channel is the third nominal channel in RGB color images.</p>
+</dd>
+<dt>
+<p><a id="combined_rgbk_channel"></a> Combined RGB/Gray (RGB/K)</p>
+</dt>
+<dd>
+<p>Applied to the red, green and blue nominal channels of RGB color images, and to the gray nominal channel of monochrome grayscale images.</p>
+</dd>
+<dt>
+<p>Alpha Channel (A)</p>
+</dt>
+<dd>
+<p>Applied to the <em>active alpha channel</em>, when it exists in the target image. The active alpha channel defines image transparency in PixInsight, and is always the first channel after the nominal channels: either a fourth channel in RGB color images, or a second channel in grayscale images.</p>
+</dd>
+</dl>
+
+<p>For grayscale images, only the combined RGB/K and alpha channel histogram transformations are available; other transformations, if defined, are simply ignored for grayscale images.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Histogram_Transformation_Parameters__">
+   <h4 class="pidoc_subsectionTitle">3.8&emsp;<a id="histogram_transformation_parameters"></a>Histogram Transformation Parameters</h4>
+<p>This section allows you to define the five parameters of each histogram transformation (one for each one of the five <a href="#channel_selection">available channels</a>). For the meaning and role of each parameter, please refer to the <a href="#histogram_transformations">description of a histogram transformation</a> made earlier in this document.</p>
+
+<div style="text-align:center;">
+<img style="margin-top:1em;" src="images/HistogramTransformationParameters.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Shadows clipping</p>
+</dt>
+<dd>
+<p>Allows you to directly enter the value of the shadows clipping point for the current histogram transformation.</p>
+</dd>
+<dt>
+<p>Highlights clipping</p>
+</dt>
+<dd>
+<p>Allows you to directly enter the value of the highlights clipping point for the current histogram transformation.</p>
+</dd>
+<dt>
+<p>Midtones balance</p>
+</dt>
+<dd>
+<p>Allows you to directly enter the value of the midtones balance point for the current histogram transformation.</p>
+</dd>
+<dt>
+<p>Dynamic range expansion lower bound</p>
+</dt>
+<dd>
+<p>Allows you to directly enter the value of the dynamic range expansion lower bound parameter for the current histogram transformation.</p>
+</dd>
+<dt>
+<p>Dynamic range expansion upper bound</p>
+</dt>
+<dd>
+<p>Allows you to directly enter the value of the dynamic range expansion upper bound parameter for the current histogram transformation.</p>
+</dd>
+<dt>
+<p>Reset parameters</p>
+</dt>
+<dd>
+<p>For each histogram transformation parameter, there is a specific reset button that allows you to quickly reset it to its default value. The default values of all histogram transformation parameters are those of an <a href="#identity_histogram_transformations">identity histogram transformation</a>.</p>
+</dd>
+<dt>
+<p>Show/hide dynamic range expansion</p>
+</dt>
+<dd>
+<p>The dynamic range expansion parameters are included in a <em>collapsible section</em> PixInsight control; click this button to toggle its collapsed state in order to show or hide dynamic range expansion parameters. As these parameters are normally not used, they are not visible by default, so you must click this button before using them.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Clipped_Pixel_Counts__">
+   <h4 class="pidoc_subsectionTitle">3.9&emsp;Clipped Pixel Counts</h4>
+
+<div style="text-align:center;">
+<img style="margin-top:1em;" src="images/ClippedPixelCounts.png" alt=""/>
+</div>
+<p>When a view is selected for histogram inspection, these two read-only controls provide information about the number of pixel samples currently being clipped as a result of the shadows and highlights clipping points defined for the currently selected transformation. The total number of clipped samples and the corresponding percentages of the total samples in the current channel of the selected image are shown. These numbers are automatically recalculated and updated when the relevant parameters are modified, either directly through the controls available in the <a href="#histogram_transformation_parameters">histogram parameters section</a>, or by dragging the associated slider controls on the <a href="#histogram_panels">input histogram panel</a>.</p>
+<p>When the combined RGB/K channel is selected, the clipping counts correspond to the sum of all clipped samples in the three nominal RGB channels, resulting from applying the RGB/K transformation. For this reason the counts can reach a maximum of a 300 percent for the RGB/K transformation applied to color images.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_AutoClip_Functions__">
+   <h4 class="pidoc_subsectionTitle">3.10&emsp;<a id="autoclip_functions"></a>AutoClip Functions</h4>
+<p>HistogramTransformation provides a number of useful functions to perform automatic clipping of pixels at the shadows and highlights, based on the properties of the histogram functions of the currently selected view.</p>
+
+<div style="text-align:center;">
+<img style="margin-top:1em;" src="images/AutoClipFunctions.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Autozero Shadows</p>
+</dt>
+<dd>
+<p>Click this button to set the current shadows clipping point to the maximum possible value such that no pixel will be clipped at the shadows. This function is useful to remove a unused initial segment of the available dynamic range. When the current channel is RGB/K, the autozero shadows clipping is applied to the individual RGB channel transformations.</p>
+</dd>
+<dt>
+<p>Autozero Highlights</p>
+</dt>
+<dd>
+<p>Click this button to set the current highlights clipping point to the minimum possible value such that no pixel will be clipped at the highlights. This function is useful to remove a unused trailing segment of the available dynamic range. When the current channel is RGB/K, the autozero highlights clipping is applied to the individual RGB channel transformations.</p>
+</dd>
+<dt>
+<p>Autoclip Shadows</p>
+</dt>
+<dd>
+<p>Click this button to apply the currently defined <em>automatic shadows clipping</em>. The automatic shadows clipping value defines a percentage of the total pixels that will be clipped automatically at the shadows when this button is activated. The default value clips a 1% of the total pixel samples for the current channel. When the current channel is RGB/K, the automatic shadows clipping is applied to the individual RGB channel transformations.</p>
+</dd>
+<dt>
+<p>Autoclip Highlights</p>
+</dt>
+<dd>
+<p>Click this button to apply the currently defined <em>automatic highlights clipping</em>. The automatic highlights clipping value defines a percentage of the total pixels that will be clipped automatically at the highlights when this button is activated. The default value clips a 1% of the total pixel samples for the current channel. When the current channel is RGB/K, the automatic highlights clipping is applied to the individual RGB channel transformations.</p>
+</dd>
+<dt>
+<p>Autoclip Parameters</p>
+</dt>
+<dd>
+<p>Click this button to open the Histogram Auto Clipping Setup dialog (see figure below).</p>
+
+<div style="text-align:center;">
+<img src="images/HistogramAutoClippingSetupDialog.png" alt=""/>
+</div>
+<p>On this dialog you can define the percentages of pixels that will be clipped by the shadows and highlights <em>Autoclip</em> functions.</p>
+</dd>
+</dl>
+
+
+<div class="pidoc_note">
+<p>Note&mdash; Applying automatic histogram clippings based on percentages of pixels to astronomical images (and, in general, to images with a documentary value) is a conceptual error. Always work out your histogram transformations to avoid clipping significant data. In general, this requires careful manual intervention.</p>
+</div>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Histogram_Readout_Modes__">
+   <h4 class="pidoc_subsectionTitle">3.11&emsp;<a id="histogram_readout_modes"></a>Histogram Readout Modes</h4>
+<p>The PixInsight Core application generates <em>pixel readouts</em> when you click on an image in <em>readout mode</em>, which is the default working mode for all images (you know the readout mode is active because the image cursor is a simple crosshair). Pixel readouts are sampled pixel values at the current cursor coordinates, and their generation is controlled through a set of <em>readout options</em> that you can define with the <a href="../../tools/ReadoutOptions/ReadoutOptions.html" title="../../tools/ReadoutOptions/ReadoutOptions.html">ReadoutOptions tool</a>. Pixel readouts are broadcasted to all process interfaces that can receive them; HistogramTransformation is one of those tools.</p>
+<p>When HistogramTransformation receives pixel readouts, it represents the readout sample values on its input and output histogram graphs as vertical lines. Each line is plotted at a constant X coordinate equal to the corresponding readout value in the normalized [0,1] range, with a color representative of the sampled image channel, depending on the <a href="#channel_selection">currently selected channel</a>.</p>
+<p>The way HistogramTransformation responds to pixel readouts depends on its currently selected <em>histogram readout mode.</em> HistogramTransformation's readout mode &mdash;not to be confused with the readout mode of image views&mdash; can be selected with a set of dedicated tool buttons, as shown on the figure below.</p>
+
+<div style="text-align:center;">
+<img style="margin-top:1em;" src="images/HistogramReadoutModes.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Normal Histogram Readout Mode</p>
+</dt>
+<dd>
+<p>In this mode HistogramTransformation draws vertical lines corresponding to incoming pixel readouts, as explained above, but it does not change histogram transformation parameters.</p>
+
+<div class="pidoc_figure" style="width:100%;">
+<a id="__figure_7__"></a>
+<p><span class="pidoc_figure_title">Figure 7 &mdash;</span>  <strong>Normal Histogram Readout Mode</strong></p>
+<img src="images/HistogramReadoutExample.jpg" alt=""/>
+<p>The HistogramTransformation tool is receiving pixel readouts from a RGB color image in <em>normal histogram readout mode.</em> Readout values are plotted as vertical lines at the corresponding normalized X coordinates. Note that the vertical lines plotted on the output histogram panel take into account the current histogram transformations; for example, in this case a midtones transfer function is being applied, which causes the vertical lines to shift toward the highlights side of the output histogram.</p>
+</div>
+</dd>
+<dt>
+<p>Black Point Histogram Readout Mode</p>
+</dt>
+<dd>
+<p>In the <em>black point</em> histogram readout mode, pixel readout values are used to set the shadows clipping points for individual RGB channels, when the selected view is a color image, or for the RGB/K combined channel, if the view is a grayscale image.</p>
+</dd>
+<dt>
+<p>Midtones Histogram Readout Mode</p>
+</dt>
+<dd>
+<p>In the <em>midtones</em> histogram readout mode, pixel readout values are used to set the midtones balance parameters for individual RGB channels, when the selected view is a color image, or for the RGB/K combined channel, if the view is a grayscale image.</p>
+
+<div class="pidoc_figure" style="width:100%;">
+<a id="__figure_8__"></a>
+<p><span class="pidoc_figure_title">Figure 8 &mdash;</span>  <strong>Midtones Histogram Readout Mode</strong></p>
+<img style="margin-bottom:8px;" src="images/MidtonesReadoutExample_1.jpg" alt=""/>
+<img src="images/MidtonesReadoutExample_2.jpg" alt=""/>
+<p><em>Top:</em> pixel readouts are being received in midtones histogram readout mode from an underexposed image. <em>Bottom:</em> Resulting image after applying the histogram transformation.</p>
+</div>
+</dd>
+<dt>
+<p>White Point Histogram Readout Mode</p>
+</dt>
+<dd>
+<p>In the <em>white point</em> histogram readout mode, pixel readout values are used to set the highlights clipping points for individual RGB channels, when the selected view is a color image, or for the RGB/K combined channel, if the view is a grayscale image.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Interoperability_with_ScreenTransferFunction__">
+   <h4 class="pidoc_subsectionTitle">3.12&emsp;Interoperability with ScreenTransferFunction</h4>
+<p>The standard <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">ScreenTransferFunction</a> and HistogramTransformation processes can share instances. This is possible because both tools actually work with very similar parameters: histogram transformations defined by two clipping points (shadows and highlights) and a midtones balance value.</p>
+<p>You can drag a STF instance to the control bar of the HistogramTransformation tool window, and the HistogramTransformation tool will import its histogram parameters from the STF instance. When the STF instance defines the same parameters for the three RGB channels, HistogramTransformation will import them in its RGB/K combined transformation. Otherwise each set of STF parameters is imported in its corresponding channel-specific transformation of HistogramTransformation. The reverse operation, that is importing a HistogramTransformation instance in ScreenTransferFunction, is also possible and works in a similar way.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Working_with_the_RealTime_Preview_Virtual_View__">
+   <h4 class="pidoc_subsectionTitle">3.13&emsp;<a id="working_with_virtual_views"></a>Working with the Real-Time Preview Virtual View</h4>
+<p>In PixInsight, a <em>virtual view</em> is a special object that is not an image, but behaves as such to some extent. A virtual view shares some properties of actual views by emulating them in such a way that they are almost indistinguishable from true views, as they are seen by some tools. A useful virtual view is the <em>real-time virtual view.</em> Thanks to the virtual views mechanism, some tools are able to select the real-time virtual view and work with some of its properties just as if it were a regular image. HistogramTransformation is one of these tools, also known as <em>virtual view clients</em>.</p>
+<p>When the standard Real-Time Preview interface is visible, you can select the real-time virtual view as <span class="pidoc_code">RealTimePreview</span> with HistogramTransformation's view selector. The figure below shows an example of the kind of workflows you can implement with virtual views in PixInsight.</p>
+
+<div class="pidoc_figure" style="width:100%;">
+<a id="__figure_9__"></a>
+<p><span class="pidoc_figure_title">Figure 9 &mdash;</span>  <strong>Working with the Real-Time Virtual View</strong></p>
+<img style="margin-bottom:8px;" src="images/RealTimeVirtualViewExample.jpg" alt=""/>
+<p>In this example, the <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a> tool owns the standard Real-Time Preview interface. The user is working on some curves and previewing the result on the real-time preview, which is a quite usual workflow in PixInsight. However, note that the HistogramTransformation and <a href="../../tools/Statistics/Statistics.html" title="../../tools/Statistics/Statistics.html">Statistics</a> tools are also present, and they have the RealTimePreview virtual view selected in their respective interfaces. As soon as the user moves one of the curve points, the following happens automatically:</p>
+
+<ul class="pidoc_list">
+<li>The Real-Time Preview interface forces recalculation of the transformed image and displays it.</li>
+<li>The RealTimePreview virtual view broadcasts a message to inform that it has been modified.</li>
+<li>The HistogramTransformation tool receives the message. Since it has the RealTimePreview view selected, it requests recalculation of its histograms and displays them. Since HistogramTransformation defines an identity histogram transformation, nothing more happens. Otherwise, the histogram transformation would be applied to predict an output histogram.</li>
+<li>The Statistics tool receives the message. Since it has the RealTimePreview view selected, it requests recalculation of its image statistics and displays them.</li>
+</ul>
+
+<p>In this example, the user is able not only to preview the result of a process (CurvesTransformation in this case), but to preview also how the histograms and the statistical properties of the image will be after applying the process, all in a fully automatic way.</p>
+</div>
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> Rafael C González &amp; Richard E. Woods (2008), <em>Digital Image Processing, Third Edition</em>, Pearson Prentice Hall, &sect; 3.3.</p>
+      <p id="__reference_2__"><strong>[2]</strong> John C. Russ (2007), <em>The Image Processing Handbook, Fifth Edition</em>, CRC Press, Chapter 5.</p>
+      <p id="__reference_3__"><strong>[3]</strong> R. Bulirsch, J. Stoer et al. (2010), <em>Introduction to Numerical Analysis, Third Edition</em>, Springer, &sect; 2.2</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/AutoHistogram/AutoHistogram.html" title="../../tools/AutoHistogram/AutoHistogram.html">AutoHistogram</a>, <a href="../../tools/ScreenTransferFunction/ScreenTransferFunction.html" title="../../tools/ScreenTransferFunction/ScreenTransferFunction.html">ScreenTransferFunction</a>, <a href="../../tools/CurvesTransformation/CurvesTransformation.html" title="../../tools/CurvesTransformation/CurvesTransformation.html">CurvesTransformation</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:19 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+===============================================================================
+Documentation Compiler Script Changelog
+===============================================================================
+
+2020/01/24 - v1.6.5
+
+   - Fixed wrong generation of HTML id attribute values for "Related..."
+     sections.
+
+   - Improved tooltip documentation for the Target System directory edit
+     control, describing in more detail the required file access permissions
+     and the different options available for authoring development
+     documentation on the local machine.
+
+-------------------------------------------------------------------------------
+2015/01/18 - v1.6.1
+
+   https://pixinsight.com/forum/index.php?topic=8087
+
+-------------------------------------------------------------------------------
+2013/11/20 - v1.5.0
+
+   https://pixinsight.com/forum/index.php?topic=6318
+
+-------------------------------------------------------------------------------
+2010/10/29 - v1.2.0
+
+   https://pixinsight.com/forum/index.php?topic=2429
+
+-------------------------------------------------------------------------------
+2010/10/02 - v1.0.9
+
+   https://pixinsight.com/forum/index.php?topic=2413

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | Resample</title>
+   <meta name="keywords" content="resample, resize, pixel interpolation" />
+   <meta name="author" content="Javier Sanchis Muñoz, PTeam" />
+   <meta name="description" content="Changes the dimensions of an image by interpolation of new pixel values from original pixel data." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>Resample</h1>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Changes the dimensions of an image by interpolation of new pixel values from original pixel data. <a href="#__contents__">[more]</a></p></div>
+
+<div id="categories">
+<p><strong>Categories:</strong> Geometry</p>
+</div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> resample, resize, pixel interpolation</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Description__">1&emsp;Description</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Dimensions__">2.1&emsp;Dimensions</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Interpolation__">2.2&emsp;Interpolation</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Resolution__">2.3&emsp;Resolution</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Process_Mode__">2.4&emsp;Process Mode</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedDocuments__">Related Documents</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Description__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Description</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Description', this );">[hide]</p>
+   <div id="Description">
+<img style="float:left;margin-right:1.25em;margin-bottom:0.5em;" src="images/Resample.png" alt=""/>
+<p>The Resample process is a basic geometric tool that allows resizing a target image using several pixel interpolation algorithms. As in the case of <a href="../../tools/Crop/Crop.html" title="../../tools/Crop/Crop.html">Crop,</a> this tool allows the user to work either with absolute dimensions in pixels, centimeters or inches, or with relative dimensions. It also allows modifying the target image's resolution in pixels per inch or pixels per centimeter.</p>
+<p>Unlike Crop and <a href="../../tools/FastRotation/FastRotation.html" title="../../tools/FastRotation/FastRotation.html">FastRotation,</a> which only copy or exchange existing pixel values to different locations on the target image, Resample generates output pixel values by interpolation from source pixels. This is an important difference because pixel interpolation is a <em>destructive operation</em>, in the sense that it cannot be undone to recover the original data. With non-interpolating tools such as Crop and FastRotation, on the other hand, you could apply an unlimited number of operations and, as long as no pixels were cropped, the original pixel values wouldn't be modified.</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+<p>The first element in the Resample interface is the <em>view selector</em>, which can be used to copy geometric properties from an existing image to the <a href="#dimensions_section">Dimensions</a> section of the interface. Selecting a view is optional and has no effect at all on the selected view. The process can be applied to the active view by clicking the <em>Apply</em> button (or equivalently, by pressing F5), or by direct application of an instance of the process to a view, as part of the usual procedures to execute a process in PixInsight.</p>
+
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+
+<div class="pidoc_group" style="margin-bottom:8px;">
+<img style="float:left;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/DimensionsDefault.png" alt=""/>
+<img style="float:left;margin-left:0.5em;margin-right:0.5em;margin-top:0.5em;margin-bottom:0.5em;" src="images/DimensionsFromView.png" alt=""/>
+</div>
+<p>The picture to the left shows the default <a href="#dimensions_section">Dimensions</a> section. In the right image the Dimensions section has acquired the geometric properties of the image specified by the view selector. Note the disabled <em>Original px Width</em> and <em>Heigth</em> edit boxes. When a view is selected, both fields are no longer modifiable since the <em>Original px</em> dimensions correspond to those of the selected view.</p>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Dimensions__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;<a id="dimensions_section"></a>Dimensions</h4>
+<img style="border:1px solid black;" src="images/Dimensions.png" alt=""/>
+<p>In this section you can specify the new dimensions of the target image directly by entering new width and height values, either in pixels, as a percentage of the original image, in centimeters, or in inches. The <em>cm</em> and <em>inch</em> fields depend on the resolution of the image, which can be changed in the <a href="#resolution_section">Resolution</a> section. The text area below the edit fields provides information on the dimensions of the resulting image. The final dimensions are calculated from the current dimensions in <em>Original px</em>. When no view is selected in the view selector, a default 32-bit format is considered for calculation of new dimensions.</p>
+<p>It is important to note that this tool performs a resizing operation on the target image, and not only a redimensioning of its <em>canvas</em> (for this purpose refer to the <a href="../../tools/Crop/Crop.html" title="../../tools/Crop/Crop.html">Crop</a> or <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a> tools).</p>
+<p>Resizing or resampling an image requires the use of pixel interpolations. For detailed information on interpolation algorithms, refer to the <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms documentation</a>.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Preserve Aspect Ratio</p>
+</dt>
+<dd>
+<p>This mode preserves the <em>aspect ratio</em> of the target image after the resampling operation. The aspect ratio is que quotient between image dimensions. When this mode is active and the width(height) is changed, the height(width) is automatically recalculated to ensure that the width:height quotient is as close as possible to the original. Bear in mind that the discrete representation of digital images can lead to slight differences due to roundoff errors. These differences are obviously less important for large images.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Interpolation__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;<a id="interpolation_section"></a>Interpolation</h4>
+<img style="border:1px solid black;" src="images/Interpolation.png" alt=""/>
+<p>The Rescale process uses pixel interpolation to compute output image pixels. For each pixel in the rescaled image, <em>inverse interpolation</em> is applied to compute an output pixel value from a set of source input pixels. For detailed information on interpolation algorithms, refer to the <a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms documentation</a>.</p>
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Resolution__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;<a id="resolution_section"></a>Resolution</h4>
+<img style="border:1px solid black;" src="images/Resolution.png" alt=""/>
+<p>The resolution of an image is used to specify its final dimensions, in inches or centimeters, when the image is to be <em>printed.</em> The resolution is relevant when the image is imported in a page layout application, such as a word processor or a desktop edition application. It is important to point out that <em>changing the resolution of an image does not change its dimensions in pixels</em>. It is just <em>the dimensions of a printed pixel</em> what image resolution specifies. A default resolution of 72x72 pixels/inch is predefined.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Horizontal and Vertical</p>
+</dt>
+<dd>
+<p>The user can specify the horizontal and vertical resolution either in centimeters or inches. The physical width and heigth of the pinted image depend on the resolution and the dimensions in pixels; for instance, a 1000x1000 pixels image with a resolution of 100 pixels per inch in both axes would be printed over a square of 10x10 inches.</p>
+</dd>
+<dt>
+<p>Force resolution</p>
+</dt>
+<dd>
+<p>When this checkbox is checked the resolution of the target image is effectively modified when the process is executed. Otherwise, when this chekbox is unchecked, resolution values are used <em>for informative purposes exclusively</em>, but they won't change the current resolution of the target image. In both cases, the specified horizontal and vertical resolutions are used to calculate the <em>cm</em> and <em>inch</em> fields of the <a href="#dimensions_section">Dimensions</a> section.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Process_Mode__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;<a id="process_mode_section"></a>Process Mode</h4>
+<img style="border:1px solid black;" src="images/ProcessMode.png" alt=""/>
+<p>The resize of a target image can be carried out mainly in three different ways: <em>relative,</em> <em>absolute</em> or <em>force area</em> mode. Regardless of the working mode, the modification of any parameter in the <em>Dimensions</em> section will affect the other parameters in the same row (corresponding to Width or Heigth) or even in both rows (respectively Heigth or Width) if the <em>Preserve Aspect Ratio</em> option is selected.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Relative resize</p>
+</dt>
+<dd>
+<p>In this mode, resizing is carried out by specifying a percentage of the width and heigth of the original image (the relevant parameters of the <em>Dimensions</em> section are then the <em>percents</em> of width and heigth). Applying the same instance to a different image will perform the same operation but using the dimensions of the new target image. To get updated information about the target image in the rest of the <em>Dimensions</em> section fields, the <em>Original px</em> edit boxes must be filled with its original dimensions either manually or by selecting the corresponding view with the view selector.</p>
+<p>This mode can be used along with the <em>Preserve Aspect Ratio</em> checkbox to ensure preservation of the proportions of the target image after the resize operation.</p>
+</dd>
+<dt>
+<p>Absolute dimensions in pixels, centimeters or inches</p>
+</dt>
+<dd>
+<p>By selecting this mode, the user can specify the exact dimensions of the resulting image either in pixels, centimeters or inches. When working in <em>Absolute dimensions in pixels</em> mode, the dimensions of the resulting image in centimeters or inches will depend on its resolution. Upon execution of the process, the resolution values are taken automatically from the target image, or if they are being forced by enabling the <em>Force Resolution</em> option, from the values specified in the <a href="#resolution_section">Resolution section</a>. When working in <em>Absolute dimensions in centimeters</em> or <em>inches,</em> the dimensions in pixels of the resulting image will depend on the resolution (either forced or read from the target image). The three variants of <em>Absolute dimensions</em> can work in the following three sub-modes:</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Force width and heigth</p>
+</dt>
+<dd>
+<p>Using this mode you can force the width and heigth of the resulting image. In this mode the <em>Preserve Aspect Ratio</em> checkbox remains unchecked and disabled.</p>
+</dd>
+<dt>
+<p>Force width, keep aspect ratio</p>
+</dt>
+<dd>
+<p>In this mode you can specify only the <em>width</em> of the target image. The heigth will be automatically calculated in order to preserve the existing aspect ratio in the target image. In this mode the <em>Preserve Aspect Ratio</em> checkbox remains checked and disabled.</p>
+</dd>
+<dt>
+<p>Force height, keep aspect ratio</p>
+</dt>
+<dd>
+<p>This mode is complementary to the preceding one. You can specify only the <em>heigth</em> of the target image; the width will be calculated automatically to preserve the existing aspect ratio in the target image. In this mode the <em>Preserve Aspect Ratio</em> checkbox remains checked and disabled.</p>
+</dd>
+</dl>
+
+</dd>
+<dt>
+<p>Force area in pixels, keep aspect ratio</p>
+</dt>
+<dd>
+<p>Use this mode to force an area in square pixels, regardless of the original dimensions.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/IntegerResample/IntegerResample.html" title="../../tools/IntegerResample/IntegerResample.html">IntegerResample</a>, <a href="../../tools/Crop/Crop.html" title="../../tools/Crop/Crop.html">Crop</a>, <a href="../../tools/DynamicCrop/DynamicCrop.html" title="../../tools/DynamicCrop/DynamicCrop.html">DynamicCrop</a>, <a href="../../tools/FastRotation/FastRotation.html" title="../../tools/FastRotation/FastRotation.html">FastRotation</a>, <a href="../../tools/Rotation/Rotation.html" title="../../tools/Rotation/Rotation.html">Rotation</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_documents__">
+   <h3 class="pidoc_sectionTitle">Related Documents</h3>
+   <div id="related_documents">
+<p><a href="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html" title="../../docs/InterpolationAlgorithms/InterpolationAlgorithms.html">Interpolation Algorithms in PixInsight</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2011 Pleiades Astrophoto. All Rights Reserved.</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:23:26 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

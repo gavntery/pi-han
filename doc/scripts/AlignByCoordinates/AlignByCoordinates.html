@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PixInsight Reference Documentation | AlignByCoordinates</title>
+   <meta name="keywords" content="alignment, coordinates" />
+   <meta name="author" content="Andrés del Pozo" />
+   <meta name="description" content="Script for aligning deep sky astronomical images using their coordinates." />
+   <meta name="robots" content="INDEX,FOLLOW" />
+   <meta name="generator" content="PixInsight Documentation Compiler script version 1.6.3" />
+   <script type="text/javascript" src="../../pidoc/scripts/pidoc-utility.js"></script>
+   <link type="text/css" href="../../pidoc/css/pidoc-common.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-highlight.css" rel="stylesheet" />
+   <link type="text/css" href="../../pidoc/css/pidoc-tool.css" rel="stylesheet" />
+   <link rel="icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+   <link rel="shortcut icon" href="../../pidoc/icons/pidoc-icon.png" type="image/png" />
+</head>
+<body>
+<script type="text/javascript">
+   pidoc_generateDynamicContents();
+</script>
+
+<h1>AlignByCoordinates</h1>
+
+<div id="authors">
+<p>By Andrés del Pozo</p>
+</div>
+
+<hr class="separator"/>
+
+<div id="brief">
+<p>Script for aligning deep sky astronomical images using their coordinates. <a href="#__contents__">[more]</a></p></div>
+
+<div id="keywords">
+<p><strong>Keywords:</strong> alignment, coordinates</p>
+</div>
+
+<h3 class="pidoc_sectionTitle" id="__toc__">Contents</h3>
+<p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'toc', this );">[hide]</p>
+<div id="toc">
+<ul>
+<li class="pidoc_tocItem"><a href="#__Introduction__">1&emsp;Introduction</a></li>
+<li class="pidoc_tocItem"><a href="#__Usage__">2&emsp;Usage</a>
+<ul>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Execution_mode__">2.1&emsp;Execution mode </a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Images__">2.2&emsp;Images</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Options__">2.3&emsp;Options</a></li>
+<li class="pidoc_tocSubitem"><a href="#__Usage_:_Output_images__">2.4&emsp;Output images</a></li>
+</ul>
+</li>
+<li class="pidoc_tocItem"><a href="#__Tips__">3&emsp;Tips</a></li>
+<li class="pidoc_tocItem"><a href="#__Limitations__">4&emsp;Limitations</a></li>
+<li class="pidoc_tocItem"><a href="#__references__">References</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedTools__">Related Tools</a></li>
+<li class="pidoc_tocItem"><a href="#__relatedScripts__">Related Scripts</a></li>
+</ul>
+</div>
+
+<div id="__contents__">
+
+<div class="pidoc_section" id="__Introduction__">
+   <h3 class="pidoc_sectionTitle">1&emsp;Introduction</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Introduction', this );">[hide]</p>
+   <div id="Introduction">
+<p>The alignment of images is a basic tool for processing of astronomical images. PixInsight has an excellent tool (<a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>) for aligning images that works comparing the overlapping areas between the target image and a reference image and trying to find a match between them. Then computes a lineal transformation that converts the geometry of the target image so that it is similar to the reference image.</p>
+<p><strong>AlignByCoordinates</strong> uses a different approach to the alignment: Instead of matching an image against other, it requires that the images are plate solved. Knowing the coordinates of each pixel of the image the script can reproject them so the geometries of the images are compatible.</p>
+<p>The geometry of the image has to be defined using the convention <em>FITS World Coordinate System (WCS)</em><sup><a href="#__reference_1__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 1]<br/>
+E. W. Greisen, M. R. Calabretta (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075">[1]</a></sup> <sup><a href="#__reference_2__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 2]<br/>
+M. R. Calabretta, E. W. Greisen (2002) <em><a href='http://fits.gsfc.nasa.gov/fits_wcs.html' title='http://fits.gsfc.nasa.gov/fits_wcs.html'>Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122">[2]</a></sup> . This can be done using the scripts <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> or <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a>. There are also other applications that can solve images using this convention such as PinPoint.</p>
+<p>AlignByCoordinates can cope with two kind of geometric distortions:</p>
+
+<ul class="pidoc_list">
+<li> <strong>Projection distortions <a id="Projection"></a></strong>: When two images are not centered in the same point they have different projections. The difference in the projections causes that there is not a lineal transformation between them. This effect is stronger in images with short focal length.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ The following animation shows an example of this effect. The images have been generated from catalog data and the only geometric distortions are caused by the projection. As can be seen in the animation, the Orion asterism has different distortions in each frame.
+<div class="pidoc_figure">
+<a id="__figure_1__"></a>
+<p class="pidoc_figure_title">Figure 1</p>
+<img style="width:100%;height:auto;" src="images/ProjectionDistortion.gif" alt=""/>
+</div>
+</li>
+<li> <strong>Geometric optical aberrations <a id="Aberrations"></a></strong>: The plate solving of astronomical images is usually done supposing that the optical system can be modeled by a <a href="http://en.wikipedia.org/wiki/Gnomonic_projection" title="http://en.wikipedia.org/wiki/Gnomonic_projection">Gnomonic projection</a> <sup><a href="#__reference_3__" class="pidoc_referenceTooltip" onmouseover="pidoc_showReferenceToolTip( this );" onmouseout="pidoc_hideReferenceToolTip();" data-tooltip="[Reference 3]<br/>
+Wikipedia contributors, <em><a href='http://en.wikipedia.org/wiki/Gnomonic_projection' title='http://en.wikipedia.org/wiki/Gnomonic_projection'>Gnomonic projection</a></em>, Wikipedia, The Free Encyclopedia">[3]</a></sup>. However, many lenses or telescopes don't follow strictly this projection. The images from these optical systems can not be solved with high accuracy using only lineal polynomials. <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> and <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a> can use higher degree polynomials to model the geometric distortions. AlignByCoordinates can use the distortion model generated by the plate solving process for fixing it when aligning images with different distortions.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+ The following image is the distortion map from an image taken with a 17mm lens. It shows the difference between the image and an &quot;ideal&quot; lens that generates images using Gnomonic projection.
+<div class="pidoc_figure">
+<a id="__figure_2__"></a>
+<p class="pidoc_figure_title">Figure 2</p>
+<img style="width:100%;height:auto;" src="images/Aberrations.png" alt=""/>
+</div>
+</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Usage__">
+   <h3 class="pidoc_sectionTitle">2&emsp;Usage</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Usage', this );">[hide]</p>
+   <div id="Usage">
+
+<div style="text-align:center;">
+<img src="images/MainDialog.png" alt=""/>
+</div>
+<div class="pidoc_subsection" id="__Usage_:_Execution_mode__">
+   <h4 class="pidoc_subsectionTitle">2.1&emsp;Execution mode <a id="Mode"></a></h4>
+<p>The script has three modes operation that can be chosen using the <em>Execution mode</em> box.</p>
+
+<dl class="pidoc_list">
+<dt>
+<p>Align images against reference <a id="Align"></a></p>
+</dt>
+<dd>
+<p>This mode uses an image as a <a href="#Reference">reference</a> and aligns all the images in the <a href="#Target">target list</a> against this. For each target image a new image is generated that has the same geometry as the reference image.</p>
+<p>This option is useful for stacking images that cover the same area.</p>
+</dd>
+<dt>
+<p>Undistort images</p>
+</dt>
+<dd>
+<p>This mode generates a new image for each target image removing the <a href="#Aberrations">geometric optical aberrations</a>. The geometry of the output images keep the characteristics of the original geometries (projection, resolution, rotation and dimensions) but removing the aberrations. This mode doesn't use a reference image.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Images__">
+   <h4 class="pidoc_subsectionTitle">2.2&emsp;Images</h4>
+
+<dl class="pidoc_list">
+<dt>
+<p>Reference image <a id="Reference"></a></p>
+</dt>
+<dd>
+<p>The reference image for the execution mode <a href="#Align">Align images against reference</a> can be selected using the <em>Reference image</em> list box. This parameter is not used when the <a href="#Mode">Execution mode</a> is &quot;Undistort image&quot;.</p>
+<p>You can select as reference an open image or a file. The list enumerates initially the open images in PixInsight. With the <em>Browse</em> button you can add a file to the list.</p>
+</dd>
+<dt>
+<p>Target images <a id="Target"></a></p>
+</dt>
+<dd>
+<p>The script can use the active image in PixInsight as target image or it can use a list of images. You can add files to the list using the button <em>Add files</em> or you can add open windows using the button <em>Add windows</em>. The button <em>Remove images</em> removes the selected images from the list. The button <em>Clear list</em> removes all the images.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Options__">
+   <h4 class="pidoc_subsectionTitle">2.3&emsp;Options</h4>
+
+<div style="text-align:center;">
+<img src="images/Options.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Quality</p>
+</dt>
+<dd>
+<p>This option determines the quality of the output:</p>
+
+<ul class="pidoc_list">
+<li><strong>Fast <a id="Fast"></a></strong>: This option calculates the alignment transformation for a few pixels and then approximates the transformation for the rest of pixels using splines. The quality of the transformation is usually good enough for most uses but it is not guaranteed that all the pixels are correct.</li>
+<li><strong>High quality <a id="HQ"></a></strong>: This option calculates the alignment transformation for all the pixels in the image. The quality of the result is the best possible but the process can be quite slow, up to several minutes for each image.</li>
+</ul>
+
+</dd>
+<dt>
+<p>Pixel interpolation</p>
+</dt>
+<dd>
+<p>This option determines the algorithm for pixel interpolation when the <a href="#HQ">High quality</a> option is used. The available values are the same used in <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>.</p>
+</dd>
+<dt>
+<p>Clamping threshold</p>
+</dt>
+<dd>
+<p>This parameter is explained in the documentation of <a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>.</p>
+</dd>
+</dl>
+
+</div>
+
+<div class="pidoc_subsection" id="__Usage_:_Output_images__">
+   <h4 class="pidoc_subsectionTitle">2.4&emsp;Output images</h4>
+
+<div style="text-align:center;">
+<img src="images/Output.png" alt=""/>
+</div>
+
+<dl class="pidoc_list">
+<dt>
+<p>Output directory</p>
+</dt>
+<dd>
+<p>Path of the directory where the aligned images will be written. If it is empty, the images will be written at the same directories as the source images.</p>
+<p>This parameter is not used when aligning windows since in this case the images are not written to the disk.</p>
+</dd>
+<dt>
+<p>Output file suffix</p>
+</dt>
+<dd>
+<p>This suffix will be appended to the filename when saving each image.</p>
+</dd>
+<dt>
+<p>Overwrite existing files</p>
+</dt>
+<dd>
+<p>If this option is not checked the alignment of an image fails when the output file already exists.</p>
+</dd>
+<dt>
+<p>On error</p>
+</dt>
+<dd>
+<p>This parameter determines what to do when there are errors during the process. The options are <em>Continue</em>, <em>Abort</em> and <em>Ask user</em>.</p>
+</dd>
+</dl>
+
+</div>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Tips__">
+   <h3 class="pidoc_sectionTitle">3&emsp;Tips</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Tips', this );">[hide]</p>
+   <div id="Tips">
+
+<ul class="pidoc_list">
+<li> Since AlignByCoordinates uses the coordinates of the image as the sole method for aligning the images, the coordinates solution must be of very high precision. It should have residuals of less than one pixel.
+<div class="pidoc_vspacer" style="margin-top:1em;"></div>
+For narrow field images taken with long focal lengths (usually more than 1000mm) and lenses of high optical quality, the solution usually doesn't need distortion correction. However, images taken with short focal lengths (&lt;100mm) or lenses with strong aberrations (for example, Newton telescopes with coma), the coordinates should be calculated using distortion correction in order to achieve the required precision. These coordinates solutions can be calculated using both <a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a> and <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a>.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__Limitations__">
+   <h3 class="pidoc_sectionTitle">4&emsp;Limitations</h3>
+   <p class="pidoc_sectionToggleButton" onclick="pidoc_toggleSection( 'Limitations', this );">[hide]</p>
+   <div id="Limitations">
+
+<ul class="pidoc_list">
+<li>Since this script requires to know the geometry of the images it can only work with images that can be plate solved. This is usually only possible for deep sky images where enough stars can be detected and matched to a catalog.</li>
+</ul>
+
+   </div>
+</div>
+
+<div class="pidoc_section" id="__references__">
+   <h3 class="pidoc_sectionTitle">References</h3>
+   <div id="references">
+      <p id="__reference_1__"><strong>[1]</strong> E. W. Greisen, M. R. Calabretta (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of World Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1061-1075</p>
+      <p id="__reference_2__"><strong>[2]</strong> M. R. Calabretta, E. W. Greisen (2002) <em><a href="http://fits.gsfc.nasa.gov/fits_wcs.html" title="http://fits.gsfc.nasa.gov/fits_wcs.html">Representations of Celestial Coordinates in FITS</a></em>, Astronomy &amp; Astrophysics, 395, 1077-1122</p>
+      <p id="__reference_3__"><strong>[3]</strong> Wikipedia contributors, <em><a href="http://en.wikipedia.org/wiki/Gnomonic_projection" title="http://en.wikipedia.org/wiki/Gnomonic_projection">Gnomonic projection</a></em>, Wikipedia, The Free Encyclopedia</p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_tools__">
+   <h3 class="pidoc_sectionTitle">Related Tools</h3>
+   <div id="related_tools">
+<p><a href="../../tools/StarAlignment/StarAlignment.html" title="../../tools/StarAlignment/StarAlignment.html">StarAlignment</a>, <a href="../../tools/DynamicAlignment/DynamicAlignment.html" title="../../tools/DynamicAlignment/DynamicAlignment.html">DynamicAlignment</a>, <a href="../../tools/GradientMergeMosaic/GradientMergeMosaic.html" title="../../tools/GradientMergeMosaic/GradientMergeMosaic.html">GradientMergeMosaic</a></p>
+   </div>
+</div>
+
+<div class="pidoc_section" id="__related_scripts__">
+   <h3 class="pidoc_sectionTitle">Related Scripts</h3>
+   <div id="related_scripts">
+<p><a href="../../scripts/ImageSolver/ImageSolver.html" title="../../scripts/ImageSolver/ImageSolver.html">ImageSolver</a>, <a href="../../scripts/ManualImageSolver/ManualImageSolver.html" title="../../scripts/ManualImageSolver/ManualImageSolver.html">ManualImageSolver</a></p>
+   </div>
+</div>
+
+<hr class="separator"/>
+
+<div id="copyright">
+   <p>Copyright &copy; 2013, Andrés del Pozo</p>
+</div>
+
+<div id="footer">
+   <p>Generated by the PixInsight Documentation Compiler script version 1.6.3 on 2018-12-04 19:24:37 UTC</p>
+</div>
+<br/>
+<br/>
+
+</div> <!-- contents -->
+
+</body>
+</html>

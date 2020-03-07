@@ -1,0 +1,65 @@
+// _____________       ________            _____        ______ _____
+// ___  __ \__(_)___  _____  _/_______________(_)______ ___  /___  /_
+// __  /_/ /_  /__  |/_/__  /__  __ \_  ___/_  /__  __ `/_  __ \  __/
+// _  ____/_  / __>  < __/ / _  / / /(__  )_  / _  /_/ /_  / / / /_
+// /_/     /_/  /_/|_| /___/ /_/ /_//____/ /_/  _\__, / /_/ /_/\__/
+//                                              /____/
+// ----------------------------------------------------------------------------
+// PixInsight Core Application Version 01.08.06.1473 Ripley
+// ----------------------------------------------------------------------------
+// Core Syntax Highlighting Resources
+// /PixInsight/rsc/shlt/js-reserved
+// Released 2019 MAY 07
+// ----------------------------------------------------------------------------
+// Copyright (c) 2003-2019 Pleiades Astrophoto S.L. All Rights Reserved.
+// ----------------------------------------------------------------------------
+
+break
+case
+catch
+class
+const
+constructor
+continue
+debugger
+default
+delete
+do
+else
+export
+extends
+false
+finally
+for
+function
+get
+if
+import
+in
+instanceof
+let
+new
+null
+prototype
+return
+set
+static
+super
+switch
+this
+throw
+true
+try
+typeof
+undefined
+var
+void
+while
+with
+yield
+Infinity
+NaN
+
+// ----------------------------------------------------------------------------
+// /PixInsight/rsc/shlt/js-reserved
+// Released 2019 MAY 07
