@@ -216,7 +216,7 @@ function OverscanRectControl( parent, overscan, sourceRegion )
    this.leftControl.setReal( false );
    this.leftControl.setRange( 0, 9999999 )
    this.leftControl.edit.setFixedWidth( editWidth1 );
-   this.leftControl.toolTip = "<p>Left coordinate of the " + fullName + " in CCD pixels.</p>"
+   this.leftControl.toolTip = "<p>CCD像素中" + fullName + "的左侧边界坐标。</p>"
    this.leftControl.onValueUpdated = function( value )
    {
       var ivalue = Math.trunc( value );
@@ -235,7 +235,7 @@ function OverscanRectControl( parent, overscan, sourceRegion )
    this.topControl.setReal( false );
    this.topControl.setRange( 0, 9999999 )
    this.topControl.edit.setFixedWidth( editWidth1 );
-   this.topControl.toolTip = "<p>Top coordinate of the " + fullName + " in CCD pixels.</p>"
+   this.topControl.toolTip = "<p>CCD像素中" + fullName + "的顶部边界坐标。</p>"
    this.topControl.onValueUpdated = function( value )
    {
       var ivalue = Math.trunc( value );
@@ -254,7 +254,7 @@ function OverscanRectControl( parent, overscan, sourceRegion )
    this.widthControl.setReal( false );
    this.widthControl.setRange( 0, 9999999 )
    this.widthControl.edit.setFixedWidth( editWidth1 );
-   this.widthControl.toolTip = "<p>Width of the " + fullName + " in CCD pixels.</p>"
+   this.widthControl.toolTip = "<p>CCD像素中" + fullName + "的宽度。</p>"
    this.widthControl.onValueUpdated = function( value )
    {
       var ivalue = Math.trunc( value );
@@ -273,7 +273,7 @@ function OverscanRectControl( parent, overscan, sourceRegion )
    this.heightControl.setReal( false );
    this.heightControl.setRange( 0, 9999999 )
    this.heightControl.edit.setFixedWidth( editWidth1 );
-   this.heightControl.toolTip = "<p>Height of the " + fullName + " in CCD pixels.</p>"
+   this.heightControl.toolTip = "<p>CCD像素中" + fullName + "的高度。</p>"
    this.heightControl.onValueUpdated = function( value )
    {
       var ivalue = Math.trunc( value );
@@ -320,8 +320,8 @@ function OverscanRegionControl( parent, overscan )
    {
       this.applyCheckBox = new CheckBox( this );
       this.applyCheckBox.overscan = overscan;
-      this.applyCheckBox.text = "Overscan #" + (overscan+1).toString();
-      this.applyCheckBox.toolTip = "<p>Enable overscan region #" + (overscan+1).toString() + ".</p>";
+      this.applyCheckBox.text = "过扫描 #" + (overscan+1).toString();
+      this.applyCheckBox.toolTip = "<p>启用过扫描区域 #" + (overscan+1).toString() + ".</p>";
       this.applyCheckBox.onCheck = function( checked )
       {
          engine.overscan.overscan[this.overscan].enabled = checked;
@@ -352,7 +352,7 @@ OverscanRegionControl.prototype = new Control;
 function OverscanControl( parent, expand )
 {
    this.__base__ = ParametersControl;
-   this.__base__( "Overscan", parent, expand );
+   this.__base__( "过扫描(Overscan)", parent, expand );
 
    //
 
@@ -560,14 +560,14 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.minMaxLowSpinBox.minValue = 0;
    this.minMaxLowSpinBox.maxValue = 100;
    this.minMaxLowSpinBox.setFixedWidth( this.dialog.numericEditWidth + this.logicalPixelsToPhysical( 16 ) );
-   this.minMaxLowSpinBox.toolTip = "<p>Number of low (dark) pixels to be rejected by the min/max algorithm.</p>";
+   this.minMaxLowSpinBox.toolTip = "<p>最小值/最大值算法将排除的低(暗)像素数。</p>";
    this.minMaxLowSpinBox.onValueUpdated = function( value )
    {
       engine.minMaxLow[this.parent.parent.imageType] = value;
    };
 
    this.minMaxLowLabel.toolTip = this.minMaxLowSpinBox.toolTip =
-      "<p>Number of low (dark) pixels to be rejected by the min/max algorithm.</p>";
+      "<p>最小值/最大值算法将排除的低(暗)像素数。</p>";
 
    this.minMaxLowSizer = new HorizontalSizer;
    this.minMaxLowSizer.spacing = 4;
@@ -586,14 +586,14 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.minMaxHighSpinBox.minValue = 0;
    this.minMaxHighSpinBox.maxValue = 100;
    this.minMaxHighSpinBox.setFixedWidth( this.dialog.numericEditWidth + this.logicalPixelsToPhysical( 16 ) );
-   this.minMaxHighSpinBox.toolTip = "<p>Number of high (bright) pixels to be rejected by the min/max algorithm.</p>";
+   this.minMaxHighSpinBox.toolTip = "<p>最小值/最大值算法将排除的高(亮)像素数。</p>";
    this.minMaxHighSpinBox.onValueUpdated = function( value )
    {
       engine.minMaxHigh[this.parent.parent.imageType] = value;
    };
 
    this.minMaxHighLabel.toolTip = this.minMaxHighSpinBox.toolTip =
-      "<p>Number of high (bright) pixels to be rejected by the min/max algorithm.</p>";
+      "<p>最小值/最大值算法将排除的高(亮)像素数。</p>";
 
    this.minMaxHighSizer = new HorizontalSizer;
    this.minMaxHighSizer.spacing = 4;
@@ -611,7 +611,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.percentileLowControl.slider.scaledMinWidth = 200;
    this.percentileLowControl.setPrecision( 2 );
    this.percentileLowControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.percentileLowControl.toolTip = "<p>Low clipping factor for the percentile clipping rejection algorithm.</p>";
+   this.percentileLowControl.toolTip = "<p>百分比剪切排异算法的低剪切因子。</p>";
    this.percentileLowControl.onValueUpdated = function( value )
    {
       engine.percentileLow[this.parent.parent.imageType] = value;
@@ -627,7 +627,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.percentileHighControl.slider.scaledMinWidth = 200;
    this.percentileHighControl.setPrecision( 2 );
    this.percentileHighControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.percentileHighControl.toolTip = "<p>High clipping factor for the percentile clipping rejection algorithm.</p>";
+   this.percentileHighControl.toolTip = "<p>百分比剪切排异算法的高剪切因子。</p>";
    this.percentileHighControl.onValueUpdated = function( value )
    {
       engine.percentileHigh[this.parent.parent.imageType] = value;
@@ -644,7 +644,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.sigmaLowControl.setPrecision( 2 );
    this.sigmaLowControl.setValue( 4.0 );
    this.sigmaLowControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.sigmaLowControl.toolTip = "<p>Low clipping factor for the sigma clipping rejection algorithms.</p>";
+   this.sigmaLowControl.toolTip = "<p>标准差剪切排异算法的低剪切因子。</p>";
    this.sigmaLowControl.onValueUpdated = function( value )
    {
       engine.sigmaLow[this.parent.parent.imageType] = value;
@@ -661,7 +661,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.sigmaHighControl.setPrecision( 2 );
    this.sigmaHighControl.setValue( 2.0 );
    this.sigmaHighControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.sigmaHighControl.toolTip = "<p>High clipping factor for the sigma clipping rejection algorithms.</p>";
+   this.sigmaHighControl.toolTip = "<p>标准差剪切排异算法的低剪切因子。</p>";
    this.sigmaHighControl.onValueUpdated = function( value )
    {
       engine.sigmaHigh[this.parent.parent.imageType] = value;
@@ -678,7 +678,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.linearFitLowControl.setPrecision( 2 );
    this.linearFitLowControl.setValue( 5.0 );
    this.linearFitLowControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.linearFitLowControl.toolTip = "<p>Low clipping factor for the linear fit clipping rejection algorithm.</p>";
+   this.linearFitLowControl.toolTip = "<p>线性拟合剪切排异算法的低剪切因子。</p>";
    this.linearFitLowControl.onValueUpdated = function( value )
    {
       engine.linearFitLow[this.parent.parent.imageType] = value;
@@ -695,7 +695,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    this.linearFitHighControl.setPrecision( 2 );
    this.linearFitHighControl.setValue( 2.5 );
    this.linearFitHighControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.linearFitHighControl.toolTip = "<p>High clipping factor for the linear fit clipping rejection algorithm.</p>";
+   this.linearFitHighControl.toolTip = "<p>线性拟合剪切排异算法的高剪切因子。</p>";
    this.linearFitHighControl.onValueUpdated = function( value )
    {
       engine.linearFitHigh[this.parent.parent.imageType] = value;
@@ -714,10 +714,10 @@ function ImageIntegrationControl( parent, imageType, expand )
       this.esdOutliersControl.setPrecision( 2 );
       this.esdOutliersControl.setValue( 0.3 );
       this.esdOutliersControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-      this.esdOutliersControl.toolTip = "<p>Expected maximum fraction of outliers for the generalized ESD rejection algotirhm.</p>" +
-         "<p>For example, a value of 0.2 applied to a stack of 10 pixels means that the ESD algorithm will be limited to detect a " +
-         "maximum of two outlier pixels, or in other words, only 0, 1 or 2 outliers will be detectable in such case. The default " +
-         "value is 0.3, which allows the algorithm to detect up to a 30% of outlier pixels in each pixel stack.</p>";
+      this.esdOutliersControl.toolTip = "<p>GESD排异算法的预期奇异值的最大分数。</p>" +
+         "<p>例如，将值0.2应用于10个像素的堆栈意味着ESD算法将被限制为最多检测两个奇异值像素，" +
+         "换句话说，在这种情况下只能检测到0、1或2个奇异值。 默认值为0.3，这使算法可以检测每个" +
+         "像素堆栈中多达30％的奇异像素。</p>";
       this.esdOutliersControl.onValueUpdated = function( value )
       {
          engine.esdOutliers[this.parent.parent.imageType] = value;
@@ -765,8 +765,7 @@ function ImageIntegrationControl( parent, imageType, expand )
    {
       this.largeScaleRejectionCheckBox = new CheckBox( this );
       this.largeScaleRejectionCheckBox.text = "大尺度像素排斥";
-      this.largeScaleRejectionCheckBox.toolTip = "<p>Apply large-scale pixel rejection, high pixel sample values. " +
-         "Useful to improve rejection of stars for integration of sky flats.</p>";
+      this.largeScaleRejectionCheckBox.toolTip = "<p>应用大尺度像素排异，高像素采样值。有助于在堆叠平场是改善星点的排异。</p>";
       this.largeScaleRejectionCheckBox.onCheck = function( checked )
       {
          engine.flatsLargeScaleRejection = checked;
@@ -795,8 +794,8 @@ function ImageIntegrationControl( parent, imageType, expand )
       };
 
       this.largeScaleRejectionLayersLabel.toolTip = this.largeScaleRejectionLayersSpinBox.toolTip =
-         "<p>Large-scale pixel rejection, number of protected small-scale wavelet layers. " +
-         "Increase it to restrict large-scale rejection to larger structures of contiguous rejected pixels.</p>";
+         "<p>大尺度像素排异时，受保护的小波层数。" +
+         "增加它可以将大尺度排异限制为较大的连续排异像素结构。</p>";
 
       this.largeScaleRejectionLayersSizer = new HorizontalSizer;
       this.largeScaleRejectionLayersSizer.spacing = 4;
@@ -821,8 +820,7 @@ function ImageIntegrationControl( parent, imageType, expand )
       };
 
       this.largeScaleRejectionGrowthLabel.toolTip = this.largeScaleRejectionGrowthSpinBox.toolTip =
-         "<p>Large-scale pixel rejection, growth of large-scale pixel rejection structures. " +
-         "Increase to extend rejection to more adjacent pixels.</p>";
+         "<p>大尺度像素排异，排异结构成长的速度。 增加它可以将排异范围扩展到更多相邻像素。</p>";
 
       this.largeScaleRejectionGrowthSizer = new HorizontalSizer;
       this.largeScaleRejectionGrowthSizer.spacing = 4;
@@ -926,7 +924,7 @@ function CosmeticCorrectionControl( parent )
 
    this.applyCheckBox = new CheckBox( this );
    this.applyCheckBox.text = "启用";
-   this.applyCheckBox.toolTip = "<p>Apply cosmetic correction.</p>";
+   this.applyCheckBox.toolTip = "<p>启用瑕疵校正。</p>";
    this.applyCheckBox.onCheck = function( checked )
    {
       engine.cosmeticCorrection = checked;
@@ -941,10 +939,9 @@ function CosmeticCorrectionControl( parent )
 
    //
 
-   var templateIconIdToolTip = "<p>Identifier of an existing CosmeticCorrection icon " +
-      "that will be used as a template to apply a cosmetic correction process to the " +
-      "calibrated frames. Cosmetic correction will be applied just after calibration, " +
-      "before deBayering (when appropriate) and registration.</p>";
+   var templateIconIdToolTip = "<p>标记一个现有的瑕疵校准图标作为模板，" +
+      "从而可以将一个瑕疵校正程序应用到校准帧集合。" +
+      "瑕疵校准将在正常的校准程序之后，反拜尔(deBayering，当需要时)和对齐之前执行。</p>";
 
    this.templateIconIdLabel = new Label( this );
    this.templateIconIdLabel.text = "模板图标:";
@@ -1009,7 +1006,7 @@ function DeBayerControl( parent )
    this.bayerPatternLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
    this.bayerPatternComboBox = new ComboBox( this );
-   this.bayerPatternComboBox.addItem( "Auto" );
+   this.bayerPatternComboBox.addItem( "自动" );
    this.bayerPatternComboBox.addItem( "RGGB" );
    this.bayerPatternComboBox.addItem( "BGGR" );
    this.bayerPatternComboBox.addItem( "GBRG" );
@@ -1036,8 +1033,8 @@ function DeBayerControl( parent )
    this.debayerMethodLabel.textAlignment = TextAlign_Right|TextAlign_VertCenter;
 
    this.debayerMethodComboBox = new ComboBox( this );
-   this.debayerMethodComboBox.addItem( "SuperPixel" );
-   this.debayerMethodComboBox.addItem( "Bilinear" );
+   this.debayerMethodComboBox.addItem( "超级像素(SuperPixel)" );
+   this.debayerMethodComboBox.addItem( "双线性(Bilinear)" );
    this.debayerMethodComboBox.addItem( "VNG" );
    this.debayerMethodComboBox.onItemSelected = function( itemIndex )
    {
@@ -1080,13 +1077,13 @@ function ImageRegistrationControl( parent, expand )
    this.pixelInterpolationComboBox.addItem( "近邻法(Nearest Neighbor)" );
    this.pixelInterpolationComboBox.addItem( "双线性法(Bilinear)" );
    this.pixelInterpolationComboBox.addItem( "双三次样条法(Bicubic Spline)" );
-   this.pixelInterpolationComboBox.addItem( "双三次b样条法(Bicubic B-Spline)" );
+   this.pixelInterpolationComboBox.addItem( "双三次B样条法(Bicubic B-Spline)" );
    this.pixelInterpolationComboBox.addItem( "Lanczos-3" );
    this.pixelInterpolationComboBox.addItem( "Lanczos-4" );
    this.pixelInterpolationComboBox.addItem( "Lanczos-5" );
    this.pixelInterpolationComboBox.addItem( "Mitchell-Netravali Filter" );
    this.pixelInterpolationComboBox.addItem( "Catmul-Rom Spline Filter" );
-   this.pixelInterpolationComboBox.addItem( "三次b样条过滤(Cubic B-Spline Filter)" );
+   this.pixelInterpolationComboBox.addItem( "三次B样条过滤(Cubic B-Spline Filter)" );
    this.pixelInterpolationComboBox.addItem( "自动" );
    this.pixelInterpolationComboBox.currentItem = engine.pixelInterpolation;
    this.pixelInterpolationComboBox.onItemSelected = function( item )
@@ -1110,7 +1107,7 @@ function ImageRegistrationControl( parent, expand )
    this.clampingThresholdControl.setPrecision( 2 );
    this.clampingThresholdControl.setValue( engine.clampingThreshold );
    this.clampingThresholdControl.edit.setFixedWidth( this.dialog.numericEditWidth );
-   this.clampingThresholdControl.toolTip = "<p>Clamping threshold for the bicubic spline and Lanczos interpolation algorithms.</p>";
+   this.clampingThresholdControl.toolTip = "<p>双三次样条的Clamping阈值和Lanczos插值算法。</p>";
    this.clampingThresholdControl.onValueUpdated = function( value )
    {
       engine.clampingThreshold = value;
@@ -1127,12 +1124,11 @@ function ImageRegistrationControl( parent, expand )
    this.maxStarsSpinBox.minValue = 0; // <Auto>
    this.maxStarsSpinBox.maxValue = 262144;
    this.maxStarsSpinBox.minimumValueText = "<Auto>";
-   this.maxStarsSpinBox.toolTip = "<p>Maximum number of stars allowed for image registration.</p>" +
-      "<p>By default, the BatchPreprocessing script limits the StarAlignment process to the 500 brightest stars in each image. " +
-      "This is normally sufficient to achieve an accurate alignment for similar images without differential distortions.</p>" +
-      "<p>If your images suffer from field distortions and the data set includes significantly displaced or rotated frames, such " +
-      "as frames affected by meridian flips for example, then you should enable the distortion correction option. In such case this " +
-      "parameter will be ignored and the StarAlignment tool will select the required stars automatically.</p>";
+   this.maxStarsSpinBox.toolTip = "<p>图像对齐所允许的最大星点数。</p>" +
+      "<p>默认情况下，BatchPreprocessing脚本将StarAlignment进程限制为每个图像中500个最亮的星点。" +
+      "通常，这足以在没有差异失真的情况下为相似图像实现精确对齐。</p>" +
+      "<p>如果图像遭受场失真，并且数据集包含明显移位或旋转的帧，例如受中天翻转影响的帧，" +
+      "则应启用失真校正选项。 在这种情况下，此参数将被忽略，StarAlignment工具将自动选择所需的星点。</p>";
    this.maxStarsSpinBox.onValueUpdated = function( value )
    {
       engine.maxStars = value;
@@ -1148,14 +1144,11 @@ function ImageRegistrationControl( parent, expand )
 
    this.distortionCorrectionCheckBox = new CheckBox( this );
    this.distortionCorrectionCheckBox.text = "变形校准";
-   this.distortionCorrectionCheckBox.toolTip = "<p>Check this option to enable StarAlignment's arbitrary distortion correction " +
-      "algorithms.</p>" +
-      "<p>This feature is required to correct for nonlinear distorions such as barrel, pincushion and lateral chromatic aberration, " +
-      "as well as correction of differential field curvature and optical distortions, which arise frequently with mosaics and " +
-      "frames significantly displaced or rotated (e.g., frames subject to meridian flips).</p>" +
-      "<p>Distortion correction requires the use of thin plate splines and a large number of PSF star fits, so it can be " +
-      "significantly slower than normal registration with projective transformations. For difficult cases where you need more " +
-      "control, check the <i>calibrate only</i> option and align your images manually after calibration.</p>";
+   this.distortionCorrectionCheckBox.toolTip = "<p>选中此选项以启用StarAlignment的失真校正算法。</p>" +
+      "<p>需要此功能来校正诸如桶形、枕形和横向色差之类的非线性畸变，以及校正场差曲率和光学畸变，" +
+      "这些畸变通常出现在马赛克和显著移位或旋转的帧中（例如，中天翻转的帧）。</p>" +
+      "<p>畸变校正需要使用薄板样条(TPS，Thin Plate Splines)和大量的PSF星点配合，因此，与投射变换相比，" +
+      "它可能比正常对齐要慢得多。对于需要更多控制的困难情况，请选中<i>仅校准</i>选项，并在校准后手动对齐图像。</p>";
    this.distortionCorrectionCheckBox.__parentControl__ = this;
    this.distortionCorrectionCheckBox.onCheck = function( checked )
    {
@@ -1178,15 +1171,14 @@ function ImageRegistrationControl( parent, expand )
    this.noiseReductionFilterRadiusSpinBox = new SpinBox( this );
    this.noiseReductionFilterRadiusSpinBox.minValue = 0; // <Auto>
    this.noiseReductionFilterRadiusSpinBox.maxValue = 50;
-   this.noiseReductionFilterRadiusSpinBox.minimumValueText = "<Disabled>";
+   this.noiseReductionFilterRadiusSpinBox.minimumValueText = "<禁用>";
    this.noiseReductionFilterRadiusSpinBox.toolTip =
-      "<p>Size of the noise reduction filter.</p>" +
-      "<p>This is the radius in pixels of a Gaussian convolution filter applied to the working image used for " +
-      "calculation of star positions during the star detection phase. Use it only for very low SNR images, where " +
-      "the star detector cannot find reliable stars with default parameters. Be aware that noise reduction will " +
-      "modify star profiles and hence the way star positions are calculated. Under extreme low-SNR conditions, " +
-      "however, this is probably better than working with the actual data anyway.</p>" +
-      "<p>To disable noise reduction, set this parameter to zero.</p>";
+      "<p>降噪过滤器的大小。</p>" +
+      "<p>这是在恒星检测阶段，用于计算恒星位置的图像，其高斯卷积滤波器的半径（以像素为单位）。" +
+      "仅将其用于非常低的SNR图像，在该图像中，恒星检测器无法找到具有默认参数的可靠恒星。请注意，" +
+      "降噪会改变恒星轮廓，因此会改变恒星位置的计算方式。但是，在极低的SNR条件下，" +
+      "这可能总比处理实际数据要好。</p>" +
+      "<p>要禁用降噪，请将此参数设置为零。</p>";
    this.noiseReductionFilterRadiusSpinBox.onValueUpdated = function( value )
    {
       engine.noiseReductionFilterRadius = value;
@@ -1202,12 +1194,11 @@ function ImageRegistrationControl( parent, expand )
 
    this.useTriangleSimilarityCheckBox = new CheckBox( this );
    this.useTriangleSimilarityCheckBox.text = "使用三角形相似度";
-   this.useTriangleSimilarityCheckBox.toolTip = "<p>If this option is checked, the image registration process will use " +
-      "triangle similarity instead of polygonal descriptors for the star matching routine.</p>" +
-      "<p>Polygonal descriptors are more robust and accurate, but cannot register images subject to specular transformations " +
-      "(horizontal and vertical mirror). Triangle similarity works well under normal conditions and is able to register " +
-      "mirrored images, so it is the default option in the BatchPreprocessing script. If you need more control on image " +
-      "registration parameters, check the <i>calibrate only</i> option and align your images manually after calibration.</p>";
+   this.useTriangleSimilarityCheckBox.toolTip = "<p>如果选中此选项，则图像对齐过程将在星点匹配程序中，" +
+      "使用三角形相似度而不是多边形描述符来进行匹配。</p>" +
+      "<p>多边形描述符更健壮和准确，但无法对齐要进行镜面变换（水平和垂直镜）的图像。" +
+      "三角形相似度在正常情况下效果很好，并且能够对齐镜像图像，因此它是BatchPreprocessing脚本中的默认选项。" +
+      "如果您需要对图像对齐参数进行更多控制，请选中<i>仅校准</i>选项，并在校准后手动对齐图像。</p>";
    this.useTriangleSimilarityCheckBox.onCheck = function( checked )
    {
       engine.useTriangleSimilarity = checked;
@@ -1253,7 +1244,7 @@ function LightsIntegrationControl( parent )
 
    this.applyCheckBox = new CheckBox( this );
    this.applyCheckBox.text = "启用";
-   this.applyCheckBox.toolTip = "<p>Integrate light frames after image registration.</p>";
+   this.applyCheckBox.toolTip = "<p>在图像对齐后进行亮场帧的堆叠。</p>";
    this.applyCheckBox.onCheck = function( checked )
    {
       engine.integrate = checked;
@@ -1271,7 +1262,7 @@ function LightsIntegrationControl( parent )
    this.editButton = new PushButton( this );
    this.editButton.text = "堆叠参数...";
    this.editButton.icon = this.scaledResource( ":/icons/arrow-right.png" );
-   this.editButton.toolTip = "<p>Edit image integration parameters.</p>";
+   this.editButton.toolTip = "<p>编辑图像堆叠参数。</p>";
    this.editButton.onClick = function()
    {
       var lightsPage = this.dialog.tabBox.pageControlByIndex( ImageType.LIGHT );
@@ -1308,9 +1299,9 @@ function LightsRegistrationControl( parent )
 
    this.generateDrizzleDataCheckBox = new CheckBox( this );
    this.generateDrizzleDataCheckBox.text = "生成Drizzle数据";
-   this.generateDrizzleDataCheckBox.toolTip = "<p>Generate .xdrz files in the image registration task. " +
-         "These files can later be used with the ImageIntegration and DrizzleIntegration tools to " +
-         "perform a drizzle integration process.</p>";
+   this.generateDrizzleDataCheckBox.toolTip = "<p>在图像对齐任务中生成.xdrz文件。" +
+         "这个文件能够让你在后面使用ImageIntegration和DrizzleIntegration工具时，" +
+         "执行一个Drizzle堆叠程序。</p>";
    this.generateDrizzleDataCheckBox.onCheck = function( checked )
    {
       engine.generateDrizzleData = checked;
@@ -1328,7 +1319,7 @@ function LightsRegistrationControl( parent )
    this.editButton = new PushButton( this );
    this.editButton.text = "对齐参数...";
    this.editButton.icon = this.scaledResource( ":/icons/arrow-right.png" );
-   this.editButton.toolTip = "<p>Edit image registration parameters.</p>";
+   this.editButton.toolTip = "<p>编辑图像对齐参数。</p>";
    this.editButton.onClick = function()
    {
       var lightsPage = this.dialog.tabBox.pageControlByIndex( ImageType.LIGHT );
@@ -1374,7 +1365,7 @@ function FileControl( parent, imageType )
    this.clearButton = new PushButton( this );
    this.clearButton.text = "清除";
    this.clearButton.icon = this.scaledResource( ":/icons/clear.png" );
-   this.clearButton.toolTip = "<p>Clear the current list of input files.</p>";
+   this.clearButton.toolTip = "<p>清除当前列表中的所有文件。</p>";
    this.clearButton.onClick = function()
    {
       this.dialog.clearTab( this.dialog.tabBox.currentPageIndex );
@@ -1383,7 +1374,7 @@ function FileControl( parent, imageType )
    this.removeSelectedButton = new PushButton( this );
    this.removeSelectedButton.text = "移除选定项";
    this.removeSelectedButton.icon = this.scaledResource( ":/icons/clear.png" );
-   this.removeSelectedButton.toolTip = "<p>Remove selected items in the current list of input files.</p>";
+   this.removeSelectedButton.toolTip = "<p>移除当前列表中被选中的那些文件。</p>";
    this.removeSelectedButton.onClick = function()
    {
       var tree = this.dialog.tabBox.pageControlByIndex( this.dialog.tabBox.currentPageIndex ).treeBox;
@@ -1410,7 +1401,7 @@ function FileControl( parent, imageType )
    this.invertSelectionButton = new PushButton( this );
    this.invertSelectionButton.text = "反选";
    this.invertSelectionButton.icon = this.scaledResource( ":/icons/select-invert.png" );
-   this.invertSelectionButton.toolTip = "<p>Invert selected items in the current list of input files.</p>";
+   this.invertSelectionButton.toolTip = "<p>反选当前列表中的文件。</p>";
    this.invertSelectionButton.onClick = function()
    {
       function invertNodeSelection( node )
@@ -1466,12 +1457,9 @@ function FileControl( parent, imageType )
       this.darkOptimizationThresholdControl.slider.setRange( 0, 200 );
       //this.darkOptimizationThresholdControl.slider.scaledMinWidth = 200;
       this.darkOptimizationThresholdControl.setPrecision( 4 );
-      this.darkOptimizationThresholdControl.toolTip = "<p>Lower bound for the set of dark optimization pixels, " +
-         "measured in sigma units from the median.</p>" +
-         "<p>This parameter defines the set of dark frame pixels that will be used to compute dark optimization " +
-         "factors adaptively. By restricting this set to relatively bright pixels, the optimization process can " +
-         "be more robust to readout noise present in the master bias and dark frames. Increase this parameter to " +
-         "remove more dark pixels from the optimization set.</p>";
+      this.darkOptimizationThresholdControl.toolTip = "<p>暗场优化像素集的下限，以中位数的标准差单位计量。</p>" +
+         "<p>此参数定义了一组暗场帧像素，这些像素将用于自适应地计算暗场优化因子。通过将此设置限制为相对较亮的像素，" +
+         "优化过程可以更健壮，以读出存在于主偏置和暗场帧中的噪声。增大此参数可从优化集中删除更多暗像素。</p>";
       this.darkOptimizationThresholdControl.onValueUpdated = function( value )
       {
          engine.darkOptimizationLow = value;
@@ -1492,15 +1480,11 @@ function FileControl( parent, imageType )
       this.darkOptimizationWindowSpinBox.minValue = 0;
       this.darkOptimizationWindowSpinBox.maxValue = 65536;
       this.darkOptimizationWindowSpinBox.setFixedWidth( this.dialog.numericEditWidth + this.logicalPixelsToPhysical( 16 ) );
-      this.darkOptimizationWindowSpinBox.toolTip = "<p>This parameter is the size in pixels of a square region " +
-         "used to compute noise estimates during the dark optimization procedure. The square region is centered " +
-         "on each target image. By default, a <i>window</i> of one megapixel (1024x1024 pixels) is used.</p>" +
-         "<p>By using a reduced subset of pixels, the dark optimization process can be much faster, and noise " +
-         "evaluation on a reduced region is in general as accurate as noise evaluation on the whole image, for " +
-         "dark frame scaling purposes.</p>" +
-         "<p>To disable this feature, and hence to use the whole image to compute noise estimates, select a " +
-         "zero window size. If the selected window size is larger than the dimensions of the target image, then " +
-         "it will be ignored and the whole image will be used for noise evaluation.</p>";
+      this.darkOptimizationWindowSpinBox.toolTip = "<p>此参数是暗场优化过程中，用于计算噪声估计的正方形区域的大小（以像素为单位）。" +
+         "正方形区域以每个目标图像为中心。默认情况下，使用的<i>窗口</i>为一百万像素（1024x1024像素）。</p>" +
+         "<p>通过使用减少的像素子集，暗场优化过程可以更快，并且出于暗帧缩放的目的，对缩小区域的噪声评估通常与对整个图像的噪声评估一样准确。</p>" +
+         "<p>要禁用此功能，从而使用整个图像来计算噪声评估，请选择零窗口大小。 如果选择的窗口尺寸大于目标图像的尺寸，则此功能也会被忽略，" +
+         "并将整个图像用于噪声评估。</p>";
       this.darkOptimizationWindowSpinBox.onValueUpdated = function( value )
       {
          engine.darkOptimizationWindow = value;
@@ -1527,8 +1511,7 @@ function FileControl( parent, imageType )
       this.darkExposureToleranceSpinBox.minValue = 0;
       this.darkExposureToleranceSpinBox.maxValue = 600;
       this.darkExposureToleranceSpinBox.setFixedWidth( this.dialog.numericEditWidth + this.logicalPixelsToPhysical( 16 ) );
-      this.darkExposureToleranceSpinBox.toolTip = "<p>Dark frames with exposure times differing less than this value " +
-         "(in seconds) will be grouped together.</p>";
+      this.darkExposureToleranceSpinBox.toolTip = "<p>曝光时间差异小于此值（以秒为单位）的暗帧将被分组在一起。</p>";
       this.darkExposureToleranceSpinBox.onValueUpdated = function( value )
       {
          engine.darkExposureTolerance = value;
@@ -1558,9 +1541,8 @@ function FileControl( parent, imageType )
       this.flatDarksOnlyCheckBox = new CheckBox( this );
       this.flatDarksOnlyCheckBox.checked = engine.flatDarksOnly;
       this.flatDarksOnlyCheckBox.text = "只使用暗平场校准";
-      this.flatDarksOnlyCheckBox.toolTip = "<p>Perform calibration of flat frames only if darks with the same " +
-        "duration (flat darks) are provided. Useful when scaling darks of significantly different duration is " +
-        "not reliable because of the presence of non-negligible residuals, such as ampglow.</p>";
+      this.flatDarksOnlyCheckBox.toolTip = "<p>仅在提供相同曝光时间的暗场（暗平场）时，才执行平场帧校准。" +
+      "由于存在不可忽略的残留物（例如辉光），如果用于校准曝光时间明显不同的暗场时，则结果会非常的不可靠。</p>";
       this.flatDarksOnlyCheckBox.onCheck = function( checked )
       {
          engine.flatDarksOnly = checked;
@@ -1586,7 +1568,7 @@ function FileControl( parent, imageType )
 
       this.calibrateOnlyCheckBox = new CheckBox( this );
       this.calibrateOnlyCheckBox.text = "仅校准";
-      this.calibrateOnlyCheckBox.toolTip = "<p>Calibrate only - Do not perform the image registration and integration tasks.</p>";
+      this.calibrateOnlyCheckBox.toolTip = "<p>仅校准 —— 不执行图像对齐和堆叠任务。</p>";
       this.calibrateOnlyCheckBox.onCheck = function( checked )
       {
          engine.calibrateOnly = checked;
@@ -1696,7 +1678,7 @@ function ResetDialog()
    this.adjustToContents();
    this.setFixedSize();
 
-   this.windowTitle = "Reset Preprocessing Engine";
+   this.windowTitle = "重置预处理引擎";
 }
 
 ResetDialog.prototype = new Dialog;
@@ -1714,7 +1696,7 @@ function SelectCustomFilesDialog()
    this.exposureTime = 0;
    this.files = new Array;
 
-   var labelWidth1 = this.font.width( "Exposure time (s):" + "M" );
+   var labelWidth1 = this.font.width( "曝光时间(秒):" + "M" );
 
    //
 
@@ -1729,12 +1711,12 @@ function SelectCustomFilesDialog()
    this.addButton = new PushButton( this );
    this.addButton.text = "添加文件";
    this.addButton.icon = this.scaledResource( ":/icons/add.png" );
-   this.addButton.toolTip = "<p>Add files to the input files list.</p>";
+   this.addButton.toolTip = "<p>添加文件到文件列表中。</p>";
    this.addButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = true;
-      ofd.caption = "Select Images";
+      ofd.caption = "选择图像";
       ofd.loadImageFilters();
       if ( ofd.execute() )
       {
@@ -1763,7 +1745,7 @@ function SelectCustomFilesDialog()
 
    //
 
-   var imageTypeToolTip = "<p>Frame type. Select '?' to determine frame types automatically.</p>";
+   var imageTypeToolTip = "<p>帧类型。可以选择'?'，程序会尝试自动判断帧类型。</p>";
 
    this.imageTypeLabel = new Label( this );
    this.imageTypeLabel.text = "图像类型:";
@@ -1791,7 +1773,7 @@ function SelectCustomFilesDialog()
 
    //
 
-   var filterToolTip = "<p>Filter name. Specify a single question mark '?' to determine filters automatically.</p>";
+   var filterToolTip = "<p>滤镜名称。可以选择'?'，程序会尝试自动判断是什么滤镜。</p>";
 
    this.filterLabel = new Label( this );
    this.filterLabel.text = "滤镜名称:";
@@ -1814,7 +1796,7 @@ function SelectCustomFilesDialog()
 
    //
 
-   var binningToolTip = "<p>Pixel binning. Specify zero to determine binnings automatically.</p>";
+   var binningToolTip = "<p>像素合并。选择0时，程序会尝试自动判断像素合并的值。</p>";
 
    this.binningLabel = new Label( this );
    this.binningLabel.text = "像素合并:";
@@ -1846,7 +1828,7 @@ function SelectCustomFilesDialog()
    this.exposureTimeEdit.setRange( 0, 999999 );
    this.exposureTimeEdit.setPrecision( 2 );
    this.exposureTimeEdit.setValue( this.exposureTime );
-   this.exposureTimeEdit.toolTip = "<p>Exposure time in seconds. Specify zero to determine exposure times automatically.</p>";
+   this.exposureTimeEdit.toolTip = "<p>曝光时间，单位：秒。选择0，程序会尝试自动判断曝光时间。</p>";
    this.exposureTimeEdit.sizer.addStretch();
    this.exposureTimeEdit.onValueUpdated = function( value )
    {
@@ -1919,7 +1901,7 @@ function StackDialog()
    this.__base__ = Dialog;
    this.__base__();
 
-   this.labelWidth1 = this.font.width( "Bayer/mosaic pattern:" + "M" );
+   this.labelWidth1 = this.font.width( "拜尔/马赛克模式:" + "M" );
    this.textEditWidth = 25 * this.font.width( "M" );
    this.numericEditWidth = 6 * this.font.width( "0" );
    this.suffixEditWidth = 10 * this.font.width( "M" );
@@ -1948,14 +1930,14 @@ function StackDialog()
    this.helpButton.icon = this.scaledResource( ":/icons/comment.png" );
    this.helpButton.setScaledFixedSize( 20, 20 );
    this.helpButton.toolTip =
-     "<p><b>1.</b> Select the Bias tab and load either raw bias frames or a master bias (check <i>Use master bias</i> if so).</p>"
-   + "<p><b>2.</b> Select the Darks tab and repeat the process in step 1.</p>"
-   + "<p><b>3.</b> Select the Flats tab and again repeat the process in step 1. Load flats for all the filters you will load in Lights.</p>"
-   + "<p><b>4.</b> Select the Lights tab and load all the light frames you wish (you can load all filters in a single operation).</p>"
-   + "<p><b>5.</b> Select a light frame as the <i>registration reference</i>. You can select it by simply double-clicking on the list.</p>"
-   + "<p><b>6.</b> Select an output directory.</p>"
-   + "<p><b>7.</b> Click Run and now go get a cup of coffee or a glass of wine.</p>"
-   + "<p><b>8.</b> The script will output the calibrated and registered light frames on the output directory, in subfolders for each filter.</p>";
+     "<p><b>1.</b> 选择偏置场标签，然后添加原始的偏置场，或者添加处理好的主偏置场(需要选中<i>“使用主偏置场”</i>)。</p>"
+   + "<p><b>2.</b> 选择暗场标签，然后重复上面第一步的操作。</p>"
+   + "<p><b>3.</b> 选择平场标签，然后再一次重复上面第一步的操作。如果你的亮场使用了滤镜拍摄，则需要将对应滤镜的平场都添加进来。</p>"
+   + "<p><b>4.</b> 选择亮场标签，然后将所有亮场帧都添加进来（你可以把所有通道的滤镜亮场一次性添加进来）。</p>"
+   + "<p><b>5.</b> 选择一个亮场帧作为<i>对齐参考帧</i>。你只需要在亮场列表中双击你选中用做参考的亮场帧就可以完成这个操作。</p>"
+   + "<p><b>6.</b> 选择一个输出文件夹(用来保存处理成果)。</p>"
+   + "<p><b>7.</b> 点击“运行”，然后去喝杯咖啡，或者找个妹子勾搭一会儿。</p>"
+   + "<p><b>8.</b> 本脚本将会把校准的和对齐的亮场帧都保存到输出文件夹中。如果图像使用了滤镜拍摄，则不同滤镜会分别保存在相应的子文件夹中。</p>";
 
    //
 
@@ -1986,7 +1968,7 @@ function StackDialog()
    this.newInstanceButton = new ToolButton( this );
    this.newInstanceButton.icon = this.scaledResource( ":/process-interface/new-instance.png" );
    this.newInstanceButton.setScaledFixedSize( 24, 24 );
-   this.newInstanceButton.toolTip = "New Instance";
+   this.newInstanceButton.toolTip = "新实例";
    this.newInstanceButton.onMousePress = function()
    {
       this.hasFocus = true;
@@ -2000,13 +1982,13 @@ function StackDialog()
    this.fileAddButton = new PushButton( this );
    this.fileAddButton.text = "添加文件";
    this.fileAddButton.icon = this.scaledResource( ":/icons/add.png" );
-   this.fileAddButton.toolTip = "<p>Add files to the input files list.</p>" +
-         "<p>Image types will be selected automatically based on XISF image properties and/or FITS keywords.</p>";
+   this.fileAddButton.toolTip = "<p>添加文件到文件列表。</p>" +
+         "<p>文件类型会根据XISF图像属性或者FITS关键字自动选择。</p>";
    this.fileAddButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = true;
-      ofd.caption = "Select Images";
+      ofd.caption = "选择图像";
       ofd.loadImageFilters();
       if ( ofd.execute() )
       {
@@ -2028,13 +2010,13 @@ function StackDialog()
    this.biasAddButton = new PushButton( this );
    this.biasAddButton.text = "添加偏置场";
    this.biasAddButton.icon = this.scaledResource( ":/icons/add.png" );
-   this.biasAddButton.toolTip = "<p>Add files to the input bias frames list.</p>" +
-         "<p>Files will be added as bias frames unconditionally - no keyword checks will be performed.</p>";
+   this.biasAddButton.toolTip = "<p>添加文件到偏置场列表。</p>" +
+         "<p>文件将会被无条件的加入到偏置场列表中 —— 不会进行FITS关键字检查。</p>";
    this.biasAddButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = true;
-      ofd.caption = "Select Bias Frames";
+      ofd.caption = "选择偏置帧";
       ofd.loadImageFilters();
       if ( ofd.execute() )
       {
@@ -2057,13 +2039,13 @@ function StackDialog()
    this.darkAddButton = new PushButton( this );
    this.darkAddButton.text = "添加暗场";
    this.darkAddButton.icon = this.scaledResource( ":/icons/add.png" );
-   this.darkAddButton.toolTip = "<p>Add files to the input dark frames list.</p>" +
-         "<p>Files will be added as dark frames unconditionally - no keyword checks will be performed.</p>";
+   this.darkAddButton.toolTip = "<p>添加文件到暗场列表。</p>" +
+         "<p>文件将会被无条件的加入到暗场列表中 —— 不会进行FITS关键字检查。</p>";
    this.darkAddButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = true;
-      ofd.caption = "Select Dark Frames";
+      ofd.caption = "选择暗场帧";
       ofd.loadImageFilters();
       if ( ofd.execute() )
       {
@@ -2086,13 +2068,13 @@ function StackDialog()
    this.flatAddButton = new PushButton( this );
    this.flatAddButton.text = "添加平场";
    this.flatAddButton.icon = this.scaledResource( ":/icons/add.png" );
-   this.flatAddButton.toolTip = "<p>Add files to the input flat frames list.</p>" +
-         "<p>Files will be added as flat frames unconditionally - no keyword checks will be performed.</p>";
+   this.flatAddButton.toolTip = "<p>添加文件到平场列表。</p>" +
+         "<p>文件将会被无条件的加入到平场列表中 —— 不会进行FITS关键字检查。</p>";
    this.flatAddButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = true;
-      ofd.caption = "Select Flat Frames";
+      ofd.caption = "选择平场帧";
       ofd.loadImageFilters();
       if ( ofd.execute() )
       {
@@ -2115,13 +2097,13 @@ function StackDialog()
    this.lightAddButton = new PushButton( this );
    this.lightAddButton.text = "添加亮场";
    this.lightAddButton.icon = this.scaledResource( ":/icons/add.png" );
-   this.lightAddButton.toolTip = "<p>Add files to the input light frames list.</p>" +
-         "<p>Files will be added as light frames unconditionally - no keyword checks will be performed.</p>";
+   this.lightAddButton.toolTip = "<p>添加文件到亮场列表。</p>" +
+         "<p>文件将会被无条件的加入到亮场列表中 —— 不会进行FITS关键字检查。</p>";
    this.lightAddButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = true;
-      ofd.caption = "Select Light Frames";
+      ofd.caption = "选择亮场帧";
       ofd.loadImageFilters();
       if ( ofd.execute() )
       {
@@ -2144,7 +2126,7 @@ function StackDialog()
    this.customAddButton = new PushButton( this );
    this.customAddButton.text = "添加自定义";
    this.customAddButton.icon = this.scaledResource( ":/icons/document-edit.png" );
-   this.customAddButton.toolTip = "<p>Add custom files to the input custom frames list.</p>";
+   this.customAddButton.toolTip = "<p>添加自定义文件到自定义文件列表。<p>";
    this.customAddButton.onClick = function()
    {
       var d = new SelectCustomFilesDialog;
@@ -2171,7 +2153,7 @@ function StackDialog()
    this.resetButton = new PushButton( this );
    this.resetButton.text = "重置";
    this.resetButton.icon = this.scaledResource( ":/icons/reload.png" );
-   this.resetButton.toolTip = "<p>Perform optional reset and clearing actions.</p>";
+   this.resetButton.toolTip = "<p>执行选项重置并清除所有动作。</p>";
    this.resetButton.onClick = function()
    {
       var d = new ResetDialog;
@@ -2193,7 +2175,7 @@ function StackDialog()
    this.diagnosticsButton.defaultButton = true;
    this.diagnosticsButton.text = "诊断";
    this.diagnosticsButton.icon = this.scaledResource( ":/icons/gear.png" );
-   this.diagnosticsButton.toolTip = "<p>Check validity of selected files and processes.</p>";
+   this.diagnosticsButton.toolTip = "<p>检查选择的文件和处理程序是否有效。</p>";
    this.diagnosticsButton.onClick = function()
    {
       engine.runDiagnostics();
@@ -2203,7 +2185,7 @@ function StackDialog()
          engine.clearDiagnosticMessages();
       }
       else
-         (new MessageBox( "Diagnostics completed OK.", TITLE + " v" + VERSION, StdIcon_Information, StdButton_Ok )).execute();
+         (new MessageBox( "诊断完成。", TITLE + " v" + VERSION, StdIcon_Information, StdButton_Ok )).execute();
    };
 
    //
@@ -2228,10 +2210,8 @@ function StackDialog()
 
    this.cfaImagesCheckBox = new CheckBox( this );
    this.cfaImagesCheckBox.text = "彩色图像";
-   this.cfaImagesCheckBox.toolTip = "<p>When checked, the Batch Preprocessing script works under the assumption that all " +
-      "input frames (calibration and light frames) have been mosaiced with a Color Filter Array (CFA) pattern, such as a " +
-      "Bayer pattern. When this option is enabled, an additional deBayering task will be performed prior to image " +
-      "registration using the <i>Bayer pattern</i> and <i>DeBayer method</i> parameters.</p>";
+   this.cfaImagesCheckBox.toolTip = "<p>选中该复选框后，批量预处理脚本会将所有输入帧（校准帧和亮场帧）当做彩色图像进行处理。" +
+      "启用此选项后，将使用<i>Bayer模式</i>和<i> DeBayer方法</i>在图像对齐之前执行额外的DeBayering任务。</p>";
    this.cfaImagesCheckBox.onCheck = function( checked )
    {
       engine.cfaImages = checked;
@@ -2242,9 +2222,8 @@ function StackDialog()
 
    this.optimizeDarksCheckBox = new CheckBox( this );
    this.optimizeDarksCheckBox.text = "优化暗场帧";
-   this.optimizeDarksCheckBox.toolTip = "<p>Enable this option to apply <i>dark frame optimization</i> during calibration " +
-      "of flat and light frames.</p>" +
-      "<p>The dark frame optimization routine computes dark scaling factors to minimize the noise induced by dark subtraction.</p>";
+   this.optimizeDarksCheckBox.toolTip = "<p>启用此选项可在平场和亮场校准期间应用<i>暗场优化</i>。</p>" +
+      "<p>暗场优化程序会计算暗缩放比例因子，以最大程度地减少由暗减法引起的噪声。</p>";
    this.optimizeDarksCheckBox.onCheck = function( checked )
    {
       engine.optimizeDarks = checked;
@@ -2254,10 +2233,9 @@ function StackDialog()
    //
 
    this.generateRejectionMapsCheckBox = new CheckBox( this );
-   this.generateRejectionMapsCheckBox.text = "生成排斥图"
-   this.generateRejectionMapsCheckBox.toolTip = "<p>Generate rejection map images during integration of bias, dark, flat and " +
-      "light frames.</p>" +
-      "<p>Rejection maps are stored as multiple-image XISF files.</p>";
+   this.generateRejectionMapsCheckBox.text = "生成排异图"
+   this.generateRejectionMapsCheckBox.toolTip = "<p>在对偏置、暗场，平场和亮场帧进行堆叠时生成排异图图像。</p>" +
+      "<p>排异图会被存储为多图像XISF文件。</p>";
    this.generateRejectionMapsCheckBox.onCheck = function( checked )
    {
       engine.generateRejectionMaps = checked;
@@ -2279,8 +2257,7 @@ function StackDialog()
 
     this.saveProcessLogCheckBox = new CheckBox( this );
     this.saveProcessLogCheckBox.text = "保存处理日志";
-    this.saveProcessLogCheckBox.toolTip = "<p>When checked, the log of the process will be saved as a plain text file on the " +
-      "output directory tree.</p>";
+    this.saveProcessLogCheckBox.toolTip = "<p>选中后，该过程的日志将作为纯文本文件保存在输出文件夹中。</p>";
     this.saveProcessLogCheckBox.onCheck = function( checked )
     {
         engine.saveProcessLog = checked;
@@ -2290,12 +2267,9 @@ function StackDialog()
 
    this.upBottomFITSCheckBox = new CheckBox( this );
    this.upBottomFITSCheckBox.text = "顶-底FITS";
-   this.upBottomFITSCheckBox.toolTip = "<p>If this option is enabled, the Batch Preprocessing script assumes that all input " +
-      "FITS files follow the \'top-left\' coordinate convention: the origin of coordinates is at the top left corner of the " +
-      "image, and vertical coordinates grow from top to bottom. This is the convention used by most amateur camera control " +
-      "applications.</p>" +
-      "<p>If this option is disabled, the \'professional\' convention is assumed: the coordinate origin is at the " +
-      "bottom left corner and vertical coordinates grow from bottom to top.</p>";
+   this.upBottomFITSCheckBox.toolTip = "<p>如果启用此选项，则“批预处理”脚本将假定所有输入的FITS文件都遵循“左上”坐标惯例：" +
+      "坐标的原点位于图像的左上角，垂直坐标从上到下递增。 这是大多数业余摄像机控制应用程序使用的约定。</p>" +
+      "<p>如果禁用此选项，则采用“专业”惯例：坐标原点在左下角，垂直坐标从下到上增长。</p>";
    this.upBottomFITSCheckBox.onCheck = function( checked )
    {
       engine.upBottomFITS = checked;
@@ -2305,7 +2279,7 @@ function StackDialog()
 
    this.useAsMasterBiasCheckBox = new CheckBox( this );
    this.useAsMasterBiasCheckBox.text = "使用主偏置场";
-   this.useAsMasterBiasCheckBox.toolTip = "<p>Use the first bias frame file as master bias.</p>";
+   this.useAsMasterBiasCheckBox.toolTip = "<p>将第一个偏置帧文件用作主偏置。</p>";
    this.useAsMasterBiasCheckBox.onCheck = function( checked )
    {
       engine.useAsMaster[ImageType.BIAS] = checked;
@@ -2317,7 +2291,7 @@ function StackDialog()
 
    this.useAsMasterDarkCheckBox = new CheckBox( this );
    this.useAsMasterDarkCheckBox.text = "使用主暗场";
-   this.useAsMasterDarkCheckBox.toolTip = "<p>Use the first dark frame file as master dark.</p>";
+   this.useAsMasterDarkCheckBox.toolTip = "<p>将第一个暗场帧文件用作主暗场。</p>";
    this.useAsMasterDarkCheckBox.onCheck = function( checked )
    {
       engine.useAsMaster[ImageType.DARK] = checked;
@@ -2329,7 +2303,7 @@ function StackDialog()
 
    this.useAsMasterFlatCheckBox = new CheckBox( this );
    this.useAsMasterFlatCheckBox.text = "使用主平场";
-   this.useAsMasterFlatCheckBox.toolTip = "<p>Use the first flat frame file as master flat.</p>";
+   this.useAsMasterFlatCheckBox.toolTip = "<p>将第一个平场帧文件用作主平场。</p>";
    this.useAsMasterFlatCheckBox.onCheck = function( checked )
    {
       engine.useAsMaster[ImageType.FLAT] = checked;
@@ -2369,9 +2343,8 @@ function StackDialog()
    this.referenceImageEdit = new Edit( this );
    this.referenceImageEdit.minWidth = this.textEditWidth;
    this.referenceImageEdit.text = engine.referenceImage;
-   this.referenceImageEdit.toolTip = "<p>Reference image for image registration.</p>" +
-      "<p>Along with selecting an existing disk file, you can double-click one of the light frames in " +
-      "the Lights list to select it as the registration reference image.</p>";
+   this.referenceImageEdit.toolTip = "<p>图像对齐的参考图像。</p>" +
+      "<p>除了选择现有的磁盘文件外，您还可以双击“亮场”列表中的一个亮场帧，将其选择为对齐参考图像。</p>";
    this.referenceImageEdit.onEditCompleted = function()
    {
       engine.referenceImage = this.text = File.windowsPathToUnix( this.text.trim() );
@@ -2380,12 +2353,12 @@ function StackDialog()
    this.referenceImageSelectButton = new ToolButton( this );
    this.referenceImageSelectButton.icon = this.scaledResource( ":/icons/select-file.png" );
    this.referenceImageSelectButton.setScaledFixedSize( 20, 20 );
-   this.referenceImageSelectButton.toolTip = "<p>Select the image registration reference image file.</p>";
+   this.referenceImageSelectButton.toolTip = "<p>选择图像对齐功能的参考图像文件。</p>";
    this.referenceImageSelectButton.onClick = function()
    {
       var ofd = new OpenFileDialog;
       ofd.multipleSelections = false;
-      ofd.caption = "Select Registration Reference Image";
+      ofd.caption = "选择对齐参考图像";
       ofd.loadImageFilters();
       var filters = ofd.filters;
       filters.push( ["Comma Separated Value (CSV) files", ".csv", ".txt"] );
@@ -2409,9 +2382,8 @@ function StackDialog()
    this.outputDirectoryEdit = new Edit( this );
    this.outputDirectoryEdit.minWidth = this.textEditWidth;
    this.outputDirectoryEdit.text = engine.outputDirectory;
-   this.outputDirectoryEdit.toolTip = "<p>Output root directory.</p>" +
-      "<p>The Batch Preprocessing script will generate all master, calibrated and registered images " +
-      "populating a directory tree rooted at the specified output directory.</p>";
+   this.outputDirectoryEdit.toolTip = "<p>输出根文件夹。</p>" +
+      "<p>批量预处理脚本会将产生的所有主帧、校准帧、对齐帧等图像全部存储到这个输出文件夹中。</p>";
    this.outputDirectoryEdit.onEditCompleted = function()
    {
       var dir = File.windowsPathToUnix( this.text.trim() );
@@ -2423,12 +2395,12 @@ function StackDialog()
    this.outputDirSelectButton = new ToolButton( this );
    this.outputDirSelectButton.icon = this.scaledResource( ":/icons/select-file.png" );
    this.outputDirSelectButton.setScaledFixedSize( 20, 20 );
-   this.outputDirSelectButton.toolTip = "<p>Select the output root directory.</p>";
+   this.outputDirSelectButton.toolTip = "<p>选择输出根文件夹。</p>";
    this.outputDirSelectButton.onClick = function()
    {
       var gdd = new GetDirectoryDialog;
       gdd.initialPath = engine.outputDirectory;
-      gdd.caption = "Select Output Directory";
+      gdd.caption = "选择输出文件夹";
       if ( gdd.execute() )
       {
          var dir = gdd.directory;
@@ -2443,7 +2415,7 @@ function StackDialog()
    this.outputDirSizer.addSpacing( 2 );
    this.outputDirSizer.add( this.outputDirSelectButton );
 
-   this.outputDirControl = new ParametersControl( "输出目录", this );
+   this.outputDirControl = new ParametersControl( "输出文件夹", this );
    this.outputDirControl.add( this.outputDirSizer );
 
    //
@@ -2589,7 +2561,7 @@ StackDialog.prototype.refreshTreeBoxes = function()
       var node = new TreeBoxNode;
       this.tabBox.pageControlByIndex( frameGroup.imageType ).treeBox.add( node );
       node.expanded = true;
-      node.setText( 0, "Binning " + frameGroup.binning.toString() );
+      node.setText( 0, "像素合并 " + frameGroup.binning.toString() );
       node.nodeData_type = "FrameGroup";
       node.nodeData_index = i;
       nodes.push( node );
@@ -2635,7 +2607,7 @@ StackDialog.prototype.refreshTreeBoxes = function()
 
          var toolTip = "<p style=\"white-space:pre;\">" + fileItem.filePath;
          if ( fileItem.exposureTime > 0.004999 )
-            toolTip += format( "<br/>Exposure: %.2f s", fileItem.exposureTime );
+            toolTip += format( "<br/>曝光时间: %.2f 秒", fileItem.exposureTime );
          toolTip += "</p>";
          node.setToolTip( 0, toolTip );
 

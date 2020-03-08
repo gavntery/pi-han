@@ -506,7 +506,7 @@ StackEngine.prototype.rejectionMethods = function()
    {
       methods.push(
       {
-         name: "Generalized Extreme Studentized Deviate",
+         name: "GESD(Generalized Extreme Studentized Deviate)",
          rejection: ImageIntegration.prototype.Rejection_ESD
       } );
    }
