@@ -515,38 +515,34 @@ function ImageIntegrationControl( parent, imageType, expand )
    };
 
    this.rejectionAlgorithmLabel.toolTip = this.rejectionAlgorithmComboBox.toolTip =
-      "<p><b>标准差排异(Sigma Clipping)</b>算法通常是合成10-15个以上图像的理想算法。" +
+      "<p><b>标准差剪切(Sigma Clipping)</b>算法通常是合成10-15个以上图像的理想算法。" +
       "记住，要想使用Sigma Clipping算法，预估的标准差散布情况必须很好，因此堆栈中的像素越多越好" +
       "(也就是图像越多越好)。</p>" +
-      "<p><b>Winsorized Sigma Clipping</b>算法与普通的Sigma Clipping算法类似。" +
+      "<p><b>Winsorized标准差剪切(Sigma Clipping)</b>算法与普通的Sigma Clipping算法类似。" +
       "但是它使用了一个特殊的迭代过程，这个迭代过程是基于Huber的使用<i>缩尾处理" +
       "(Winsorization)</i>的健壮性参数评估方法。该算法可以更好地保留离散值，" +
       "从而可以更好地保留大量图像的重要数据。</p>" +
-      "<p><b>Linear fit clipping</b> fits each pixel stack to a straigtht line. The linear fit is optimized " +
-      "in the twofold sense of minimizing average absolute deviation and maximizing inliers. This rejection " +
-      "algorithm is more robust than sigma clipping for large sets of images, especially in presence of " +
-      "additive sky gradients of varying intensity and spatial distribution. For the best performance, use " +
-      "this algorithm for large sets of at least 15 images. Five images is the minimum required.</p>" +
+      "<p><b>线性拟合剪切(Linear fit clipping)</b>将每个像素堆栈拟合到一条直线。线性拟合在" +
+      "最小化平均绝对偏差和最大化内联的双重意义上进行了优化。对于大型图像集，此排斥算法比标准差" +
+      "剪切(Sigma Clipping)算法更健壮，尤其是在存在强度和空间分布变化的附加天空渐变的情况下。" +
+      "为了获得最佳性能，请将此算法用于至少15张图像的大集合。最少需要五张图像。</p>" +
       (ImageIntegration.prototype.Rejection_ESD ?
-      "<p>The <b>Generalized Extreme Studentized Deviate (ESD) Test</b> rejection algorithm is an " +
-      "implementation of the method described by Bernard Rosner in his 1983 paper <i>Percentage " +
-      "Points for a Generalized ESD Many-Outlier procedure</i>, adapted to the image integration task. " +
-      "The ESD algorithm assumes that each pixel stack, ni absence of outliers, follows an approximately " +
-      "normal (Gaussian) distribution. It aims at avoiding <i>masking</i>, a serious issue that occurs when " +
-      "an outlier goes undetected because its value is similar to another outlier. The performance of this algorithm" +
-      "can be excellent for large data sets of 25 or more images, and especially for very large sets of " +
-      "50 or more frames. The minimum required is 3 images.</p>" : "") +
-      "<p><b>Percentile clipping</b> rejection is excellent to integrate reduced sets of images, such as " +
-      "3 to 6 images. This is a single-pass algorithm that rejects pixels outside a fixed range of values " +
-      "relative to the median of each pixel stack.</p>" +
-      "<p><b>Averaged iterative sigma clipping</b> is intended for sets of 10 or more images. This algorithm " +
-      "tries to derive the gain of an ideal CCD detector from existing pixel data, assuming zero readout noise, " +
-      "then uses a Poisson noise model to perform rejection. For large sets of images however, sigma clipping " +
-      "tends to be superior.</p>" +
-      "<p>The <b>min/max</b> method can be used to ensure rejection of extreme values. Min/max performs an " +
-      "unconditional rejection of a fixed number of pixels from each stack, without any statistical basis. " +
-      "Rejection methods based on robust statistics, such as percentile, Winsorized sigma clipping, linear " +
-      "fitting and averaged sigma clipping are in general preferable.</p>";
+      "<p><b>GESD(Generalized Extreme Studentized Deviate)测试</b>排斥算法是Bernard Rosner" +
+      "在1983年发表的论文<i>《Percentage Points for a Generalized ESD Many-Outlier Procedure》</i>" +
+      "中描述的一种算法，适用于图像堆叠任务。" +
+      "ESD算法假定在没有异常值的情况下，每个像素堆栈都遵循近似正态（高斯）分布。它旨在避免<i>掩盖</i>，当一个" +
+      "异常值因为与另一个异常值相似而未被检测到时，就会发生严重的问题。对于25个或更多图像的大型数据集，" +
+      "尤其是对于50个或更多帧的大型数据集，此算法的性能可能非常出色。最少需要3张图像。</p>" : "") +
+      "<p><b>百分比剪切(Percentile Clipping)</b>排斥算法非常适合堆叠较小的图像集合，例如3到6张图像。" +
+      "这是一种非迭代算法，相对于每个像素堆栈的中位数都有一个固定的范围值，" +
+      "这个算法可以将超出这个范围的异常像素排除在外。</p>" +
+      "<p><b>平均迭代标准差剪切(Averaged Iterative Sigma Clipping)</b>适用于10张或更多图像的集合。" +
+      "该算法尝试在假设读取噪声为零的情况下，从现有像素数据中得出理想CCD传感器的增益，然后使用泊松噪声模型进行抑制。" +
+      "但是，对于大量图像，标准差剪切(Sigma Clipping)可能是个更好的选择。</p>" +
+      "<p><b>最小值/最大值</b>方法可用于确保排除极值。最小值/最大值无条件地排除每个堆栈中固定数量的像素，" +
+      "而无需任何统计依据。基于可靠统计信息的排异算法通常都是很好的选择，例如百分比剪切(Percentile Clipping)、" +
+      "Winsorized标准差剪切(Sigma Clipping)、线性拟合剪切(Linear Fit Clipping)和平均迭代标准差剪切" +
+      "(Averaged Iterative Sigma Clipping)等。</p>";
 
    this.rejectionAlgorithmSizer = new HorizontalSizer;
    this.rejectionAlgorithmSizer.spacing = 4;
