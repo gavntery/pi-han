@@ -152,9 +152,9 @@ function FrameGroup( imageType, filter, binning, exposureTime, firstItem, master
          break;
       case ImageIntegration.prototype.Rejection_ESD:
          if ( n < 8 )
-            return [false, "ESD requires at least 15 images to provide reliable results; consider using percentile clipping"];
+            return [false, "ESD需要至少15张以上的图片才能提供最低限度的可靠结果；你可以考虑使用百分比剪切算法"];
          if ( n < 20 )
-            return [false, "ESD may not be better than Winsorized sigma clipping or Linear Fit clipping for sets of less than 20 images"];
+            return [false, "如果待处理的图像少于20张，使用Winsorized标准差剪切(Sigma Clipping)算法或者线性拟合剪切(Linear Fit Clipping)算法，可能会比使用ESD的效果更好。"];
       default: // ?!
          break;
       }
@@ -394,7 +394,7 @@ function DiagnosticInformationDialog( messages, cancelButton )
 
    this.okButton = new PushButton( this );
    this.okButton.defaultButton = true;
-   this.okButton.text = cancelButton ? "Continue" : "OK";
+   this.okButton.text = cancelButton ? "继续" : "确定";
    this.okButton.icon = this.scaledResource( ":/icons/ok.png" );
    this.okButton.onClick = function()
    {
@@ -405,7 +405,7 @@ function DiagnosticInformationDialog( messages, cancelButton )
    {
       this.cancelButton = new PushButton( this );
       this.cancelButton.defaultButton = true;
-      this.cancelButton.text = "Cancel";
+      this.cancelButton.text = "取消";
       this.cancelButton.icon = this.scaledResource( ":/icons/cancel.png" );
       this.cancelButton.onClick = function()
       {
@@ -433,7 +433,7 @@ function DiagnosticInformationDialog( messages, cancelButton )
    this.adjustToContents();
    this.setMinSize();
 
-   this.windowTitle = "Diagnostic Messages";
+   this.windowTitle = "诊断信息";
 }
 
 DiagnosticInformationDialog.prototype = new Dialog;
@@ -464,7 +464,7 @@ StackEngine.prototype.showDiagnosticMessages = function( cancelButton )
       return (new DiagnosticInformationDialog( this.diagnosticMessages, cancelButton )).execute();
    }
 
-   (new MessageBox( "There are no errors.", TITLE + " " + VERSION, StdIcon_Information, StdButton_Ok )).execute();
+   (new MessageBox( "一切看起来都很完美！", TITLE + " " + VERSION, StdIcon_Information, StdButton_Ok )).execute();
    return StdDialogCode_Ok;
 };
 
@@ -554,24 +554,20 @@ function IntegrationWarningDialog()
    this.infoLabel.wordWrapping = true;
    this.infoLabel.styleSheet = this.scaledStyleSheet( "QWidget { font-size: 10pt; }" );
    this.infoLabel.text =
-      "<p>You have selected to perform an integration of light frames with this script.</p>"
-   +  "<p>Please keep in mind that the light frames integration functionality of this script is just "
-   +  "a convenience feature, which we have included to let you take a quick look at the final "
-   +  "image. It will give you an idea of the achievable image, but in general, it will <i>not</i> "
-   +  "provide an optimal result. In most cases the integrated result of this script will be "
-   +  "rather poor, compared with the image that can be achieved by optimizing image integration "
-   +  "parameters.</p>"
-   +  "<p>Image integration is a critical task that requires fine-tuning. Our ImageIntegration tool "
-   +  "allows you to find optimal pixel rejection parameters to maximize signal-to-noise ratio with "
-   +  "the appropriate rejection of spurious image data. In general, this requires some trial-error "
-   +  "work that can't be done automatically from this script.</p>";
+      "<p>你现在选择使用本脚本来堆叠亮场帧。</p>"
+   +  "<p>请记住，本脚本中的亮场堆叠功能只是一个快餐式的功能，我们只是希望它能够帮您快速的预览一下最终图像的大致情况。"
+   +  "但是，它无法给你提供一个最佳的图像。大多数情况下，相较于可以进行细致的参数优化的独立图像堆叠脚本，本脚本中的堆叠"
+   +  "功能是非常简陋的。</p>"
+   +  "<p>图像堆叠是一个非常关键的任务，它需要非常细致的参数调优才能达到最佳的效果。"
+   +  "我们的图像堆叠工具能够让你找到最佳的像素排异参数，从而通过适当的排除掉一些伪数据，最大化的获得最佳的信噪比。"
+   +  "总之，要想出一张好图，还是需要一些试错工作的，而这些工作是无法通过本脚本自动完成的。</p>";
 
    this.noMoreCheckBox = new CheckBox( this );
-   this.noMoreCheckBox.text = "Got it, don't show this anymore.";
+   this.noMoreCheckBox.text = "我知道啦！表在烦我！";
 
    this.okButton = new PushButton( this );
    this.okButton.defaultButton = true;
-   this.okButton.text = "Continue";
+   this.okButton.text = "继续";
    this.okButton.icon = this.scaledResource( ":/icons/ok.png" );
    this.okButton.onClick = function()
    {
@@ -580,7 +576,7 @@ function IntegrationWarningDialog()
 
    this.cancelButton = new PushButton( this );
    this.cancelButton.defaultButton = true;
-   this.cancelButton.text = "Cancel";
+   this.cancelButton.text = "取消";
    this.cancelButton.icon = this.scaledResource( ":/icons/cancel.png" );
    this.cancelButton.onClick = function()
    {
@@ -604,7 +600,7 @@ function IntegrationWarningDialog()
    this.adjustToContents();
    this.setMinSize();
 
-   this.windowTitle = "Light Frames Integration Warning";
+   this.windowTitle = "亮场堆叠警告";
 }
 
 IntegrationWarningDialog.prototype = new Dialog;
@@ -643,15 +639,15 @@ StackEngine.prototype.checkFile = function( filePath )
    try
    {
       if ( filePath.isEmpty() )
-         throw new Error( "Empty file path" );
+         throw new Error( "文件路径为空" );
 
       if ( !File.exists( filePath ) )
-         throw new Error( "No such file: " + filePath );
+         throw new Error( "这个文件不存在: " + filePath );
 
       for ( var i = 0; i < this.frameGroups.length; ++i )
          for ( var j = 0; j < this.frameGroups[i].fileItems.length; ++j )
             if ( this.frameGroups[i].fileItems[j].filePath == filePath )
-               throw new Error( "File already selected: " + filePath );
+               throw new Error( "文件已经选择: " + filePath );
 
       return true;
    }
@@ -697,7 +693,7 @@ StackEngine.prototype.addFile = function( filePath, imageType, filter, binning, 
 
       var info = f.open( filePath, "verbosity 0" ); // do not fill the console with useless messages
       if ( info.length <= 0 )
-         throw new Error( "Unable to open input file: " + filePath );
+         throw new Error( "无法打开输入的文件: " + filePath );
 
       var keywords = [];
       if ( F.canStoreKeywords )
@@ -753,7 +749,7 @@ StackEngine.prototype.addFile = function( filePath, imageType, filter, binning, 
          imageType = ImageType.LIGHT;
       else
       {
-         this.diagnosticMessages.push( "Unable to determine frame type: " + filePath );
+         this.diagnosticMessages.push( "无法检测帧类型: " + filePath );
          return false;
       }
    }
