@@ -111,11 +111,11 @@ function FrameGroup( imageType, filter, binning, exposureTime, firstItem, master
       switch ( rejection )
       {
       case ImageIntegration.prototype.NoRejection:
-         return [false, "No pixel rejection algorithm has been selected"];
+         return [false, "没有选择像素排异算法"];
       case ImageIntegration.prototype.MinMax:
-         return [false, "Min/Max rejection should not be used for production work"];
+         return [false, "最小值/最大值排异算法不应用于正式的图像处理"];
       case ImageIntegration.prototype.CCDClip:
-         return [false, "CCD clipping rejection has been deprecated"];
+         return [false, "CCD剪切排异算法已经被弃用"];
       default:
          break;
       }
@@ -126,29 +126,29 @@ function FrameGroup( imageType, filter, binning, exposureTime, firstItem, master
       {
       case ImageIntegration.prototype.PercentileClip:
          if ( n > 8 )
-            return [false, "Percentile clipping should only be used for small sets of eight or less images"];
+            return [false, "百分比剪切算法应该用于处理少于8张图像文件的小集合"];
          break;
       case ImageIntegration.prototype.SigmaClip:
          if ( n < 8 )
-            return [false, "Sigma clipping requires at least 8 images to provide minimally reliable results; consider using percentile clipping"];
+            return [false, "标准差剪切(Sigma Clipping)算法需要至少8张以上的图片才能提供最低限度的可靠结果；你可以考虑使用百分比剪切算法"];
          if ( n > 15 )
-            return [false, "Winsorized sigma clipping will work better than sigma clipping for sets of 15 or more images"];
+            return [false, "如果待处理的图像超过15张，使用Winsorized标准差剪切(Sigma Clipping)算法会比常规的标准差剪切算法效果更好"];
          break;
       case ImageIntegration.prototype.WinsorizedSigmaClip:
          if ( n < 8 )
-            return [false, "Winsorized sigma clipping requires at least 8 images to provide minimally reliable results; consider using percentile clipping"];
+            return [false, "Winsorized标准差剪切(Sigma Clipping)算法需要至少8张以上的图片才能提供最低限度的可靠结果；你可以考虑使用百分比剪切算法"];
          break;
       case ImageIntegration.prototype.AveragedSigmaClip:
          if ( n < 8 )
-            return [false, "Averaged sigma clipping requires at least 8 images to provide minimally reliable results; consider using percentile clipping"];
+            return [false, "平均标准差剪切(Averaged Sigma Clipping)算法需要至少8张以上的图片才能提供最低限度的可靠结果；你可以考虑使用百分比剪切算法"];
          if ( n > 10 )
-            return [false, "Sigma clipping or Winsorized sigma clipping will work better than averaged sigma clipping for sets of 10 or more images"];
+            return [false, "如果待处理的图像超过10张，使用标准差剪切(Sigma Clipping)算法或者Winsorized标准差剪切(Sigma Clipping)算法，会比平均标准差剪切(Averaged Sigma Clipping)算法效果更好。"];
          break;
       case ImageIntegration.prototype.LinearFit:
          if ( n < 8 )
-            return [false, "Linear fit clipping requires at least 15 images to provide reliable results; consider using percentile clipping"];
+            return [false, "线性拟合剪切(Linear Fit Clipping)算法需要至少15张以上的图片才能提供最低限度的可靠结果；你可以考虑使用百分比剪切算法"];
          if ( n < 20 )
-            return [false, "Linear fit clipping may not be better than Winsorized sigma clipping for sets of less than 15-20 images"];
+            return [false, "如果待处理的图像少于15-20张，线性拟合剪切(Linear Fit Clipping)算法可能比Winsorized标准差剪切(Sigma Clipping)算法效果更好。"];
          break;
       case ImageIntegration.prototype.Rejection_ESD:
          if ( n < 8 )
